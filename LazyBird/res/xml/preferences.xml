@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res/at.jku.pci.lazybird"
+    android:orderingFromXml="true">
+    
+    <ListPreference
+        android:key="valueUpdateSpeed"
+        android:title="@string/set_valueUpdateSpeed"
+        android:dialogTitle="@string/set_valueUpdateSpeed"
+        android:entryValues="@array/update_speeds_values"
+        android:entries="@array/update_speeds"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:defaultValue="750"
+        android:summary="%s" />
+    
+    <EditTextPreference
+        android:key="outputDir"
+        android:title="@string/set_outputDir"
+        android:defaultValue="ARFF Recorder"
+        android:dialogTitle="@string/set_outputDir"
+        android:dialogMessage="@string/set_outputDir_long"
+        android:selectAllOnFocus="true"
+        android:singleLine="true" />
+    
+    <ListPreference
+        android:defaultValue="1000000"
+        android:title="@string/set_maxNumValues"
+        android:key="maxNumValues"
+        android:summary="%s"
+        android:dialogTitle="@string/set_maxNumValues"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:entries="@array/max_num"
+        android:entryValues="@array/max_num_values" />
+    
+    <at.jku.pci.lazybird.NumberPreference
+        android:defaultValue="0"
+        android:title="@string/set_startDelay"
+        android:key="startDelay"
+        android:dialogTitle="@string/set_startDelay"
+        android:dialogLayout="@layout/number_preference"
+        android:dialogMessage="@string/set_startDelay_long"
+        custom:minValue="0"
+        custom:maxValue="120" />
+
+</PreferenceScreen>
