@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     
+    <!-- Settings -->
     <string-array name="update_speeds">
         <item >Slow</item>
         <item >Normal</item>
@@ -11,13 +12,6 @@
         <item >1500</item>
         <item >750</item>
         <item >300</item>
-    </string-array>
-    
-    <string-array name="classes">
-        <item>none</item>
-        <item>sitting</item>
-        <item>walking</item>
-        <item>standing</item>
     </string-array>
     
     <string-array name="max_num_values">
@@ -40,6 +34,27 @@
         <item >500 000</item>
         <item >1 000 000</item>
         <item >Unlimited (!)</item>
+    </string-array>
+    
+    <!-- Record -->
+    <string-array name="classes">
+        <item>none</item>
+        <item>sitting</item>
+        <item>walking</item>
+        <item>standing</item>
+    </string-array>
+    
+    <!-- Train -->
+    <string-array name="classifiers">
+        <item>IBk</item>
+        <item>NaiveBayes</item>
+        <item>J48</item>
+    </string-array>
+    
+    <string-array name="slidingWindowSizes">
+        <item>300</item>
+        <item>1000</item>
+        <item>3000</item>
     </string-array>
     
 </resources>
