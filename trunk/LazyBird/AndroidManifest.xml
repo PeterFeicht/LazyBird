@@ -24,6 +24,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name="ARFFRecorderService" android:exported="false" android:enabled="true">
+            <intent-filter>
+                <action android:name="at.jku.pci.lazybird.ARFF_SERVICE" />
+            </intent-filter>
+        </service>
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="at.jku.pci.lazybird.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

@@ -2,6 +2,7 @@ package at.jku.pci.lazybird;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -15,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.widget.TextView;
 
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener
@@ -79,10 +81,19 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.activity_main, menu);
+		//menu.findItem(R.id.menu_delete).setOnMenuItemClickListener(onMenuDeleteFileClick);
+		menu.findItem(R.id.menu_settings).setOnMenuItemClickListener(onMenuSettingsClick);
 		return true;
 	}
+	
+	OnMenuItemClickListener onMenuSettingsClick = new OnMenuItemClickListener() {
+		public boolean onMenuItemClick(MenuItem item)
+		{
+			// TODO startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+			return true;
+		}
+	};
 	
 	@Override
 	public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction)
