@@ -1190,6 +1190,7 @@ public class CoverTree
    * @param cover_set The cover set to sort.
    */
 
+  @SuppressWarnings("unused")
   protected void halfsort(Stack<d_node> cover_set) {
     if(cover_set.length <= 1)
       return;

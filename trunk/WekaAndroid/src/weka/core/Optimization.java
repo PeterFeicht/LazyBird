@@ -818,7 +818,8 @@ public abstract class Optimization
      * @return the solution of x, null if number of iterations not enough
      * @throws Exception if an error occurs
      */
-    public double[] findArgmin(double[] initX, double[][] constraints) 
+    @SuppressWarnings("unused")
+	public double[] findArgmin(double[] initX, double[][] constraints) 
 	throws Exception{
 	int l = initX.length;
 	

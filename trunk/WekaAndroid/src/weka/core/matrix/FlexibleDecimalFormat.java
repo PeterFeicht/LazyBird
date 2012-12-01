@@ -77,7 +77,7 @@ public class FlexibleDecimalFormat
       this.decimalDigits = digits - intDigits;
     }
     else {
-      this.decimalDigits = decimalDigits;
+      //this.decimalDigits = decimalDigits;
       this.intDigits = Math.max( 1, digits - decimalDigits );
     }
   }
