@@ -68,7 +68,7 @@ public class TrainFragment extends Fragment
 		{
 			if(ARFFRecorderService.isRunning())
 			{
-				// TODO update progress if possible
+				// TODO update progress if possible, most likely remove
 			}
 		}
 	};
@@ -162,6 +162,7 @@ public class TrainFragment extends Fragment
 	{
 		super.onPause();
 		
+		// TODO maybe remove progress handler
 		// stop progress update and unregister service receiver when paused
 		mHandler.removeCallbacks(mRunProgress);
 		mBroadcastManager.unregisterReceiver(mServiceReceiver);
@@ -172,9 +173,10 @@ public class TrainFragment extends Fragment
 	{
 		super.onResume();
 		
+		// TODO check for running training service
 		// check for running training every time the fragment is resumed, since broadcast can't
 		// be received while paused or stopped
-		// TODO setViewStates(ARFFRecorderService.isRunning());
+		// setViewStates(ARFFRecorderService.isRunning());
 //		if(ARFFRecorderService.isRunning())
 //		{
 //			// resume last value update and re-register the service receiver, if service is
