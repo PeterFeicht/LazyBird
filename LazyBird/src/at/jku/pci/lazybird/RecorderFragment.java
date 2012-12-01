@@ -42,8 +42,8 @@ public class RecorderFragment extends Fragment
 	public static final String EXTRA_CLASSES = "at.jku.pci.lazybird.CLASSES";
 	public static final String EXTRA_DIRNAME = "at.jku.pci.lazybird.DIRNAME";
 	// Intents
-	public static final String BCAST_SERVICE_STOPPED = "at.jku.pci.lazybird.SERVICE_STOPPED";
-	public static final String BCAST_SERVICE_STARTED = "at.jku.pci.lazybird.SERVICE_STARTED";
+	public static final String BCAST_SERVICE_STOPPED = "at.jku.pci.lazybird.REC_SERVICE_STOPPED";
+	public static final String BCAST_SERVICE_STARTED = "at.jku.pci.lazybird.REC_SERVICE_STARTED";
 	// Constants
 	public static final String LOGTAG = "ARFFRecorderFragment";
 	public static final boolean LOCAL_LOGV = true;
@@ -150,7 +150,7 @@ public class RecorderFragment extends Fragment
 		getWidgets(getView());
 		
 		// if the service is running and we just got created, fill inputs with running data.
-		// setting of input enabled and such things are done in onResume
+		// setting of input enabled and such things are done in onResume.
 		if(ARFFRecorderService.isRunning())
 		{
 			mService = ARFFRecorderService.getInstance();
@@ -288,6 +288,7 @@ public class RecorderFragment extends Fragment
 		}
 	}
 	
+	// TODO move to MainActivity to avoid duplicate code
 	/**
 	 * Sets all appropriate private fields from the shared preferences.<br>
 	 * Also sets static properties of {@link ARFFRecorderService}:
