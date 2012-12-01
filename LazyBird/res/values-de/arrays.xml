@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     
+    <!-- Settings -->
     <string-array name="update_speeds">
         <item >Langsam</item>
         <item >Normal</item>
