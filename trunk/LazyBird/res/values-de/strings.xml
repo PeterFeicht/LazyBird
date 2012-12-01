@@ -32,7 +32,7 @@
     <string name="txtStatus">Recorder Status:</string>
     <string name="btnMakeFilename">Dateiname erstellen</string>
     <string name="btnArff">+ .arff</string>
-    <string name="labelInstructions">Geben Sie zuerst einen Dateinamen ein und wählen Sie eine Klasse, dann starten Sie den Recorder.</string>
+    <string name="labelInstructions">Geben Sie zuerst einen Dateinamen ein, wählen Sie eine Klasse und starten Sie dann den Recorder.</string>
     <string name="labelClass">ARFF Klasse:</string>
     <string name="filename">Dateiname</string>
     <string name="startTime">Startzeit:</string>
@@ -49,7 +49,7 @@
     <string name="btnSelectFeatures">Features auswählen&#8230;</string>
     <string name="btnTrain">Trainieren</string>
     <string name="labelSelectClassifier">Wählen Sie einen Classifier:</string>
-    <string name="labelSelectWindowSize">Wählen Sie eine Mittelzeit:</string>
+    <string name="labelSelectWindowSize">Wählen Sie eine Mittelzeit (ms):</string>
     <string name="selectFileNote">Beachten Sie, dass nur Dateien im Ausgabeverzeichnis angezeigt werden.</string>
     <string name="trainClassifierNote">TODO.</string>
     <string name="selectFeaturesNote">Wählen Sie die Features, mit denen der Classifier trainiert wird.</string>

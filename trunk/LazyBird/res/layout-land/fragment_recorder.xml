@@ -2,7 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="top" >
+    android:gravity="top"
+    android:paddingLeft="12dp"
+    android:paddingRight="12dp"
+    android:paddingTop="10dp" >
 
     <EditText
         android:id="@+id/txtFilename"
@@ -12,8 +15,6 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="168dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="10dp"
         android:ems="10"
         android:hint="@string/filename"
         android:inputType="textNoSuggestions" />
@@ -165,9 +166,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
-        android:layout_marginTop="10dp"
         android:layout_toLeftOf="@+id/btnMakeFilename"
         android:text="@string/purposeRecorder_land" />
 
