@@ -38,15 +38,15 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 	/**
 	 * UID for the ongoing notification.
 	 */
-	private static final int NOTIFICATION_RECORDING = R.string.service_started;
+	private static final int NOTIFICATION_RECORDING = 16;
 	/**
 	 * UID for the too many values notification.
 	 */
-	private static final int NOTIFICATION_TOO_MAY_VALUES = R.string.too_many_values;
+	private static final int NOTIFICATION_TOO_MAY_VALUES = 17;
 	/**
 	 * UID for the waiting notification.
 	 */
-	private static final int NOTIFICATION_WAITING = R.string.service_waiting;
+	private static final int NOTIFICATION_WAITING = 18;
 	/**
 	 * Intent for the service.
 	 */
@@ -192,7 +192,9 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 			mSensorManager.unregisterListener(this);
 		if(mWaitingTimer != null)
 			mWaitingTimer.stop();
-		mNotificationManager.cancelAll();
+		// We don't want to cancel the notification telling the user why we stopped, only those
+		// that aren't needed any more.
+		mNotificationManager.cancel(NOTIFICATION_WAITING);
 		
 		try
 		{
@@ -398,15 +400,20 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 	private Notification makeOngoingNotification()
 	{
 		CharSequence text = getText(R.string.service_started);
-		CharSequence title = getText(R.string.service_label);
+		CharSequence title = getText(R.string.app_name);
 		
-		return new Notification.Builder(this)
+		Notification n = new Notification.Builder(this)
 			.setTicker(text)
 			.setContentTitle(title)
 			.setContentText(text)
 			.setContentIntent(mNotificationIntent)
 			.setSmallIcon(R.drawable.ic_stat_service)
-			.setOngoing(true).getNotification();
+			.setOngoing(true)
+			.setLights(0xFFFFFF00, 500, 500)
+			.setAutoCancel(false).getNotification();
+		
+		n.flags |= Notification.FLAG_SHOW_LIGHTS;
+		return n;
 	}
 	
 	/**
@@ -445,8 +452,7 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 	{
 		Resources res = getResources();
 		CharSequence ticker = res.getText(R.string.too_many_values);
-		CharSequence text =
-			res.getString(R.string.too_many_values_long, sMaxNumValues);
+		CharSequence text = res.getString(R.string.too_many_values_long, sMaxNumValues);
 		CharSequence title = res.getText(R.string.app_name);
 		
 		Notification n = new Notification.Builder(this)

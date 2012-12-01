@@ -3,8 +3,8 @@ package at.jku.pci.lazybird;
 import java.io.File;
 import java.util.Date;
 import java.util.Locale;
+import android.app.ActionBar;
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,12 +15,14 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnGenericMotionListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
@@ -54,6 +56,12 @@ public class ARFFRecorderFragment extends Fragment
 	 * Format string used to construct a filename.
 	 */
 	public static final String FILENAME_FORMAT = "yyyyMMddkkmmss";
+	/**
+	 * Gets the default title associated with this fragment for use in an {@link ActionBar} tab.
+	 * 
+	 * @see #getTitle()
+	 */
+	public static final CharSequence TITLE = "Record";
 	// Settings
 	/**
 	 * Setting: {@link SettingsActivity#KEY_VALUE_UPDATE_SPEED}
@@ -164,6 +172,7 @@ public class ARFFRecorderFragment extends Fragment
 	
 	/**
 	 * Sets the fields for the views of this Fragment and registers listeners and stuff.
+	 * 
 	 * @param v the View for this Fragment
 	 */
 	private void getWidgets(View v)
@@ -171,6 +180,7 @@ public class ARFFRecorderFragment extends Fragment
 		mTxtFilename = (EditText)v.findViewById(R.id.txtFilename);
 		
 		mSwOnOff = (Switch)v.findViewById(R.id.swOnOff);
+		mSwOnOff.setOnClickListener(onSwOnOffClick);
 		// Prevent dragging of the switch, leads to weird behavior when also setting the checked
 		// state in code
 		mSwOnOff.setOnTouchListener(new OnTouchListener() {
@@ -193,7 +203,9 @@ public class ARFFRecorderFragment extends Fragment
 		mSpinClass = (Spinner)v.findViewById(R.id.spinClass);
 		
 		mBtnMakeFilename = (Button)v.findViewById(R.id.btnMakeFilename);
+		mBtnMakeFilename.setOnClickListener(onBtnMakeFilenameClick);
 		mBtnArff = (Button)v.findViewById(R.id.btnArff);
+		mBtnArff.setOnClickListener(onBtnArffClick);
 		
 		mTxtStartTime = (TextView)v.findViewById(R.id.txtStartTime);
 		mTxtLastValues = (TextView)v.findViewById(R.id.txtLastValues);
@@ -239,6 +251,19 @@ public class ARFFRecorderFragment extends Fragment
 		}
 		else
 			mService = null;
+	}
+	
+	/**
+	 * Gets the title associated with this fragment for use in an {@link ActionBar} tab.
+	 * 
+	 * @return the title of this fragment.
+	 */
+	public CharSequence getTitle()
+	{
+		if(getActivity() != null)
+			return getString(R.string.title_tab_record);
+		else
+			return TITLE;
 	}
 	
 	/**
@@ -356,20 +381,34 @@ public class ARFFRecorderFragment extends Fragment
 		}
 	}
 	
-	public void onBtnMakeFilenameClick(View v)
-	{
-		mTxtFilename.setText(DateFormat.format(FILENAME_FORMAT, new Date()) + EXTENSION);
-	}
+	private OnClickListener onBtnMakeFilenameClick = new OnClickListener() {
+		@Override
+		public void onClick(View v)
+		{
+			mTxtFilename.setText(DateFormat.format(FILENAME_FORMAT, new Date()) + EXTENSION);
+		}
+	};
 	
-	public void onBtnArffClick(View v)
-	{
-		String f = mTxtFilename.getText().toString();
-		
-		if(!f.endsWith(EXTENSION) && !f.isEmpty())
-			mTxtFilename.setText(f + EXTENSION);
-	}
+	private OnClickListener onBtnArffClick = new OnClickListener() {
+		@Override
+		public void onClick(View v)
+		{
+			String f = mTxtFilename.getText().toString();
+			
+			if(!f.endsWith(EXTENSION) && !f.isEmpty())
+				mTxtFilename.setText(f + EXTENSION);
+		}
+	};
 	
-	public void onSwOnOffClick(View v)
+	private OnClickListener onSwOnOffClick = new OnClickListener() {
+		@Override
+		public void onClick(View v)
+		{
+			onSwOnOffClick(v);
+		}
+	};
+	
+	private void onSwOnOffClick(View v)
 	{
 		if(mSwOnOff.isChecked())
 		{
@@ -429,7 +468,7 @@ public class ARFFRecorderFragment extends Fragment
 	 * Called from the broadcast receiver when the service has stopped. This only happens if
 	 * {@link ARFFRecorderService#onDestroy()} is called by the system.
 	 */
-	public void onServiceStopped()
+	private void onServiceStopped()
 	{
 		mHandler.removeCallbacks(mRunUpdateValues);
 		setViewStates(false);

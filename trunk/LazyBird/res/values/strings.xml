@@ -15,7 +15,7 @@
     <string name="too_many_values">Recording stopped, too many values</string>
     <string name="too_many_values_long">Recording stopped after %d values</string>
     <string name="service_waiting">Recording will start in %s seconds</string>
-    <string name="service_waiting_ticker">ARFF Recorder service waiting</string>
+    <string name="service_waiting_ticker">Recorder service waiting</string>
     
     <string name="set_valueUpdateSpeed">Update speed (display)</string>
     <string name="set_ValueUpdateSpeed_long">Update speed of the last values displayed</string>
