@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="app_name">Lazy Bird</string>
+    <string name="title_tab_record">Record</string>
+    <string name="title_tab_train">Train</string>
+    <string name="title_tab_classify">Classify</string>
+    <string name="title_activity_settings">Einstellungen</string>
+    <string name="menu_settings">Einstellungen</string>
+    <string name="menu_delete">Datei löschen</string>
+    
+    <string name="service_started">ARFF Recorder service gestartet</string>
+    <string name="service_stopped">ARFF Recorder service gestoppt</string>
+    <string name="service_label">ARFF Recorder Service</string>
+    <string name="too_many_values">Aufzeichnung gestoppt, zu viele Werte</string>
+    <string name="too_many_values_long">Aufzeichnung gestoppt nach %d Werten</string>
+    <string name="service_waiting">Aufnahme startet in %s Sekunden</string>
+    <string name="service_waiting_ticker">ARFF Recorder service wartet</string>
+    
+    <string name="set_valueUpdateSpeed">Anzeigegeschwindigkeit</string>
+    <string name="set_ValueUpdateSpeed_long">Geschwindigkeit der Anzeige der letzten Werte</string>
+    <string name="set_outputDir">Ausgabeverzeichnis</string>
+    <string name="set_outputDir_long">Verzeichnis in das die Ausgabedateien gespeichert werden</string>
+    <string name="set_maxNumValues">Datenpunkt Limit</string>
+    <string name="set_maxNumValues_long">Anzahl der Datenpunkte nach der die Aufnahme beendet wird</string>
+    <string name="set_startDelay">Startverzögerung</string>
+    <string name="set_startDelay_long">Wartezeit (Sekunden) bevor die Aufnahme gestartet wird</string>
+    
+    <string name="txtStatus">Recorder Status:</string>
+    <string name="btnMakeFilename">Dateiname erstellen</string>
+    <string name="btnArff">+ .arff</string>
+    <string name="labelInstructions">Geben Sie zuerst einen Dateinamen ein und wählen Sie eine Klasse, dann starten Sie den Recorder.</string>
+    <string name="labelClass">ARFF Klasse:</string>
+    <string name="filename">Dateiname</string>
+    <string name="startTime">Startzeit:</string>
+    <string name="lastValues">Letzte Werte:</string>
+    <string name="numValues">Anzahl Datenpunkte:</string>
+    <string name="nothing">-</string>
+    <string name="dialogInfo">Info:</string>
+    <string name="valsPerSecond">Werte/Sekunde:</string>
+    
+    <string name="fileNotFound">Datei nicht gefunden</string>
+    <string name="fileDeleted">Datei gelöscht</string>
+    <string name="fileNotDeleted">Datei &lt;i&gt;nicht&lt;/i&gt; gelöscht</string>
+    
+    <string name="error">Fehler</string>
+    <string name="error_generic">Ein Fehler ist aufgetreten, bitte dem Entwickler melden.</string>
+    <string name="error_filename">Kein gültiger Dateiname</string>
+    <string name="error_extstorage">Externer Speicher nicht beschreibbar</string>
+    
+</resources>

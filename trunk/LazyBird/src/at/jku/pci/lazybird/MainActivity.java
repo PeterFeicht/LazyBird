@@ -137,15 +137,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		@Override
 		public CharSequence getPageTitle(int position)
 		{
-			switch(position)
-			{
-				case 0:
-					return getString(R.string.title_section1).toUpperCase();
-				case 1:
-					return getString(R.string.title_section2).toUpperCase();
-				case 2:
-					return getString(R.string.title_section3).toUpperCase();
-			}
 			return null;
 		}
 	}
