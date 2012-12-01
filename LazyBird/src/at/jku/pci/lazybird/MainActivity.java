@@ -119,12 +119,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	 */
 	public class SectionsPagerAdapter extends FragmentPagerAdapter
 	{
-		private ARFFRecorderFragment mRecorderFragment;
+		private RecorderFragment mRecorderFragment;
 		
 		public SectionsPagerAdapter(FragmentManager fm)
 		{
 			super(fm);
-			mRecorderFragment = new ARFFRecorderFragment();
+			mRecorderFragment = new RecorderFragment();
 		}
 		
 		@Override

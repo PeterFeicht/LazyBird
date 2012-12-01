@@ -121,10 +121,10 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 			mStartTime = new Date();
 			
 			// get information from the intent
-			mFilename = intent.getStringExtra(ARFFRecorderFragment.EXTRA_FILENAME);
-			mDirname = intent.getStringExtra(ARFFRecorderFragment.EXTRA_DIRNAME);
-			mClass = intent.getStringExtra(ARFFRecorderFragment.EXTRA_CLASS);
-			String[] classes = intent.getStringArrayExtra(ARFFRecorderFragment.EXTRA_CLASSES);
+			mFilename = intent.getStringExtra(RecorderFragment.EXTRA_FILENAME);
+			mDirname = intent.getStringExtra(RecorderFragment.EXTRA_DIRNAME);
+			mClass = intent.getStringExtra(RecorderFragment.EXTRA_CLASS);
+			String[] classes = intent.getStringArrayExtra(RecorderFragment.EXTRA_CLASSES);
 			
 			if(mFilename == null)
 			{
@@ -217,7 +217,7 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 		sRunning = false;
 		sInstance = null;
 		LocalBroadcastManager.getInstance(this).sendBroadcast(
-			new Intent(ARFFRecorderFragment.BCAST_SERVICE_STOPPED));
+			new Intent(RecorderFragment.BCAST_SERVICE_STOPPED));
 	}
 	
 	@Override
@@ -475,7 +475,7 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 		startForeground(NOTIFICATION_RECORDING, makeOngoingNotification());
 		
 		LocalBroadcastManager.getInstance(this).sendBroadcast(
-			new Intent(ARFFRecorderFragment.BCAST_SERVICE_STARTED));
+			new Intent(RecorderFragment.BCAST_SERVICE_STARTED));
 	}
 	
 	public void onSensorChanged(SensorEvent event)
