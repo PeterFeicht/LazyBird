@@ -21,17 +21,17 @@ import android.widget.TextView;
 
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener
 {
+	// Constants
+	public static final String LOGTAG = "MainActivity";
+	public static final boolean LOCAL_LOGV = true;
+	
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide fragments for each of
 	 * the sections. We use a {@link android.support.v4.app.FragmentPagerAdapter} derivative,
 	 * which will keep every loaded fragment in memory. If this becomes too memory intensive, it
 	 * may be best to switch to a {@link android.support.v4.app.FragmentStatePagerAdapter}.
 	 */
-	private SectionsPagerAdapter mSectionsPagerAdapter;
-	
-	/**
-	 * The {@link ViewPager} that will host the section contents.
-	 */
+	private SectionsPagerAdapter mPagerAdapter;
 	private ViewPager mViewPager;
 	
 	@Override
@@ -44,17 +44,10 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		
-		// Create the adapter that will return a fragment for each of the three
-		// primary sections of the app.
-		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-		
-		// Set up the ViewPager with the sections adapter.
+		mPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 		mViewPager = (ViewPager)findViewById(R.id.pager);
-		mViewPager.setAdapter(mSectionsPagerAdapter);
-		
-		// When swiping between different sections, select the corresponding
-		// tab. We can also use ActionBar.Tab#select() to do this if we have
-		// a reference to the Tab.
+		mViewPager.setAdapter(mPagerAdapter);
+		// When swiping between different sections, select the corresponding tab.
 		mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 			@Override
 			public void onPageSelected(int position)
@@ -64,16 +57,10 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		});
 		
 		// For each of the sections in the app, add a tab to the action bar.
-		for(int i = 0; i < mSectionsPagerAdapter.getCount(); i++)
+		for(int i = 0; i < mPagerAdapter.getCount(); i++)
 		{
-			// Create a tab with text corresponding to the page title defined by
-			// the adapter. Also specify this Activity object, which implements
-			// the TabListener interface, as the callback (listener) for when
-			// this tab is selected.
 			actionBar.addTab(
-				actionBar.newTab()
-					.setText(mSectionsPagerAdapter.getPageTitle(i))
-					.setTabListener(this));
+				actionBar.newTab().setText(mPagerAdapter.getPageTitle(i)).setTabListener(this));
 		}
 	}
 	
@@ -120,11 +107,13 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	public class SectionsPagerAdapter extends FragmentPagerAdapter
 	{
 		private RecorderFragment mRecorderFragment;
+		private TrainFragment mTrainFragment;
 		
 		public SectionsPagerAdapter(FragmentManager fm)
 		{
 			super(fm);
 			mRecorderFragment = new RecorderFragment();
+			mTrainFragment = new TrainFragment();
 		}
 		
 		@Override
@@ -132,6 +121,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		{
 			switch(position)
 			{
+				case 1:
+					return mTrainFragment;
 				case 2:
 					return mRecorderFragment;
 					
@@ -156,6 +147,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		{
 			switch(position)
 			{
+				case 1:
+					return mTrainFragment.getTitle();
 				case 2:
 					return mRecorderFragment.getTitle();
 					
