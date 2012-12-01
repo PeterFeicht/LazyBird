@@ -81,6 +81,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		getMenuInflater().inflate(R.menu.activity_main, menu);
+		// TODO change ActionBar and menu for different tabs
 		// menu.findItem(R.id.menu_delete).setOnMenuItemClickListener(onMenuDeleteFileClick);
 		menu.findItem(R.id.menu_settings).setOnMenuItemClickListener(onMenuSettingsClick);
 		return true;

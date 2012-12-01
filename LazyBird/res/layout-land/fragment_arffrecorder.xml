@@ -11,7 +11,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="20dp"
+        android:layout_marginLeft="168dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
         android:ems="10"
@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/btnMakeFilename"
         android:layout_marginLeft="15dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="12dp"
         android:layout_toRightOf="@+id/labelClass"
         android:entries="@+array/classes" />
 
@@ -80,7 +80,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/txtFilename"
         android:layout_marginLeft="24dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="12dp"
         android:layout_toRightOf="@+id/swOnOff"
         android:text="@string/startTime"
         android:textAppearance="?android:attr/textAppearance" />
@@ -158,5 +158,17 @@
         android:layout_marginTop="1dp"
         android:text="@string/nothing"
         android:textAppearance="?android:attr/textAppearance" />
+
+    <TextView
+        android:id="@+id/labelPurposeRecord"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginTop="10dp"
+        android:layout_toLeftOf="@+id/btnMakeFilename"
+        android:text="@string/purposeRecorder_land" />
 
 </RelativeLayout>
