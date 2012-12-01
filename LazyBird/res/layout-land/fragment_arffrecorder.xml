@@ -24,7 +24,6 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/txtFilename"
         android:layout_below="@+id/txtFilename"
-        android:onClick="onBtnMakeFilenameClick"
         android:text="@string/btnMakeFilename" />
 
     <TextView
@@ -54,8 +53,7 @@
         android:layout_alignLeft="@+id/labelClass"
         android:layout_alignParentLeft="false"
         android:layout_below="@+id/labelInstructions"
-        android:layout_marginTop="6dp"
-        android:onClick="onSwOnOffClick"
+        android:layout_marginTop="12dp"
         android:text="@string/txtStatus" />
 
     <TextView
@@ -74,7 +72,6 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/spinClass"
         android:layout_toRightOf="@+id/btnMakeFilename"
-        android:onClick="onBtnArffClick"
         android:text="@string/btnArff" />
 
     <TextView
@@ -82,7 +79,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/txtFilename"
-        android:layout_marginLeft="20dp"
+        android:layout_marginLeft="24dp"
         android:layout_marginTop="15dp"
         android:layout_toRightOf="@+id/swOnOff"
         android:text="@string/startTime"

@@ -21,19 +21,18 @@ import android.widget.TextView;
 
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener
 {
-	
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide fragments for each of
 	 * the sections. We use a {@link android.support.v4.app.FragmentPagerAdapter} derivative,
 	 * which will keep every loaded fragment in memory. If this becomes too memory intensive, it
 	 * may be best to switch to a {@link android.support.v4.app.FragmentStatePagerAdapter}.
 	 */
-	SectionsPagerAdapter mSectionsPagerAdapter;
+	private SectionsPagerAdapter mSectionsPagerAdapter;
 	
 	/**
 	 * The {@link ViewPager} that will host the section contents.
 	 */
-	ViewPager mViewPager;
+	private ViewPager mViewPager;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -82,15 +81,15 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		getMenuInflater().inflate(R.menu.activity_main, menu);
-		//menu.findItem(R.id.menu_delete).setOnMenuItemClickListener(onMenuDeleteFileClick);
+		// menu.findItem(R.id.menu_delete).setOnMenuItemClickListener(onMenuDeleteFileClick);
 		menu.findItem(R.id.menu_settings).setOnMenuItemClickListener(onMenuSettingsClick);
 		return true;
 	}
 	
-	OnMenuItemClickListener onMenuSettingsClick = new OnMenuItemClickListener() {
+	private OnMenuItemClickListener onMenuSettingsClick = new OnMenuItemClickListener() {
 		public boolean onMenuItemClick(MenuItem item)
 		{
-			// TODO startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+			startActivity(new Intent(MainActivity.this, SettingsActivity.class));
 			return true;
 		}
 	};
@@ -119,36 +118,49 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	 */
 	public class SectionsPagerAdapter extends FragmentPagerAdapter
 	{
+		private ARFFRecorderFragment mRecorderFragment;
 		
 		public SectionsPagerAdapter(FragmentManager fm)
 		{
 			super(fm);
+			mRecorderFragment = new ARFFRecorderFragment();
 		}
 		
 		@Override
 		public Fragment getItem(int position)
 		{
-			// getItem is called to instantiate the fragment for the given page.
-			// Return a DummySectionFragment (defined as a static inner class
-			// below) with the page number as its lone argument.
-			Fragment fragment = new DummySectionFragment();
-			Bundle args = new Bundle();
-			args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
-			fragment.setArguments(args);
-			return fragment;
+			switch(position)
+			{
+				case 2:
+					return mRecorderFragment;
+					
+				default:
+					Fragment fragment = new DummySectionFragment();
+					Bundle args = new Bundle();
+					args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
+					fragment.setArguments(args);
+					return fragment;
+			}
+			
 		}
 		
 		@Override
 		public int getCount()
 		{
-			// Show 3 total pages.
 			return 3;
 		}
 		
 		@Override
 		public CharSequence getPageTitle(int position)
 		{
-			return null;
+			switch(position)
+			{
+				case 2:
+					return mRecorderFragment.getTitle();
+					
+				default:
+					return Integer.toString(position + 1);
+			}
 		}
 	}
 	
