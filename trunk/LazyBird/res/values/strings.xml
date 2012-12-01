@@ -26,6 +26,9 @@
     <string name="set_startDelay">Start delay</string>
     <string name="set_startDelay_long">Time to wait (in seconds) before starting to record</string>
     
+    <!-- Record -->
+    <string name="purposeRecorder">In this tab, you can record accelerometer data to ARFF files to train a classifier with. You have to record data and train a classifier, before you can report your activity to the server.</string>
+    <string name="purposeRecorder_land">In this tab, you can record accelerometer data to ARFF files to train a classifier with. You have to record data and train a classifier, before you can report your activity to the server.</string>
     <string name="txtStatus">Recorder status:</string>
     <string name="btnMakeFilename">Make Filename</string>
     <string name="btnArff">+ .arff</string>
@@ -38,6 +41,9 @@
     <string name="numValues">Number of values:</string>
     <string name="dialogInfo">Info:</string>
     <string name="valsPerSecond">Values/Second:</string>
+    
+    <!-- Train -->
+    <string name="purposeTrain">In this Tab, you can train a classifier to classify your activity, using data you recorded. You have to record data and train a classifier, before you can report your activity to the server.</string>
     
     <string name="fileNotFound">File not found</string>
     <string name="fileDeleted">File deleted</string>
