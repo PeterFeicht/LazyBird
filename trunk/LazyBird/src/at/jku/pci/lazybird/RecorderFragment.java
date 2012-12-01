@@ -34,7 +34,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ARFFRecorderFragment extends Fragment
+public class RecorderFragment extends Fragment
 {
 	// Extras
 	public static final String EXTRA_FILENAME = "at.jku.pci.lazybird.FILENAME";
@@ -130,7 +130,7 @@ public class ARFFRecorderFragment extends Fragment
 	{
 		// Just return the inflated layout, other initializations will be done when the host
 		// activity is created
-		return inflater.inflate(R.layout.fragment_arffrecorder, container, false);
+		return inflater.inflate(R.layout.fragment_recorder, container, false);
 	}
 	
 	@Override
