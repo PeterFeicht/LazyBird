@@ -5,8 +5,8 @@ import java.io.FileFilter;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
@@ -19,9 +19,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
+import at.jku.pci.lazybird.features.Feature;
 
 public class TrainFragment extends Fragment
 {
@@ -67,6 +69,7 @@ public class TrainFragment extends Fragment
 	
 	private FileFilter arffFilter;
 	private File[] files = new File[0];
+	private Feature[] features = new Feature[0];
 	
 	// Handlers
 	// private ARFFRecorderService mService = null;
@@ -285,7 +288,7 @@ public class TrainFragment extends Fragment
 				}
 			}
 			
-			AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+			final AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
 			// b.setMessage(R.string.selectFileNote);
 			b.setTitle(R.string.btnSelectFile);
 			b.setPositiveButton(android.R.string.ok, filesSelectedListener);
@@ -331,13 +334,30 @@ public class TrainFragment extends Fragment
 	};
 	
 	private OnClickListener onBtnSelectFeaturesClick = new OnClickListener() {
+		final Feature[] allFeatures = Feature.values();
+		int rawIdx;
 		AlertDialog dialog = null;
+		boolean[] selected;
 		
 		@Override
 		public void onClick(View v)
 		{
 			if(dialog == null)
 				createDialog();
+			
+			selected = new boolean[allFeatures.length];
+			for(int j = 0; j < selected.length; j++)
+			{
+				for(int k = 0; k < features.length; k++)
+				{
+					if(features[k] == allFeatures[j])
+					{
+						selected[j] = true;
+						break;
+					}
+				}
+			}
+			
 			dialog.show();
 		}
 		
@@ -346,19 +366,95 @@ public class TrainFragment extends Fragment
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
-					// TODO Auto-generated method stub
+					if(which != AlertDialog.BUTTON_POSITIVE)
+						return;
 					
+					if(selected[rawIdx])
+					{
+						features = new Feature[] { Feature.RAW };
+						setLeftDrawable(mBtnSelectFeatures, compoundCheck);
+						
+						return;
+					}
+					
+					// User clicked OK, count the number of selected features
+					int numSelected = 0;
+					for(int j = 0; j < selected.length; j++)
+					{
+						if(selected[j])
+							numSelected++;
+					}
+					
+					// Save selected features in member and set button checkbox
+					features = new Feature[numSelected];
+					if(numSelected > 0)
+					{
+						int idx = 0;
+						for(int j = 0; j < selected.length; j++)
+						{
+							if(selected[j])
+								features[idx++] = allFeatures[j];
+						}
+						setLeftDrawable(mBtnSelectFeatures, compoundCheck);
+					}
+					else
+					{
+						setLeftDrawable(mBtnSelectFeatures, compoundUncheck);
+					}
 				}
 			};
 		
 		private void createDialog()
 		{
-			AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+			final AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
 			b.setTitle(R.string.btnSelectFeatures);
 			b.setPositiveButton(android.R.string.ok, featuresSelectedListener);
 			b.setNegativeButton(android.R.string.cancel, null);
-			// TODO add features
 			
+			final String[] featureNames = new String[allFeatures.length];
+			selected = new boolean[allFeatures.length];
+			
+			for(int j = 0; j < allFeatures.length; j++)
+			{
+				featureNames[j] = allFeatures[j].getName();
+				if(allFeatures[j] == Feature.RAW)
+					rawIdx = j;
+			}
+			
+			final OnMultiChoiceClickListener checkListener = new OnMultiChoiceClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which, boolean isChecked)
+				{
+					final ListView list = ((AlertDialog)dialog).getListView();
+					selected[which] = isChecked;
+					
+					if(isChecked)
+					{
+						// If raw feature was selected, clear all other selections, otherwise
+						// clear raw feature selection
+						if(which == rawIdx)
+						{
+							for(int j = 0; j < selected.length; j++)
+							{
+								if(selected[j])
+								{
+									list.setItemChecked(j, false);
+									selected[j] = false;
+								}
+							}
+							selected[rawIdx] = true;
+							list.setItemChecked(rawIdx, true);
+						}
+						else
+						{
+							list.setItemChecked(rawIdx, false);
+							selected[rawIdx] = false;
+						}
+					}
+				}
+			};
+			
+			b.setMultiChoiceItems(featureNames, selected, checkListener);
 			dialog = b.create();
 		}
 	};
