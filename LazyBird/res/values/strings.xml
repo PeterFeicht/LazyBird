@@ -47,8 +47,8 @@
     <!-- Train -->
     <string name="purposeTrain">In this Tab, you can train a classifier to classify your activity, using data you recorded. You have to record data and train a classifier, before you can report your activity to the server.</string>
     <string name="btnSelectFile">Select data file(s)&#8230;</string>
-    <string name="btnMergeFiles">Merge data files&#8230;</string>
     <string name="btnSelectFeatures">Select features&#8230;</string>
+    <string name="btnSaveFeatures">Save Features&#8230;</string>
     <string name="btnTrain">Train</string>
     <string name="labelSelectClassifier">Select a classifier:</string>
     <string name="labelSelectWindowSize">Select sliding window size (ms):</string>
