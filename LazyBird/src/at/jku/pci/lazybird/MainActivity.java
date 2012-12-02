@@ -1,6 +1,7 @@
 package at.jku.pci.lazybird;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
@@ -35,14 +36,14 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		// Set up the action bar.
+		// Set up the action bar
 		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		
 		mPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 		mViewPager = (ViewPager)findViewById(R.id.pager);
 		mViewPager.setAdapter(mPagerAdapter);
-		// When swiping between different sections, select the corresponding tab.
+		// When swiping between different sections, select the corresponding tab
 		mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 			@Override
 			public void onPageSelected(int position)
@@ -51,7 +52,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			}
 		});
 		
-		// For each of the sections in the app, add a tab to the action bar.
+		// For each of the sections in the app, add a tab to the action bar
 		for(int i = 0; i < mPagerAdapter.getCount(); i++)
 		{
 			actionBar.addTab(
@@ -66,6 +67,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		// TODO enable report button in layout
 		menu.findItem(R.id.menu_report).setOnMenuItemClickListener(onMenuReportClick);
 		menu.findItem(R.id.menu_settings).setOnMenuItemClickListener(onMenuSettingsClick);
+		menu.findItem(R.id.menu_help).setOnMenuItemClickListener(onMenuHelpClick);
 		return true;
 	}
 	
@@ -86,11 +88,38 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		}
 	};
 	
+	private OnMenuItemClickListener onMenuHelpClick = new OnMenuItemClickListener() {
+		@Override
+		public boolean onMenuItemClick(MenuItem item)
+		{
+			final AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
+			b.setIcon(android.R.drawable.ic_dialog_info);
+			b.setTitle(R.string.menu_help);
+			b.setNeutralButton(android.R.string.ok, null);
+			
+			switch(getActionBar().getSelectedNavigationIndex())
+			{
+				case 1:
+					b.setMessage(R.string.helpTrain);
+					break;
+				case 2:
+					b.setMessage(R.string.helpRecorder);
+					break;
+				
+				default:
+					b.setMessage("");
+					break;
+			}
+			
+			b.show();
+			return true;
+		}
+	};
+	
 	@Override
 	public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction)
 	{
-		// When the given tab is selected, switch to the corresponding page in
-		// the ViewPager.
+		// When the given tab is selected, switch to the corresponding page in the ViewPager
 		mViewPager.setCurrentItem(tab.getPosition());
 	}
 	
@@ -176,8 +205,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState)
 		{
-			// Create a new TextView and set its text to the fragment's section
-			// number argument value.
+			// Create a new TextView and set its text to the fragment's section number argument
+			// value
 			TextView textView = new TextView(getActivity());
 			textView.setGravity(Gravity.CENTER);
 			textView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));

@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="top"
+    android:paddingBottom="10dp"
     android:paddingLeft="20dp"
     android:paddingRight="20dp"
     android:paddingTop="10dp" >
@@ -13,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/labelPurposeRecord"
+        android:layout_alignParentTop="true"
         android:layout_marginTop="10dp"
         android:ems="10"
         android:hint="@string/filename"
@@ -155,14 +156,5 @@
         android:layout_toRightOf="@+id/labelValsPerSecond"
         android:text="@string/nothing"
         android:textAppearance="?android:attr/textAppearance" />
-
-    <TextView
-        android:id="@+id/labelPurposeRecord"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:text="@string/purposeRecorder" />
 
 </RelativeLayout>
