@@ -288,7 +288,7 @@ public class RecorderFragment extends Fragment
 		}
 	}
 	
-	// TODO move to MainActivity to avoid duplicate code
+	// TODO move to MainActivity or SettingsActivity to avoid duplicate code
 	/**
 	 * Sets all appropriate private fields from the shared preferences.<br>
 	 * Also sets static properties of {@link ARFFRecorderService}:
@@ -476,6 +476,7 @@ public class RecorderFragment extends Fragment
 		mSwOnOff.setChecked(false);
 	}
 	
+	// TODO integrate delete button in layout, maybe action bar style next to the text input
 	// OnMenuItemClickListener onMenuDeleteFileClick = new OnMenuItemClickListener() {
 	// public boolean onMenuItemClick(MenuItem item)
 	// {

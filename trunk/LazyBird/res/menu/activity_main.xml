@@ -1,6 +1,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     
-    <item android:id="@+id/menu_settings"
+    <item
+        android:id="@+id/menu_report"
+        android:orderInCategory="50"
+        android:showAsAction="always"
+        android:title="@string/menu_report_off"
+        android:icon="@drawable/ic_action_report_off"
+        android:enabled="false" />
+    
+    <item
+        android:id="@+id/menu_settings"
         android:title="@string/menu_settings"
         android:orderInCategory="100"
         android:showAsAction="ifRoom|withText"

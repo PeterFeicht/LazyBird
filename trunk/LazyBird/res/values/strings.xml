@@ -7,7 +7,8 @@
     <string name="title_tab_classify">Classify</string>
     <string name="title_activity_settings">Settings</string>
     <string name="menu_settings">Settings</string>
-    <string name="menu_delete">Delete file</string>
+    <string name="menu_report_on">Reporting is ON</string>
+    <string name="menu_report_off">Reporting is OFF</string>
     
     <string name="service_started">ARFF Recorder service started</string>
     <string name="service_stopped">ARFF Recorder service stopped</string>
@@ -41,6 +42,7 @@
     <string name="numValues">Number of values:</string>
     <string name="dialogInfo">Info:</string>
     <string name="valsPerSecond">Values/Second:</string>
+    <string name="btnDelete">Delete file</string>
     
     <!-- Train -->
     <string name="purposeTrain">In this Tab, you can train a classifier to classify your activity, using data you recorded. You have to record data and train a classifier, before you can report your activity to the server.</string>
@@ -53,6 +55,9 @@
     <string name="selectFileNote">Note that only files in the output directory are listed.</string>
     <string name="trainClassifierNote">TODO.</string>
     <string name="selectFeaturesNote">Select the features used to train the classifier.</string>
+    
+    <!-- Report -->
+    
     
     <string name="fileNotFound">File not found</string>
     <string name="fileDeleted">File deleted</string>
