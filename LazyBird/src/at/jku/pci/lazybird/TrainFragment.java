@@ -237,6 +237,13 @@ public class TrainFragment extends Fragment
 		mProgressTraining.setVisibility(training ? View.VISIBLE : View.INVISIBLE);
 	}
 	
+	private void updateTrainEnabled()
+	{
+		boolean enabled = files.length > 0 && features.length > 0;
+		mBtnTrain.setEnabled(enabled);
+		mBtnSaveFeatures.setEnabled(enabled);
+	}
+	
 	private OnClickListener onBtnSelectFileClick = new OnClickListener() {
 		File[] allFiles;
 		boolean[] selected;
@@ -329,6 +336,7 @@ public class TrainFragment extends Fragment
 					{
 						setLeftDrawable(mBtnSelectFile, compoundUncheck);
 					}
+					updateTrainEnabled();
 				}
 			};
 	};
@@ -373,6 +381,7 @@ public class TrainFragment extends Fragment
 					{
 						features = new Feature[] { Feature.RAW };
 						setLeftDrawable(mBtnSelectFeatures, compoundCheck);
+						updateTrainEnabled();
 						
 						return;
 					}
@@ -401,6 +410,7 @@ public class TrainFragment extends Fragment
 					{
 						setLeftDrawable(mBtnSelectFeatures, compoundUncheck);
 					}
+					updateTrainEnabled();
 				}
 			};
 		
