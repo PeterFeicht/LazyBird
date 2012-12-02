@@ -25,12 +25,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	public static final String LOGTAG = "MainActivity";
 	public static final boolean LOCAL_LOGV = true;
 	
-	/**
-	 * The {@link android.support.v4.view.PagerAdapter} that will provide fragments for each of
-	 * the sections. We use a {@link android.support.v4.app.FragmentPagerAdapter} derivative,
-	 * which will keep every loaded fragment in memory. If this becomes too memory intensive, it
-	 * may be best to switch to a {@link android.support.v4.app.FragmentStatePagerAdapter}.
-	 */
+	// The PagerAdapter supplies the fragments to be displayed in the ViewPager
 	private SectionsPagerAdapter mPagerAdapter;
 	private ViewPager mViewPager;
 	
@@ -68,8 +63,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		getMenuInflater().inflate(R.menu.activity_main, menu);
-		// TODO change ActionBar and menu for different tabs
-		// menu.findItem(R.id.menu_delete).setOnMenuItemClickListener(onMenuDeleteFileClick);
+		// TODO enable report button in layout
+		menu.findItem(R.id.menu_report).setOnMenuItemClickListener(onMenuReportClick);
 		menu.findItem(R.id.menu_settings).setOnMenuItemClickListener(onMenuSettingsClick);
 		return true;
 	}
@@ -79,6 +74,15 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		{
 			startActivity(new Intent(MainActivity.this, SettingsActivity.class));
 			return true;
+		}
+	};
+	
+	private OnMenuItemClickListener onMenuReportClick = new OnMenuItemClickListener() {
+		@Override
+		public boolean onMenuItemClick(MenuItem item)
+		{
+			// TODO Auto-generated method stub
+			return false;
 		}
 	};
 	
@@ -100,10 +104,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	{
 	}
 	
-	/**
-	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to one of the
-	 * sections/tabs/pages.
-	 */
 	public class SectionsPagerAdapter extends FragmentPagerAdapter
 	{
 		private RecorderFragment mRecorderFragment;

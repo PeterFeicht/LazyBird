@@ -7,7 +7,9 @@
     <string name="title_tab_classify">Classify</string>
     <string name="title_activity_settings">Einstellungen</string>
     <string name="menu_settings">Einstellungen</string>
-    <string name="menu_delete">Datei löschen</string>
+    <string name="menu_report_on">Senden ist EIN</string>
+    <string name="menu_report_off">Senden ist AUS</string>
+    
     
     <string name="service_started">ARFF Recorder service gestartet</string>
     <string name="service_stopped">ARFF Recorder service gestoppt</string>
@@ -41,6 +43,7 @@
     <string name="nothing">-</string>
     <string name="dialogInfo">Info:</string>
     <string name="valsPerSecond">Werte/Sekunde:</string>
+    <string name="btnDelete">Datei löschen</string>
     
     <!-- Train -->
     <string name="purposeTrain">In diesem Tab können Sie einen Classifier mit aufgenommenen Daten trainieren, um ihre Aktivität zu klassifizieren. Sie müssen Daten aufnehmen und einen Classifier trainieren, bevor Sie ihre Aktivität an den Server melden können.</string>
