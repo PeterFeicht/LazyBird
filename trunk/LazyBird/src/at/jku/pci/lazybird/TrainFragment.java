@@ -52,9 +52,9 @@ public class TrainFragment extends Fragment
 	private SharedPreferences mPrefs;
 	
 	// Fields
-	private Button mBtnMergeFiles;
 	private Button mBtnSelectFile;
 	private Button mBtnSelectFeatures;
+	private Button mBtnSaveFeatures;
 	private Button mBtnTrain;
 	private Spinner mSpinWindowSize;
 	private Spinner mSpinClassifier;
@@ -72,19 +72,6 @@ public class TrainFragment extends Fragment
 			}
 		}
 	};
-	private LocalBroadcastManager mBroadcastManager;
-	private IntentFilter mServiceIntentFilter;
-	private BroadcastReceiver mServiceReceiver = new BroadcastReceiver() {
-		public void onReceive(Context context, Intent intent)
-		{
-			if(LOCAL_LOGV) Log.v(LOGTAG, "Received broadcast: " + intent);
-			
-			if(intent.getAction().equals(BCAST_SERVICE_STOPPED))
-				onServiceStopped();
-			if(intent.getAction().equals(BCAST_SERVICE_STARTED))
-				onServiceStarted();
-		}
-	};
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -99,11 +86,6 @@ public class TrainFragment extends Fragment
 	public void onActivityCreated(Bundle savedInstanceState)
 	{
 		super.onActivityCreated(savedInstanceState);
-		
-		mBroadcastManager = LocalBroadcastManager.getInstance(getActivity());
-		mServiceIntentFilter = new IntentFilter();
-		mServiceIntentFilter.addAction(BCAST_SERVICE_STARTED);
-		mServiceIntentFilter.addAction(BCAST_SERVICE_STOPPED);
 		
 		PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, false);
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -139,12 +121,13 @@ public class TrainFragment extends Fragment
 	 */
 	private void getWidgets(View v)
 	{
-		mBtnMergeFiles = (Button)v.findViewById(R.id.btnMergeFiles);
-		mBtnMergeFiles.setOnClickListener(onBtnMergeFilesClick);
 		mBtnSelectFile = (Button)v.findViewById(R.id.btnSelectFile);
 		mBtnSelectFile.setOnClickListener(onBtnSelectFileClick);
 		mBtnSelectFeatures = (Button)v.findViewById(R.id.btnSelectFeatures);
 		mBtnSelectFeatures.setOnClickListener(onBtnSelectFeaturesClick);
+		mBtnSaveFeatures = (Button)v.findViewById(R.id.btnSaveFeatures);
+		mBtnSaveFeatures.setOnClickListener(onBtnSaveFeaturesClick);
+		mBtnSaveFeatures.setEnabled(false);
 		mBtnTrain = (Button)v.findViewById(R.id.btnTrain);
 		mBtnTrain.setOnClickListener(onBtnTrainClick);
 		mBtnTrain.setEnabled(false);
@@ -165,7 +148,6 @@ public class TrainFragment extends Fragment
 		// TODO maybe remove progress handler
 		// stop progress update and unregister service receiver when paused
 		mHandler.removeCallbacks(mRunProgress);
-		mBroadcastManager.unregisterReceiver(mServiceReceiver);
 	}
 	
 	@Override
@@ -218,7 +200,6 @@ public class TrainFragment extends Fragment
 	 */
 	private void setViewStates(boolean training)
 	{
-		mBtnMergeFiles.setEnabled(!training);
 		mBtnSelectFile.setEnabled(!training);
 		mBtnSelectFeatures.setEnabled(!training);
 		mSpinClassifier.setEnabled(!training);
@@ -226,15 +207,6 @@ public class TrainFragment extends Fragment
 		
 		mProgressTraining.setVisibility(training ? View.VISIBLE : View.INVISIBLE);
 	}
-	
-	private OnClickListener onBtnMergeFilesClick = new OnClickListener() {
-		@Override
-		public void onClick(View v)
-		{
-			// TODO Auto-generated method stub
-			
-		}
-	};
 	
 	private OnClickListener onBtnSelectFileClick = new OnClickListener() {
 		@Override
@@ -254,7 +226,7 @@ public class TrainFragment extends Fragment
 		}
 	};
 	
-	private OnClickListener onBtnTrainClick = new OnClickListener() {
+	private OnClickListener onBtnSaveFeaturesClick = new OnClickListener() {
 		@Override
 		public void onClick(View v)
 		{
@@ -263,17 +235,14 @@ public class TrainFragment extends Fragment
 		}
 	};
 	
-	private void onServiceStopped()
-	{
-		// TODO Auto-generated method stub
-		
-	}
-	
-	private void onServiceStarted()
-	{
-		// TODO Auto-generated method stub
-		
-	}
+	private OnClickListener onBtnTrainClick = new OnClickListener() {
+		@Override
+		public void onClick(View v)
+		{
+			// TODO Auto-generated method stub
+			
+		}
+	};
 	
 	/**
 	 * Builds an {@link AlertDialog} with the specified title, message and info and displays it
