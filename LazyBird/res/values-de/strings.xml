@@ -65,5 +65,7 @@
     <string name="error_generic">Ein Fehler ist aufgetreten, bitte dem Entwickler melden.</string>
     <string name="error_filename">Kein gültiger Dateiname</string>
     <string name="error_extstorage">Externer Speicher nicht beschreibbar</string>
+    <string name="error_extstorage_read">Externer Speicher nicht lesbar</string>
+    <string name="error_nodir">Verzeichnis existiert nicht</string>
     
 </resources>

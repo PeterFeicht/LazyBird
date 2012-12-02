@@ -67,5 +67,7 @@
     <string name="error_generic">An error occurred, please tell the developer.</string>
     <string name="error_filename">Not a valid filename</string>
     <string name="error_extstorage">External storage not writable</string>
+    <string name="error_extstorage_read">External storage not readable</string>
+    <string name="error_nodir">Directory doesn\'t exist</string>
 
 </resources>
