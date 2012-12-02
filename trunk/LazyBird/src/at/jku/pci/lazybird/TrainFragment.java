@@ -1,18 +1,18 @@
 package at.jku.pci.lazybird;
 
+import java.io.File;
+import java.io.FileFilter;
 import android.app.ActionBar;
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.DialogInterface.OnMultiChoiceClickListener;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 public class TrainFragment extends Fragment
 {
@@ -60,6 +61,13 @@ public class TrainFragment extends Fragment
 	private Spinner mSpinClassifier;
 	private ProgressBar mProgressTraining;
 	
+	private Drawable compoundCheck;
+	private Drawable compoundUncheck;
+	private Drawable compoundAlert;
+	
+	private FileFilter arffFilter;
+	private File[] files = new File[0];
+	
 	// Handlers
 	// private ARFFRecorderService mService = null;
 	private Handler mHandler = new Handler();
@@ -92,6 +100,24 @@ public class TrainFragment extends Fragment
 		updateSettings();
 		
 		getWidgets(getView());
+		
+		// Get drawables for the select buttons
+		compoundUncheck = getResources().getDrawable(android.R.drawable.checkbox_off_background);
+		compoundUncheck.setBounds(mBtnSelectFile.getCompoundDrawables()[0].copyBounds());
+		compoundCheck = getResources().getDrawable(android.R.drawable.checkbox_on_background);
+		compoundCheck.setBounds(compoundUncheck.copyBounds());
+		compoundAlert = getResources().getDrawable(android.R.drawable.ic_dialog_alert);
+		compoundAlert.setBounds(compoundUncheck.copyBounds());
+		
+		arffFilter = new FileFilter() {
+			@Override
+			public boolean accept(File pathname)
+			{
+				if(!pathname.isFile())
+					return false;
+				return pathname.getName().endsWith(RecorderFragment.EXTENSION);
+			}
+		};
 		
 		// if the service is running and we just got created, fill inputs with running data.
 		// setting of input enabled and such things are done in onResume
@@ -159,15 +185,15 @@ public class TrainFragment extends Fragment
 		// check for running training every time the fragment is resumed, since broadcast can't
 		// be received while paused or stopped
 		// setViewStates(ARFFRecorderService.isRunning());
-//		if(ARFFRecorderService.isRunning())
-//		{
-//			// resume last value update and re-register the service receiver, if service is
-//			// started
-//			mHandler.post(mRunUpdateValues);
-//			mBroadcastManager.registerReceiver(mServiceReceiver, mServiceIntentFilter);
-//		}
-//		else
-//			mService = null;
+		// if(ARFFRecorderService.isRunning())
+		// {
+		// // resume last value update and re-register the service receiver, if service is
+		// // started
+		// mHandler.post(mRunUpdateValues);
+		// mBroadcastManager.registerReceiver(mServiceReceiver, mServiceIntentFilter);
+		// }
+		// else
+		// mService = null;
 	}
 	
 	/**
@@ -209,20 +235,131 @@ public class TrainFragment extends Fragment
 	}
 	
 	private OnClickListener onBtnSelectFileClick = new OnClickListener() {
+		File[] allFiles;
+		boolean[] selected;
+		
 		@Override
 		public void onClick(View v)
 		{
-			// TODO Auto-generated method stub
+			final String readonly = Environment.MEDIA_MOUNTED_READ_ONLY;
+			if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) &&
+				!Environment.getExternalStorageState().equals(readonly))
+			{
+				Toast.makeText(getActivity(), R.string.error_extstorage_read, Toast.LENGTH_LONG)
+					.show();
+				setLeftDrawable(mBtnSelectFile, compoundAlert);
+				return;
+			}
 			
+			updateSettings();
+			final File dir = new File(Environment.getExternalStorageDirectory(), sOutputDir);
+			
+			if(!dir.exists() || !dir.isDirectory())
+			{
+				Toast.makeText(getActivity(), R.string.error_nodir, Toast.LENGTH_LONG).show();
+				setLeftDrawable(mBtnSelectFile, compoundAlert);
+				return;
+			}
+			
+			allFiles = dir.listFiles(arffFilter);
+			final OnMultiChoiceClickListener checkListener = new OnMultiChoiceClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which, boolean isChecked)
+				{
+					selected[which] = isChecked;
+				}
+			};
+			
+			String[] filenames = new String[allFiles.length];
+			selected = new boolean[allFiles.length];
+			for(int j = 0; j < allFiles.length; j++)
+			{
+				filenames[j] = allFiles[j].getName();
+				for(int k = 0; k < files.length; k++)
+				{
+					if(allFiles[j].equals(files[k]))
+					{
+						selected[j] = true;
+						break;
+					}
+				}
+			}
+			
+			AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+			// b.setMessage(R.string.selectFileNote);
+			b.setTitle(R.string.btnSelectFile);
+			b.setPositiveButton(android.R.string.ok, filesSelectedListener);
+			b.setNegativeButton(android.R.string.cancel, null);
+			b.setMultiChoiceItems(filenames, selected, checkListener);
+			b.show();
 		}
+		
+		DialogInterface.OnClickListener filesSelectedListener =
+			new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					if(which != AlertDialog.BUTTON_POSITIVE)
+						return;
+					
+					// User clicked OK, count the number of selected files
+					int numSelected = 0;
+					for(int j = 0; j < selected.length; j++)
+					{
+						if(selected[j])
+							numSelected++;
+					}
+					
+					// Save selected files in member and set button checkbox
+					files = new File[numSelected];
+					if(numSelected > 0)
+					{
+						int idx = 0;
+						for(int j = 0; j < selected.length; j++)
+						{
+							if(selected[j])
+								files[idx++] = allFiles[j];
+						}
+						setLeftDrawable(mBtnSelectFile, compoundCheck);
+					}
+					else
+					{
+						setLeftDrawable(mBtnSelectFile, compoundUncheck);
+					}
+				}
+			};
 	};
 	
 	private OnClickListener onBtnSelectFeaturesClick = new OnClickListener() {
+		AlertDialog dialog = null;
+		
 		@Override
 		public void onClick(View v)
 		{
-			// TODO Auto-generated method stub
+			if(dialog == null)
+				createDialog();
+			dialog.show();
+		}
+		
+		DialogInterface.OnClickListener featuresSelectedListener =
+			new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					// TODO Auto-generated method stub
+					
+				}
+			};
+		
+		private void createDialog()
+		{
+			AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+			b.setTitle(R.string.btnSelectFeatures);
+			b.setPositiveButton(android.R.string.ok, featuresSelectedListener);
+			b.setNegativeButton(android.R.string.cancel, null);
+			// TODO add features
 			
+			dialog = b.create();
 		}
 	};
 	
@@ -265,5 +402,10 @@ public class TrainFragment extends Fragment
 			b.setMessage(message);
 		
 		b.show();
+	}
+	
+	private void setLeftDrawable(Button btn, Drawable d)
+	{
+		btn.setCompoundDrawables(d, null, null, null);
 	}
 }

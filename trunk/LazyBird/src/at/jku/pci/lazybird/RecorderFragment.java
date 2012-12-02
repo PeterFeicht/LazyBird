@@ -47,6 +47,11 @@ public class RecorderFragment extends Fragment
 	// Constants
 	public static final String LOGTAG = "ARFFRecorderFragment";
 	public static final boolean LOCAL_LOGV = true;
+	/**
+	 * Standard extension for ARFF files.
+	 * <p>
+	 * {@value}
+	 */
 	public static final String EXTENSION = ".arff";
 	/**
 	 * Format string used for the last values displayed
