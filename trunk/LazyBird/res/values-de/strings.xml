@@ -30,8 +30,7 @@
     <string name="set_startDelay_long">Wartezeit (Sekunden) bevor die Aufnahme gestartet wird</string>
     
     <!-- Record -->
-    <string name="purposeRecorder">In diesem Tab können Sie Beschleunigungsdaten in ARFF Dateien aufnehmen um Classifier zu trainieren. Sie müssen Daten aufnehmen und einen Classifier trainieren, bevor Sie ihre Aktivität an den Server melden können.</string>
-    <string name="purposeRecorder_land">In diesem Tab können Sie Beschleunigungs-daten in ARFF Dateien aufnehmen um Clas-sifier zu trainieren. Sie müssen Daten auf-nehmen und einen Classifier trainieren, bevor Sie ihre Aktivität an den Server melden können.</string>
+    <string name="helpRecorder">In diesem Tab können Sie Beschleunigungsdaten in ARFF Dateien aufnehmen um Classifier zu trainieren.\nSie müssen Daten aufnehmen und einen Classifier trainieren, bevor Sie ihre Aktivität an den Server melden können.</string>
     <string name="txtStatus">Recorder Status:</string>
     <string name="btnMakeFilename">Dateiname erstellen</string>
     <string name="btnArff">+ .arff</string>
@@ -47,7 +46,7 @@
     <string name="btnDelete">Datei löschen</string>
     
     <!-- Train -->
-    <string name="purposeTrain">In diesem Tab können Sie einen Classifier mit aufgenommenen Daten trainieren, um Ihre Aktivität zu klassifizieren. Sie müssen Daten aufnehmen und einen Classifier trainieren, bevor Sie Ihre Aktivität an den Server melden können.</string>
+    <string name="helpTrain">In diesem Tab können Sie einen Classifier mit aufgenommenen Daten trainieren, um Ihre Aktivität zu klassifizieren.\nSie müssen Daten aufnehmen und einen Classifier trainieren, bevor Sie Ihre Aktivität an den Server melden können.</string>
     <string name="btnSelectFile">Datei(en) auswählen&#8230;</string>
     <string name="btnSelectFeatures">Features auswählen&#8230;</string>
     <string name="btnSaveFeatures">Features speichern&#8230;</string>
