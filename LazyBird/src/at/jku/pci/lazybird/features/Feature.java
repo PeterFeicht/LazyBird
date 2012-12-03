@@ -113,4 +113,32 @@ public enum Feature
 	{
 		return mName;
 	}
+	
+	/**
+	 * Gets an array of {@link Feature} objects corresponding to the bits set in the specified
+	 * number.
+	 * 
+	 * @param flags the flags.
+	 * @return an array containing the features for which corresponding bits are set.
+	 * @see #getBit()
+	 */
+	public static Feature[] getFeatures(int flags)
+	{
+		final Feature[] out = new Feature[Integer.bitCount(flags)];
+		int idx = 0;
+		
+		for(Feature f: Feature.values())
+		{
+			if((f.getBit() & flags) != 0)
+			{
+				out[idx++] = f;
+				flags &= ~f.getBit();
+			}
+		}
+		
+		if(flags != 0)
+			throw new IllegalArgumentException();
+		
+		return out;
+	}
 }
