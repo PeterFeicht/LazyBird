@@ -13,7 +13,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -296,7 +295,6 @@ public class TrainFragment extends Fragment
 			}
 			
 			final AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
-			// b.setMessage(R.string.selectFileNote);
 			b.setTitle(R.string.btnSelectFile);
 			b.setPositiveButton(android.R.string.ok, filesSelectedListener);
 			b.setNegativeButton(android.R.string.cancel, null);
@@ -320,7 +318,7 @@ public class TrainFragment extends Fragment
 							numSelected++;
 					}
 					
-					// Save selected files in member and set button checkbox
+					// Save selected files in field and set button checkbox
 					files = new File[numSelected];
 					if(numSelected > 0)
 					{
@@ -328,7 +326,7 @@ public class TrainFragment extends Fragment
 						for(int j = 0; j < selected.length; j++)
 						{
 							if(selected[j])
-								files[idx++] = allFiles[j];
+								files[idx++] = allFiles[j].getAbsoluteFile();
 						}
 						setLeftDrawable(mBtnSelectFile, compoundCheck);
 					}
@@ -343,19 +341,19 @@ public class TrainFragment extends Fragment
 	
 	private OnClickListener onBtnSelectFeaturesClick = new OnClickListener() {
 		final Feature[] allFeatures = Feature.values();
+		String[] featureNames = null;
 		int rawIdx;
-		AlertDialog dialog = null;
 		boolean[] selected;
 		
 		@Override
 		public void onClick(View v)
 		{
-			if(dialog == null)
-				createDialog();
+			if(featureNames == null)
+				init();
 			
-			selected = new boolean[allFeatures.length];
 			for(int j = 0; j < selected.length; j++)
 			{
+				selected[j] = false;
 				for(int k = 0; k < features.length; k++)
 				{
 					if(features[k] == allFeatures[j])
@@ -364,71 +362,6 @@ public class TrainFragment extends Fragment
 						break;
 					}
 				}
-			}
-			
-			dialog.show();
-		}
-		
-		DialogInterface.OnClickListener featuresSelectedListener =
-			new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which)
-				{
-					if(which != AlertDialog.BUTTON_POSITIVE)
-						return;
-					
-					if(selected[rawIdx])
-					{
-						features = new Feature[] { Feature.RAW };
-						setLeftDrawable(mBtnSelectFeatures, compoundCheck);
-						updateTrainEnabled();
-						
-						return;
-					}
-					
-					// User clicked OK, count the number of selected features
-					int numSelected = 0;
-					for(int j = 0; j < selected.length; j++)
-					{
-						if(selected[j])
-							numSelected++;
-					}
-					
-					// Save selected features in member and set button checkbox
-					features = new Feature[numSelected];
-					if(numSelected > 0)
-					{
-						int idx = 0;
-						for(int j = 0; j < selected.length; j++)
-						{
-							if(selected[j])
-								features[idx++] = allFeatures[j];
-						}
-						setLeftDrawable(mBtnSelectFeatures, compoundCheck);
-					}
-					else
-					{
-						setLeftDrawable(mBtnSelectFeatures, compoundUncheck);
-					}
-					updateTrainEnabled();
-				}
-			};
-		
-		private void createDialog()
-		{
-			final AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
-			b.setTitle(R.string.btnSelectFeatures);
-			b.setPositiveButton(android.R.string.ok, featuresSelectedListener);
-			b.setNegativeButton(android.R.string.cancel, null);
-			
-			final String[] featureNames = new String[allFeatures.length];
-			selected = new boolean[allFeatures.length];
-			
-			for(int j = 0; j < allFeatures.length; j++)
-			{
-				featureNames[j] = allFeatures[j].getName();
-				if(allFeatures[j] == Feature.RAW)
-					rawIdx = j;
 			}
 			
 			final OnMultiChoiceClickListener checkListener = new OnMultiChoiceClickListener() {
@@ -464,9 +397,71 @@ public class TrainFragment extends Fragment
 				}
 			};
 			
+			final AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+			b.setTitle(R.string.btnSelectFeatures);
+			b.setPositiveButton(android.R.string.ok, featuresSelectedListener);
+			b.setNegativeButton(android.R.string.cancel, null);
 			b.setMultiChoiceItems(featureNames, selected, checkListener);
-			dialog = b.create();
+			b.show();
 		}
+		
+		DialogInterface.OnClickListener featuresSelectedListener =
+			new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					if(which != AlertDialog.BUTTON_POSITIVE)
+						return;
+					
+					if(selected[rawIdx])
+					{
+						features = new Feature[] { Feature.RAW };
+						setLeftDrawable(mBtnSelectFeatures, compoundCheck);
+						updateTrainEnabled();
+						
+						return;
+					}
+					
+					// User clicked OK, count the number of selected features
+					int numSelected = 0;
+					for(int j = 0; j < selected.length; j++)
+					{
+						if(selected[j])
+							numSelected++;
+					}
+					
+					// Save selected features in field and set button checkbox
+					features = new Feature[numSelected];
+					if(numSelected > 0)
+					{
+						int idx = 0;
+						for(int j = 0; j < selected.length; j++)
+						{
+							if(selected[j])
+								features[idx++] = allFeatures[j];
+						}
+						setLeftDrawable(mBtnSelectFeatures, compoundCheck);
+					}
+					else
+					{
+						setLeftDrawable(mBtnSelectFeatures, compoundUncheck);
+					}
+					updateTrainEnabled();
+				}
+			};
+			
+			private void init()
+			{
+				featureNames = new String[allFeatures.length];
+				selected = new boolean[allFeatures.length];
+				
+				for(int j = 0; j < allFeatures.length; j++)
+				{
+					featureNames[j] = allFeatures[j].getName();
+					if(allFeatures[j] == Feature.RAW)
+						rawIdx = j;
+				}
+			}
 	};
 	
 	private OnClickListener onBtnSaveFeaturesClick = new OnClickListener() {
@@ -482,33 +477,9 @@ public class TrainFragment extends Fragment
 		@Override
 		public void onClick(View v)
 		{
-			// TODO Auto-generated method stub
 			
 		}
 	};
-	
-	/**
-	 * Builds an {@link AlertDialog} with the specified title, message and info and displays it
-	 * to the user. The dialog has one OK button and an alert icon.
-	 * 
-	 * @param title the resource ID to use as a title
-	 * @param message the resource ID to use for the message
-	 * @param info the info to display below the message, or {@code null}
-	 */
-	private void displayWarning(int title, int message, CharSequence info)
-	{
-		AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
-		b.setIcon(android.R.drawable.ic_dialog_alert);
-		b.setTitle(title);
-		b.setNeutralButton(android.R.string.ok, null);
-		
-		if(info != null)
-			b.setMessage(getText(message) + "\n" + getText(R.string.dialogInfo) + " " + info);
-		else
-			b.setMessage(message);
-		
-		b.show();
-	}
 	
 	private void setLeftDrawable(Button btn, Drawable d)
 	{
