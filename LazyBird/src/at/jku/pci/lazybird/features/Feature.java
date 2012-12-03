@@ -121,6 +121,7 @@ public enum Feature
 	 * @param flags the flags.
 	 * @return an array containing the features for which corresponding bits are set.
 	 * @see #getBit()
+	 * @see #getMask(Feature[])
 	 */
 	public static Feature[] getFeatures(int flags)
 	{
@@ -138,6 +139,26 @@ public enum Feature
 		
 		if(flags != 0)
 			throw new IllegalArgumentException();
+		
+		return out;
+	}
+	
+	/**
+	 * Gets a bit mask with the bits of the specified {@code Features} set.
+	 * 
+	 * @param features the features.
+	 * @return an integer where all bits corresponding to entries in the specified array are set.
+	 * @see #getBit()
+	 * @see #getFeatures(int)
+	 */
+	public static int getMask(Feature[] features)
+	{
+		if(features == null)
+			throw new NullPointerException();
+		
+		int out = 0;
+		for(Feature f: features)
+			out |= f.getBit();
 		
 		return out;
 	}
