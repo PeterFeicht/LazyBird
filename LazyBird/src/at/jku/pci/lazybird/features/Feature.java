@@ -20,61 +20,63 @@ public enum Feature
 	 * 
 	 * @see #getAttribute()
 	 */
-	RAW("Raw", null),
+	RAW("Raw", null, 0),
 	
 	/**
 	 * The mean of the X-axis.
 	 */
-	X("X Mean", "x-mean"),
+	X("X Mean", "x-mean", 0x01),
 	
 	/**
 	 * The mean of the Y-axis.
 	 */
-	Y("Y Mean", "y-mean"),
+	Y("Y Mean", "y-mean", 0x02),
 	
 	/**
 	 * The mean of the Z-axis.
 	 */
-	Z("Z Mean", "z-mean"),
+	Z("Z Mean", "z-mean", 0x04),
 	
 	/**
 	 * The mean of the absolute values of all three axes' means, that is the magnitude.
 	 */
-	ABS_MEAN("Magnitude", "mag"),
+	ABS_MEAN("Magnitude", "mag", 0x08),
 	
 	/**
 	 * The variance of all inputs separately.
 	 */
-	VARIANCE("Variance", "var"),
+	VARIANCE("Variance", "var", 0x10),
 	
 	/**
 	 * The variance of the X-axis' mean.
 	 */
-	VARIANCE_X("Variance X", "x-var"),
+	VARIANCE_X("Variance X", "x-var", 0x20),
 	
 	/**
 	 * The variance of the Y-axis' mean.
 	 */
-	VARIANCE_Y("Variance Y", "y-var"),
+	VARIANCE_Y("Variance Y", "y-var", 0x40),
 	
 	/**
 	 * The variance of the Z-axis' mean.
 	 */
-	VARIANCE_Z("Variance Z", "z-var"),
+	VARIANCE_Z("Variance Z", "z-var", 0x80),
 	
 	/**
 	 * The variance of the magnitude of all three axes. That is, {@link #ABS_MEAN} and
 	 * {@link #VARIANCE} chained.
 	 */
-	VARIANCE_OF_MAGNITUDE("Variance of the Magnitude", "varmag");
+	VARIANCE_OF_MAGNITUDE("Variance of the Magnitude", "varmag", 0x0100);
 	
-	private final String name;
-	private final String attribute;
+	private final String mName;
+	private final String mAttribute;
+	private int mBit;
 	
-	private Feature(String name, String attribute)
+	private Feature(String name, String attribute, int bit)
 	{
-		this.name = name;
-		this.attribute = attribute;
+		mName = name;
+		mAttribute = attribute;
+		mBit = bit;
 	}
 	
 	/**
@@ -82,7 +84,7 @@ public enum Feature
 	 */
 	public String getName()
 	{
-		return name;
+		return mName;
 	}
 	
 	/**
@@ -95,12 +97,20 @@ public enum Feature
 	 */
 	public String getAttribute()
 	{
-		return attribute;
+		return mAttribute;
+	}
+	
+	/**
+	 * Gets the bit of this feature, used in a bit mask to combine multiple features together.
+	 */
+	public int getBit()
+	{
+		return mBit;
 	}
 	
 	@Override
 	public String toString()
 	{
-		return name;
+		return mName;
 	}
 }
