@@ -4,7 +4,7 @@ package at.jku.pci.lazybird.features;
  * Enum with available features for extraction from ARFF Files by {@link TODO}.
  * <p>
  * Note that these only work if the file has a timestamp and exactly three numeric values for the
- * axes. The optional class attribute and timestamp are copied without change.<br>
+ * axes. The optional class attribute and the timestamp are copied without change.<br>
  * Also, a sliding window is always applied to the data point values (the data is always a mean).
  * 
  * @author Peter
@@ -89,7 +89,9 @@ public enum Feature
 	 * Gets the attribute name of this feature to be used in the resulting ARFF file.
 	 * <p>
 	 * This is also the attribute name used to determine which features should be used when
-	 * training from a raw ARFF file and when classifying instances to report.
+	 * training from a raw ARFF file and when classifying instances to report.<br>
+	 * Note that the attribute value of {@link #RAW} is {@code null}, all others are not
+	 * {@code null}.
 	 */
 	public String getAttribute()
 	{
