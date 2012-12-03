@@ -277,14 +277,14 @@ public class SlidingWindow implements Iterable<Instance>
 	 * @param jumpSize the jump size in ms, needs to be greater than {@code 1} and less than
 	 *        {@code windowSize}.
 	 * @param abs {@code true} if the absolute values should be used, {@code false} otherwise.
-	 * @return an averaged data set of the input, or {@code null} if the input set does not have
-	 *         enough data points for at least one window size.
+	 * @return an averaged data set of the input, {@code null} if the input set does not have any
+	 *         data points, or an empty data set if there are not enough data points for at least
+	 *         one window size.
 	 * @exception NullPointerException if {@code data} is {@code null}.
 	 * @exception IllegalArgumentException if
 	 *            <ul>
 	 *            <li>{@code windowSize} is less than {@code 2} <li>{@code jumpSize} is less than
-	 *            {@code 1} <li>{@code windowSize} is less than {@code jumpSize} <li>{@code data}
-	 *            has less than two instances
+	 *            {@code 1} <li>{@code windowSize} is less than {@code jumpSize}
 	 *            </ul>
 	 * @exception UnsupportedAttributeTypeException if the input data doesn't meet the
 	 *            requirements specified.
@@ -304,8 +304,8 @@ public class SlidingWindow implements Iterable<Instance>
 		
 		if(attributeOrder == AttributeOrder.INVALID)
 			throw new UnsupportedAttributeTypeException();
-		if(data.numInstances() < 2)
-			throw new IllegalArgumentException("data has no instances.");
+		if(data.numInstances() == 0)
+			return null;
 		
 		// The approximate number of jumps assuming that the data is sorted by timestamp
 		final long time = (long)(data.lastInstance().value(0) - data.firstInstance().value(0));
@@ -317,8 +317,8 @@ public class SlidingWindow implements Iterable<Instance>
 		final long startTime = System.currentTimeMillis();
 		Log.v("SlidingWindow.average", "jumps = " + jumps);
 		
-		if(jumps == 0)
-			return null;
+		if(time / windowSize < 1.0)
+			return outData;
 		
 		final boolean hasClass = (attributeOrder != AttributeOrder.NO_CLASS);
 		final LinkedList<Instance> queue = new LinkedList<Instance>();
