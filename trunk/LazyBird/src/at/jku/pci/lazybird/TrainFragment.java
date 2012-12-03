@@ -62,13 +62,13 @@ public class TrainFragment extends Fragment
 	private Spinner mSpinClassifier;
 	private ProgressBar mProgressTraining;
 	
-	private Drawable compoundCheck;
-	private Drawable compoundUncheck;
-	private Drawable compoundAlert;
+	private Drawable mCompoundCheck;
+	private Drawable mCompoundUncheck;
+	private Drawable mCompoundAlert;
 	
-	private FileFilter arffFilter;
-	private File[] files = new File[0];
-	private Feature[] features = new Feature[0];
+	private FileFilter mArffFilter;
+	private File[] mFiles = new File[0];
+	private Feature[] mFeatures = new Feature[0];
 	
 	// Handlers
 	// private ARFFRecorderService mService = null;
@@ -104,14 +104,14 @@ public class TrainFragment extends Fragment
 		getWidgets(getView());
 		
 		// Get drawables for the select buttons
-		compoundUncheck = getResources().getDrawable(android.R.drawable.checkbox_off_background);
-		compoundUncheck.setBounds(mBtnSelectFile.getCompoundDrawables()[0].copyBounds());
-		compoundCheck = getResources().getDrawable(android.R.drawable.checkbox_on_background);
-		compoundCheck.setBounds(compoundUncheck.copyBounds());
-		compoundAlert = getResources().getDrawable(android.R.drawable.ic_dialog_alert);
-		compoundAlert.setBounds(compoundUncheck.copyBounds());
+		mCompoundUncheck = getResources().getDrawable(android.R.drawable.checkbox_off_background);
+		mCompoundUncheck.setBounds(mBtnSelectFile.getCompoundDrawables()[0].copyBounds());
+		mCompoundCheck = getResources().getDrawable(android.R.drawable.checkbox_on_background);
+		mCompoundCheck.setBounds(mCompoundUncheck.copyBounds());
+		mCompoundAlert = getResources().getDrawable(android.R.drawable.ic_dialog_alert);
+		mCompoundAlert.setBounds(mCompoundUncheck.copyBounds());
 		
-		arffFilter = new FileFilter() {
+		mArffFilter = new FileFilter() {
 			@Override
 			public boolean accept(File pathname)
 			{
@@ -238,7 +238,7 @@ public class TrainFragment extends Fragment
 	
 	private void updateTrainEnabled()
 	{
-		boolean enabled = files.length > 0 && features.length > 0;
+		boolean enabled = mFiles.length > 0 && mFeatures.length > 0;
 		mBtnTrain.setEnabled(enabled);
 		mBtnSaveFeatures.setEnabled(enabled);
 	}
@@ -256,7 +256,7 @@ public class TrainFragment extends Fragment
 			{
 				Toast.makeText(getActivity(), R.string.error_extstorage_read, Toast.LENGTH_LONG)
 					.show();
-				setLeftDrawable(mBtnSelectFile, compoundAlert);
+				setLeftDrawable(mBtnSelectFile, mCompoundAlert);
 				return;
 			}
 			
@@ -266,11 +266,11 @@ public class TrainFragment extends Fragment
 			if(!dir.exists() || !dir.isDirectory())
 			{
 				Toast.makeText(getActivity(), R.string.error_nodir, Toast.LENGTH_LONG).show();
-				setLeftDrawable(mBtnSelectFile, compoundAlert);
+				setLeftDrawable(mBtnSelectFile, mCompoundAlert);
 				return;
 			}
 			
-			allFiles = dir.listFiles(arffFilter);
+			allFiles = dir.listFiles(mArffFilter);
 			final OnMultiChoiceClickListener checkListener = new OnMultiChoiceClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which, boolean isChecked)
@@ -284,9 +284,9 @@ public class TrainFragment extends Fragment
 			for(int j = 0; j < allFiles.length; j++)
 			{
 				filenames[j] = allFiles[j].getName();
-				for(int k = 0; k < files.length; k++)
+				for(int k = 0; k < mFiles.length; k++)
 				{
-					if(allFiles[j].equals(files[k]))
+					if(allFiles[j].equals(mFiles[k]))
 					{
 						selected[j] = true;
 						break;
@@ -319,20 +319,20 @@ public class TrainFragment extends Fragment
 					}
 					
 					// Save selected files in field and set button checkbox
-					files = new File[numSelected];
+					mFiles = new File[numSelected];
 					if(numSelected > 0)
 					{
 						int idx = 0;
 						for(int j = 0; j < selected.length; j++)
 						{
 							if(selected[j])
-								files[idx++] = allFiles[j].getAbsoluteFile();
+								mFiles[idx++] = allFiles[j].getAbsoluteFile();
 						}
-						setLeftDrawable(mBtnSelectFile, compoundCheck);
+						setLeftDrawable(mBtnSelectFile, mCompoundCheck);
 					}
 					else
 					{
-						setLeftDrawable(mBtnSelectFile, compoundUncheck);
+						setLeftDrawable(mBtnSelectFile, mCompoundUncheck);
 					}
 					updateTrainEnabled();
 				}
@@ -354,9 +354,9 @@ public class TrainFragment extends Fragment
 			for(int j = 0; j < selected.length; j++)
 			{
 				selected[j] = false;
-				for(int k = 0; k < features.length; k++)
+				for(int k = 0; k < mFeatures.length; k++)
 				{
-					if(features[k] == allFeatures[j])
+					if(mFeatures[k] == allFeatures[j])
 					{
 						selected[j] = true;
 						break;
@@ -415,8 +415,8 @@ public class TrainFragment extends Fragment
 					
 					if(selected[rawIdx])
 					{
-						features = new Feature[] { Feature.RAW };
-						setLeftDrawable(mBtnSelectFeatures, compoundCheck);
+						mFeatures = new Feature[] { Feature.RAW };
+						setLeftDrawable(mBtnSelectFeatures, mCompoundCheck);
 						updateTrainEnabled();
 						
 						return;
@@ -431,20 +431,20 @@ public class TrainFragment extends Fragment
 					}
 					
 					// Save selected features in field and set button checkbox
-					features = new Feature[numSelected];
+					mFeatures = new Feature[numSelected];
 					if(numSelected > 0)
 					{
 						int idx = 0;
 						for(int j = 0; j < selected.length; j++)
 						{
 							if(selected[j])
-								features[idx++] = allFeatures[j];
+								mFeatures[idx++] = allFeatures[j];
 						}
-						setLeftDrawable(mBtnSelectFeatures, compoundCheck);
+						setLeftDrawable(mBtnSelectFeatures, mCompoundCheck);
 					}
 					else
 					{
-						setLeftDrawable(mBtnSelectFeatures, compoundUncheck);
+						setLeftDrawable(mBtnSelectFeatures, mCompoundUncheck);
 					}
 					updateTrainEnabled();
 				}
