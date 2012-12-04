@@ -23,6 +23,7 @@ import android.util.Log;
  * 
  * @see WindowListener
  * @see #slide(Instances, int, int, WindowListener)
+ * @see FeatureExtractor
  * @author Peter
  */
 public class SlidingWindow implements Iterable<Instance>
@@ -263,7 +264,7 @@ public class SlidingWindow implements Iterable<Instance>
 	 * The format of the input data has to match the following conditions:
 	 * <ul>
 	 * <li>The first attribute is a timestamp.
-	 * <li>The next three attributes are numeric values (e.g. acceleration coordinates).
+	 * <li>The following three attributes are numeric values (e.g. acceleration coordinates).
 	 * <li>The optional last attribute is the class.
 	 * <li>The data is sorted in ascending order by timestamp.
 	 * <li>The data only contains one class value (this is not checked, but it leads to undefined
