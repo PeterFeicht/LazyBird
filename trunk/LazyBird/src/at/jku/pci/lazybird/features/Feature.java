@@ -40,37 +40,35 @@ public enum Feature
 	/**
 	 * The mean of the absolute values of all three axes' means, that is the magnitude.
 	 */
-	ABS_MEAN("Magnitude", "mag", 0x08),
-	
-	/**
-	 * The variance of all inputs separately.
-	 */
-	VARIANCE("Variance", "var", 0x10),
+	MAGNITUDE("Magnitude", "mag", 0x08),
 	
 	/**
 	 * The variance of the X-axis' mean.
 	 */
-	VARIANCE_X("Variance X", "x-var", 0x20),
+	VARIANCE_X("Variance X", "x-var", 0x10),
 	
 	/**
 	 * The variance of the Y-axis' mean.
 	 */
-	VARIANCE_Y("Variance Y", "y-var", 0x40),
+	VARIANCE_Y("Variance Y", "y-var", 0x20),
 	
 	/**
 	 * The variance of the Z-axis' mean.
 	 */
-	VARIANCE_Z("Variance Z", "z-var", 0x80),
+	VARIANCE_Z("Variance Z", "z-var", 0x40),
 	
 	/**
-	 * The variance of the magnitude of all three axes. That is, {@link #ABS_MEAN} and
-	 * {@link #VARIANCE} chained.
+	 * The variance of the magnitude of all three axes. That is, the variance of
+	 * {@link #MAGNITUDE}.
 	 */
-	VARIANCE_OF_MAGNITUDE("Variance of the Magnitude", "varmag", 0x0100);
+	VARIANCE_OF_MAGNITUDE("Variance of the Magnitude", "varmag", 0x80);
 	
+	// Add new features below and DO NOT change existing features
+	
+	// Fields
 	private final String mName;
 	private final String mAttribute;
-	private int mBit;
+	private final int mBit;
 	
 	private Feature(String name, String attribute, int bit)
 	{
@@ -119,7 +117,10 @@ public enum Feature
 	 * number.
 	 * 
 	 * @param flags the flags.
-	 * @return an array containing the features for which corresponding bits are set.
+	 * @return an array containing the features for which corresponding bits are set, or
+	 *         {@link #RAW} if {@code flags} is {@code 0}.
+	 * @exception IllegalArgumentException if {@code flags} contains bits with no corresponding
+	 *            {@code Feature}.
 	 * @see #getBit()
 	 * @see #getMask(Feature[])
 	 */
@@ -127,6 +128,9 @@ public enum Feature
 	{
 		final Feature[] out = new Feature[Integer.bitCount(flags)];
 		int idx = 0;
+		
+		if(flags == 0)
+			return new Feature[] { RAW };
 		
 		for(Feature f: Feature.values())
 		{
@@ -148,6 +152,8 @@ public enum Feature
 	 * 
 	 * @param features the features.
 	 * @return an integer where all bits corresponding to entries in the specified array are set.
+	 *         Note that a value of {@code 0} can mean that {@code features} was empty or that
+	 *         the only element was {@link #RAW}.
 	 * @see #getBit()
 	 * @see #getFeatures(int)
 	 */
