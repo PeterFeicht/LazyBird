@@ -22,7 +22,7 @@ import android.util.Log;
  * data.
  * 
  * @see WindowListener
- * @see #average(Instances, int, int, boolean)
+ * @see #slide(Instances, int, int, WindowListener)
  * @author Peter
  */
 public class SlidingWindow implements Iterable<Instance>
@@ -38,9 +38,9 @@ public class SlidingWindow implements Iterable<Instance>
 		/**
 		 * Called, when the window changes.
 		 * 
-		 * @param window the {@link SlidingWindow} object raising the event.
+		 * @param window the data of the new window.
 		 */
-		public void onWindowChanged(SlidingWindow window);
+		public void onWindowChanged(Iterable<Instance> window);
 	}
 	
 	/**
@@ -123,6 +123,8 @@ public class SlidingWindow implements Iterable<Instance>
 		 */
 		INVALID;
 	}
+	
+	private static boolean sAbsMean = false;
 	
 	private int mModCount = 0;
 	private int mWindowSize = 1000;
@@ -215,8 +217,8 @@ public class SlidingWindow implements Iterable<Instance>
 	
 	/**
 	 * Adds an instance of data to this sliding window. The instance needs to have exactly four
-	 * values, a class cannot be specified. For more information on the instance format or when a
-	 * class is needed, see {@link #average(Instances, int, int, boolean)}.
+	 * numeric values, a class cannot be specified. For more information on the instance format
+	 * or when a class is needed, see {@link #slide(Instances, int, int, WindowListener)}.
 	 * 
 	 * @param i the {@link Instance} to add.
 	 * @return {@code true} if the window changed after adding this instance, {@code false}
@@ -252,9 +254,11 @@ public class SlidingWindow implements Iterable<Instance>
 	
 	/**
 	 * This static method takes a fixed set of data and applies a sliding window, averaging the
-	 * input data over the window, optionally taking the absolute values. This method should be
-	 * used for performance reasons instead of instantiating a {@link SlidingWindow} when the
-	 * data doesn't change, and needs to be used when the data contains a class.
+	 * input data over the window or calling a listener. If {@code listener} is {@code null}, the
+	 * input data is averaged over the window and an output data set is returned, otherwise the
+	 * listener is called on every window change and {@code null} is returned.<br>
+	 * This method should be used instead of instantiating a {@link SlidingWindow} when the data
+	 * contains a class.
 	 * <p>
 	 * The format of the input data has to match the following conditions:
 	 * <ul>
@@ -265,8 +269,8 @@ public class SlidingWindow implements Iterable<Instance>
 	 * <li>The data only contains one class value (this is not checked, but it leads to undefined
 	 * behavior if there is more than one class).
 	 * </ul>
-	 * If there is a nominal attribute at the last position, it will be set as the class in the
-	 * output data set, regardless of whether it is tha class in the input data set.<br>
+	 * If there is a class attribute in the input data set, it will be set in the output data set
+	 * too.<br>
 	 * When these conditions are not met, an exception will be thrown.
 	 * <p>
 	 * Note that the attributes of the resulting data set are the same as the specified one, they
@@ -274,12 +278,15 @@ public class SlidingWindow implements Iterable<Instance>
 	 * 
 	 * @param data the data to apply the sliding window average to.
 	 * @param windowSize the window size in ms, needs to be greater than {@code 1}.
-	 * @param jumpSize the jump size in ms, needs to be greater than {@code 1} and less than
+	 * @param jumpSize the jump size in ms, needs to be at least {@code 1} and less than
 	 *        {@code windowSize}.
-	 * @param abs {@code true} if the absolute values should be used, {@code false} otherwise.
-	 * @return an averaged data set of the input, {@code null} if the input set does not have any
-	 *         data points, or an empty data set if there are not enough data points for at least
-	 *         one window size.
+	 * @param listener the {@link WindowListener} to be called on window changes, or {@code null}
+	 *        to return averaged data instead.
+	 * @return <ul>
+	 *         <li>If {@code listener} is {@code null}, an averaged data set of the input, or an
+	 *         empty data set if there are not enough data points for at least one window size.
+	 *         <li>{@code null} otherwise.
+	 *         </ul>
 	 * @exception NullPointerException if {@code data} is {@code null}.
 	 * @exception IllegalArgumentException if
 	 *            <ul>
@@ -289,8 +296,8 @@ public class SlidingWindow implements Iterable<Instance>
 	 * @exception UnsupportedAttributeTypeException if the input data doesn't meet the
 	 *            requirements specified.
 	 */
-	public static Instances average(Instances data, int windowSize, int jumpSize, boolean abs)
-		throws UnsupportedAttributeTypeException
+	public static Instances slide(Instances data, int windowSize, int jumpSize,
+		WindowListener listener) throws UnsupportedAttributeTypeException
 	{
 		if(data == null)
 			throw new NullPointerException();
@@ -304,23 +311,30 @@ public class SlidingWindow implements Iterable<Instance>
 		
 		if(attributeOrder == AttributeOrder.INVALID)
 			throw new UnsupportedAttributeTypeException();
-		if(data.numInstances() == 0)
-			return null;
+		if(data.numInstances() < 1)
+		{
+			if(listener != null)
+				return null;
+			return new Instances(data.relationName() + "_average", getAttributesVector(data), 0);
+		}
 		
-		// The approximate number of jumps assuming that the data is sorted by timestamp
-		final long time = (long)(data.lastInstance().value(0) - data.firstInstance().value(0));
-		final int jumps = (int)(time / jumpSize);
-		final Instances outData =
-			new Instances(data.relationName() + "_average", getAttributesVector(data), jumps);
+		final double time = data.lastInstance().value(0) - data.firstInstance().value(0);
+		Instances outData = null;
+		if(listener == null)
+		{
+			// The approximate number of jumps assuming that the data is sorted by timestamp
+			final int cap = (int)((time - windowSize) / jumpSize) + 1;
+			outData = new Instances(data.relationName() + "_average",
+				getAttributesVector(data), cap);
+			Log.v("SlidingWindow.average", "capacity = " + cap);
+		}
 		
 		// FIXME remove debug stuff
 		final long startTime = System.currentTimeMillis();
-		Log.v("SlidingWindow.average", "jumps = " + jumps);
 		
 		if(time / windowSize < 1.0)
 			return outData;
 		
-		final boolean hasClass = (attributeOrder != AttributeOrder.NO_CLASS);
 		final LinkedList<Instance> queue = new LinkedList<Instance>();
 		@SuppressWarnings("unchecked")
 		final Enumeration<Instance> instances = data.enumerateInstances();
@@ -328,7 +342,7 @@ public class SlidingWindow implements Iterable<Instance>
 		
 		while(instances.hasMoreElements())
 		{
-			Instance i = instances.nextElement();
+			final Instance i = instances.nextElement();
 			queue.add(i);
 			if(i.value(0) > nextJump)
 			{
@@ -336,12 +350,22 @@ public class SlidingWindow implements Iterable<Instance>
 				final double cut = i.value(0) - windowSize;
 				while(queue.size() > 0 && queue.getFirst().value(0) < cut)
 					queue.removeFirst();
-				outData.add(mean(queue, hasClass, abs));
+				if(listener == null)
+					outData.add(sAbsMean ? meanAbs(queue) : mean(queue));
+				else
+					listener.onWindowChanged(queue);
 			}
 		}
 		
-		Log.v("SlidingWindow.average", System.currentTimeMillis() - startTime +
-			"ms, outData count = " + outData.numInstances());
+		if(outData != null)
+		{
+			Log.v("SlidingWindow.average", System.currentTimeMillis() - startTime +
+				"ms, outData count = " + outData.numInstances());
+		}
+		else
+		{
+			Log.v("SlidingWindow.average", System.currentTimeMillis() - startTime + "ms");
+		}
 		
 		return outData;
 	}
@@ -360,9 +384,19 @@ public class SlidingWindow implements Iterable<Instance>
 		return vector;
 	}
 	
-	private static Instance mean(Iterable<Instance> i, boolean hasClass, boolean abs)
+	/**
+	 * Calculates the average of the specified instances.<br>
+	 * For the required attributes of an {@code Instance}, see
+	 * {@link #slide(Instances, int, int, WindowListener)}. If the instances contain a class, it
+	 * is also set in the output instance, the timestamp is that of the last instance in the set.
+	 * 
+	 * @param instances a set of {@link Instance} objects.
+	 * @return an averaged {@code Instance}, or {@code null} if {@code instances} is empty.
+	 * @see #meanAbs(Iterable)
+	 */
+	public static Instance mean(Iterable<Instance> instances)
 	{
-		final Iterator<Instance> it = i.iterator();
+		final Iterator<Instance> it = instances.iterator();
 		Instance last = null;
 		double x = 0.0, y = 0.0, z = 0.0;
 		int numInstances = 0;
@@ -370,32 +404,58 @@ public class SlidingWindow implements Iterable<Instance>
 		if(!it.hasNext())
 			return null;
 		
-		if(abs)
+		while(it.hasNext())
 		{
-			while(it.hasNext())
-			{
-				last = it.next();
-				numInstances++;
-				x += Math.abs(last.value(1));
-				y += Math.abs(last.value(2));
-				z += Math.abs(last.value(3));
-			}
-		}
-		else
-		{
-			while(it.hasNext())
-			{
-				last = it.next();
-				numInstances++;
-				x += last.value(1);
-				y += last.value(2);
-				z += last.value(3);
-			}
+			last = it.next();
+			numInstances++;
+			x += last.value(1);
+			y += last.value(2);
+			z += last.value(3);
 		}
 		
-		final Instance out = new Instance(hasClass ? 5 : 4);
+		final Instance out = new Instance(last.numValues());
 		out.setValue(0, last.value(0));
-		if(hasClass)
+		if(out.numValues() == 5)
+			out.setValue(4, last.value(4));
+		out.setValue(1, x / numInstances);
+		out.setValue(2, y / numInstances);
+		out.setValue(3, z / numInstances);
+		
+		return out;
+	}
+	
+	/**
+	 * Calculates the average of the absolute values of the specified instances.<br>
+	 * For the required attributes of an {@code Instance}, see
+	 * {@link #slide(Instances, int, int, WindowListener)}. If the instances contain a class, it
+	 * is also set in the output instance, the timestamp is that of the last instance in the set.
+	 * 
+	 * @param instances a set of {@link Instance} objects.
+	 * @return an averaged {@code Instance}, or {@code null} if {@code instances} is empty.
+	 * @see #mean(Iterable)
+	 */
+	public static Instance meanAbs(Iterable<Instance> instances)
+	{
+		final Iterator<Instance> it = instances.iterator();
+		Instance last = null;
+		double x = 0.0, y = 0.0, z = 0.0;
+		int numInstances = 0;
+		
+		if(!it.hasNext())
+			return null;
+		
+		while(it.hasNext())
+		{
+			last = it.next();
+			numInstances++;
+			x += Math.abs(last.value(1));
+			y += Math.abs(last.value(2));
+			z += Math.abs(last.value(3));
+		}
+		
+		final Instance out = new Instance(last.numValues());
+		out.setValue(0, last.value(0));
+		if(out.numValues() == 5)
 			out.setValue(4, last.value(4));
 		out.setValue(1, x / numInstances);
 		out.setValue(2, y / numInstances);
@@ -406,7 +466,7 @@ public class SlidingWindow implements Iterable<Instance>
 	
 	/**
 	 * Determines if a data set has a valid set of attributes and can be supplied to
-	 * {@link #average(Instances, int, int, boolean)}.
+	 * {@link #slide(Instances, int, int, WindowListener)}.
 	 * 
 	 * @param structure the data set to check.
 	 * @return {@code true} if the specified data set can be supplied to {@code average} without
