@@ -1,11 +1,11 @@
 package at.jku.pci.lazybird.features;
 
 /**
- * Enum with available features for extraction from ARFF Files by {@link TODO}.
+ * Enum with available features for extraction from ARFF Files by {@link FeatureExtractor}.
  * <p>
  * Note that these only work if the file has a timestamp and exactly three numeric values for the
  * axes. The optional class attribute and the timestamp are copied without change.<br>
- * Also, a sliding window is always applied to the data point values (the data is always a mean).
+ * Also, a sliding window is always applied to the data point values.
  * 
  * @author Peter
  */
