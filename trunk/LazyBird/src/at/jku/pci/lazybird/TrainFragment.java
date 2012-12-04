@@ -104,7 +104,8 @@ public class TrainFragment extends Fragment
 		getWidgets(getView());
 		
 		// Get drawables for the select buttons
-		mCompoundUncheck = getResources().getDrawable(android.R.drawable.checkbox_off_background);
+		mCompoundUncheck =
+			getResources().getDrawable(android.R.drawable.checkbox_off_background);
 		mCompoundUncheck.setBounds(mBtnSelectFile.getCompoundDrawables()[0].copyBounds());
 		mCompoundCheck = getResources().getDrawable(android.R.drawable.checkbox_on_background);
 		mCompoundCheck.setBounds(mCompoundUncheck.copyBounds());
@@ -250,9 +251,9 @@ public class TrainFragment extends Fragment
 		@Override
 		public void onClick(View v)
 		{
-			final String readonly = Environment.MEDIA_MOUNTED_READ_ONLY;
-			if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) &&
-				!Environment.getExternalStorageState().equals(readonly))
+			final String state = Environment.getExternalStorageState();
+			if(!state.equals(Environment.MEDIA_MOUNTED) &&
+				!state.equals(Environment.MEDIA_MOUNTED_READ_ONLY))
 			{
 				Toast.makeText(getActivity(), R.string.error_extstorage_read, Toast.LENGTH_LONG)
 					.show();
@@ -296,9 +297,20 @@ public class TrainFragment extends Fragment
 			
 			final AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
 			b.setTitle(R.string.btnSelectFile);
-			b.setPositiveButton(android.R.string.ok, filesSelectedListener);
-			b.setNegativeButton(android.R.string.cancel, null);
-			b.setMultiChoiceItems(filenames, selected, checkListener);
+			
+			if(allFiles.length > 0)
+			{
+				b.setPositiveButton(android.R.string.ok, filesSelectedListener);
+				b.setNegativeButton(android.R.string.cancel, null);
+				b.setMultiChoiceItems(filenames, selected, checkListener);
+			}
+			else
+			{
+				b.setNeutralButton(android.R.string.ok, null);
+				b.setMessage(R.string.noFiles);
+				setLeftDrawable(mBtnSelectFile, mCompoundUncheck);
+			}
+			
 			b.show();
 		}
 		
@@ -449,19 +461,19 @@ public class TrainFragment extends Fragment
 					updateTrainEnabled();
 				}
 			};
+		
+		private void init()
+		{
+			featureNames = new String[allFeatures.length];
+			selected = new boolean[allFeatures.length];
 			
-			private void init()
+			for(int j = 0; j < allFeatures.length; j++)
 			{
-				featureNames = new String[allFeatures.length];
-				selected = new boolean[allFeatures.length];
-				
-				for(int j = 0; j < allFeatures.length; j++)
-				{
-					featureNames[j] = allFeatures[j].getName();
-					if(allFeatures[j] == Feature.RAW)
-						rawIdx = j;
-				}
+				featureNames[j] = allFeatures[j].getName();
+				if(allFeatures[j] == Feature.RAW)
+					rawIdx = j;
 			}
+		}
 	};
 	
 	private OnClickListener onBtnSaveFeaturesClick = new OnClickListener() {

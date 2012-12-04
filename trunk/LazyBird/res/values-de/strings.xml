@@ -56,6 +56,7 @@
     <string name="selectFileNote">Beachten Sie, dass nur Dateien im Ausgabeverzeichnis angezeigt werden.</string>
     <string name="trainClassifierNote">TODO.</string>
     <string name="selectFeaturesNote">Wählen Sie die Features, mit denen der Classifier trainiert wird.</string>
+    <string name="noFiles">Keine ARFF Dateien im Ausgabeverzeichnis.\nKopieren Sie Dateien die Sie verwenden wollen ins Ausgabeverzeichnis.</string>
     
     <string name="fileNotFound">Datei nicht gefunden</string>
     <string name="fileDeleted">Datei gelöscht</string>
@@ -66,6 +67,6 @@
     <string name="error_filename">Kein gültiger Dateiname</string>
     <string name="error_extstorage">Externer Speicher nicht beschreibbar</string>
     <string name="error_extstorage_read">Externer Speicher nicht lesbar</string>
-    <string name="error_nodir">Verzeichnis existiert nicht</string>
+    <string name="error_nodir">Ausgabeverzeichnis existiert nicht</string>
     
 </resources>
