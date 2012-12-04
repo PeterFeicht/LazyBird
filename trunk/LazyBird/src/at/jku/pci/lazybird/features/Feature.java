@@ -113,6 +113,17 @@ public enum Feature
 	}
 	
 	/**
+	 * Determines whether the bit for this {@link Feature} is set in the specified flag.
+	 * 
+	 * @param flags the flags
+	 * @return {@code true} if the bit for this {@code Feature} is set, {@code false} otherwise.
+	 */
+	public boolean isSet(int flags)
+	{
+		return (mBit & flags) != 0;
+	}
+	
+	/**
 	 * Gets an array of {@link Feature} objects corresponding to the bits set in the specified
 	 * number.
 	 * 
@@ -134,10 +145,10 @@ public enum Feature
 		
 		for(Feature f: Feature.values())
 		{
-			if((f.getBit() & flags) != 0)
+			if(f.isSet(flags))
 			{
 				out[idx++] = f;
-				flags &= ~f.getBit();
+				flags &= ~f.mBit;
 			}
 		}
 		
@@ -164,7 +175,7 @@ public enum Feature
 		
 		int out = 0;
 		for(Feature f: features)
-			out |= f.getBit();
+			out |= f.mBit;
 		
 		return out;
 	}
