@@ -35,32 +35,49 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 	 * Format string used to format the acceleration values written to the output file.
 	 */
 	private static final String DATA_FORMAT = "%d,%.2f,%.2f,%.2f";
+	
+	/**
+	 * The attribute specification for the output ARFF file.<br>
+	 * Note that a class may also be specified, which is not part of this specification.
+	 */
+	public static final String ATTRIBUTE_STRING =
+		"@ATTRIBUTE timestamp        NUMERIC\n" +
+			"@ATTRIBUTE accelerationx    NUMERIC\n" +
+			"@ATTRIBUTE accelerationy    NUMERIC\n" +
+			"@ATTRIBUTE accelerationz    NUMERIC\n";
+	
 	/**
 	 * UID for the ongoing notification.
 	 */
 	private static final int NOTIFICATION_RECORDING = 16;
+	
 	/**
 	 * UID for the too many values notification.
 	 */
 	private static final int NOTIFICATION_TOO_MAY_VALUES = 17;
+	
 	/**
 	 * UID for the waiting notification.
 	 */
 	private static final int NOTIFICATION_WAITING = 18;
+	
 	/**
 	 * Intent for the service.
 	 */
 	public static final String ARFF_SERVICE = "at.jku.pci.lazybird.ARFF_SERVICE";
+	
 	/**
 	 * Maximum number of values after which recording is stopped automatically.
 	 * <p>
 	 * Setting {@link SettingsActivity#KEY_VALUE_UPDATE_SPEED}
 	 */
 	private static long sMaxNumValues = 10000;
+	
 	/**
 	 * To determine from the main activity whether the service is running or was shut down.
 	 */
 	private static boolean sRunning = false;
+	
 	/**
 	 * The number of seconds to wait after receiving the start command before recording.
 	 * <p>
@@ -136,7 +153,7 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 			if(!directory.exists())
 				directory.mkdir();
 			
-			// create the ARFF-file and write the header and the data
+			// create ARFF-file and write header and data
 			final File file = new File(directory, mFilename);
 			
 			try
@@ -146,14 +163,10 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 				// write the file header
 				mOutfile.write("% Group: Feichtinger, Hager\n% Date: ");
 				mOutfile.write(DateFormat.format("yyyy-MM-dd HH:mm", new Date()).toString());
-				mOutfile.write("\n\n");
-				mOutfile.write("@RELATION systemsdevelopment\n\n");
+				mOutfile.write(String.format(
+					(Locale)null, "\n\n@RELATION lazybird-%d\n\n", System.currentTimeMillis()));
 				
-				// write attributes
-				mOutfile.write("@ATTRIBUTE timestamp        NUMERIC\n");
-				mOutfile.write("@ATTRIBUTE accelerationx    NUMERIC\n");
-				mOutfile.write("@ATTRIBUTE accelerationy    NUMERIC\n");
-				mOutfile.write("@ATTRIBUTE accelerationz    NUMERIC\n");
+				mOutfile.write(ATTRIBUTE_STRING);
 				
 				if(mClass != null && classes != null)
 				{
@@ -171,10 +184,7 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 			}
 			
 			if(sStartDelay != 0)
-			{
-				mWaitingTimer = new WaitingTimer(sStartDelay);
-				mWaitingTimer.start();
-			}
+				mWaitingTimer = (new WaitingTimer(sStartDelay)).start();
 			else
 				startRecording();
 		}
@@ -529,15 +539,17 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 			mSeconds = seconds;
 		}
 		
-		public void stop()
+		public WaitingTimer stop()
 		{
 			mHandler.removeCallbacks(this);
+			return this;
 		}
 		
-		public void start()
+		public WaitingTimer start()
 		{
 			notifyWaiting(mSeconds);
 			mHandler.postDelayed(this, 1000);
+			return this;
 		}
 		
 		public void run()
