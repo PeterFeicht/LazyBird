@@ -71,6 +71,14 @@
             android:layout_marginLeft="12dp"
             android:text="@string/btnTrain" />
 
+        <Button
+            android:id="@+id/btnValidate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/btnValidate"
+            android:visibility="gone" />
+
         <ProgressBar
             android:id="@+id/progressTraining"
             android:layout_width="wrap_content"

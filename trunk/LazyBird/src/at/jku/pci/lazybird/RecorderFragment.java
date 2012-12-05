@@ -293,7 +293,6 @@ public class RecorderFragment extends Fragment
 		}
 	}
 	
-	// TODO move to MainActivity or SettingsActivity to avoid duplicate code
 	/**
 	 * Sets all appropriate private fields from the shared preferences.<br>
 	 * Also sets static properties of {@link ARFFRecorderService}:
