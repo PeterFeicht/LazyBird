@@ -1,13 +1,23 @@
 package at.jku.pci.lazybird.features;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.EnumMap;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-import android.os.AsyncTask;
-import at.jku.pci.lazybird.features.SlidingWindow.WindowListener;
+import weka.core.Attribute;
+import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.UnsupportedAttributeTypeException;
+import weka.core.converters.ArffLoader.ArffReader;
+import android.os.AsyncTask;
+import at.jku.pci.lazybird.features.SlidingWindow.WindowListener;
 
 /**
  * Represents a task that takes an array of {@link File} and {@link Feature} objects and creates
@@ -25,11 +35,11 @@ import weka.core.Instances;
  * <ul>
  * <li>The first attribute is the timestamp.
  * <li>The following three attributes are numeric values (e.g. acceleration coordinates).
- * <li>The optional last attribute is the nominal class.
+ * <li>The last attribute is the nominal class.
  * <li>The data is sorted in ascending order by timestamp (when averaging multiple instances in
  * the sliding window, the timestamp of the last value is used).
- * <li>The data only contains one class value per file (this is not checked, but it leads to
- * undefined behavior if there is more than one class).
+ * <li>The data only contains one class value per file (this is not checked for performance
+ * reasons, but it leads to undefined behavior if there is more than one class).
  * </ul>
  * If multiple files are specified, the output data set will contain the features of every file,
  * extracted separately and then joined in no particular order.
@@ -59,8 +69,8 @@ public class FeatureExtractor
 	private final Feature[] mFeatures;
 	private final int mWindowSize;
 	private final int mJumpSize;
+	private final int mOutputFeatures;
 	private Instances mOutput = null;
-	private Feature[] mOutputFeatures = null;
 	private boolean mCalculated = false;
 	
 	/**
@@ -69,7 +79,8 @@ public class FeatureExtractor
 	 * sliding window.
 	 * 
 	 * @param files the files to calculate features for.
-	 * @param features the features to calculate, or the single feature {@link Feature#RAW}.
+	 * @param features the features to calculate, or the single feature {@link Feature#RAW}. If
+	 *        any other features than {@link Feature#RAW} are specified, it is ignored.
 	 * @param windowSize the window size for
 	 *        {@link SlidingWindow#slide(Instances, int, int, WindowListener)} in ms.
 	 * @param jumpSize the jump size for
@@ -86,14 +97,15 @@ public class FeatureExtractor
 		
 		mFiles = files;
 		mFeatures = features;
+		// Needed to filter RAW and get right order.
+		mOutputFeatures = Feature.getMask(features);
 		mWindowSize = windowSize;
 		mJumpSize = jumpSize;
 	}
 	
 	/**
 	 * Gets the array of files assigned to this extractor.<br>
-	 * This can be changed before or after the extraction has run, but should not be modified
-	 * while the extraction is running or the behavior will be undefined.
+	 * The contents should not be changed.
 	 */
 	public File[] getFiles()
 	{
@@ -102,8 +114,7 @@ public class FeatureExtractor
 	
 	/**
 	 * Gets the array of features assigned to this extractor.<br>
-	 * This can be changed before or after the extraction has run, but should not be modified
-	 * while the extraction is running or the behavior will be undefined.
+	 * The contents should not be changed.
 	 */
 	public Feature[] getFeatures()
 	{
@@ -124,16 +135,20 @@ public class FeatureExtractor
 	}
 	
 	/**
-	 * Gets the features in the output data set, or {@code null} if there was an error.
+	 * Gets the features in the output data set.<br>
+	 * Note that the features are not necessarily in the same order as specified in the
+	 * constructor. Also, all occurrences of {@link Feature#RAW} are ignored, if other features
+	 * are specified.
 	 * 
 	 * @exception IllegalStateException if {@link #extract()} has not been called yet.
+	 * @see #FeatureExtractor(File[], Feature[], int, int)
 	 */
 	public Feature[] getOutputFeatures()
 	{
 		if(!mCalculated)
 			throw new IllegalStateException();
 		else
-			return mOutputFeatures;
+			return Feature.getFeatures(mOutputFeatures);
 	}
 	
 	/**
@@ -155,7 +170,9 @@ public class FeatureExtractor
 	}
 	
 	/**
-	 * Determines whether {@link #extract()} has been called and returned.
+	 * Determines whether {@link #extract()} has been called and returned.<br>
+	 * Note that this class is not thread safe and {@code extract} may be running when this
+	 * method is called.
 	 * 
 	 * @return {@code true} if {@code extract()} has been called, {@code false} if it is still
 	 *         running or was never called.
@@ -167,24 +184,152 @@ public class FeatureExtractor
 	
 	/**
 	 * Starts the feature extraction by reading files and extracting features. This method can
-	 * block the calling thread a long time and should not be run on the UI thread.
+	 * block the calling thread a long time and should not be run on the UI thread.<br>
+	 * Note that calls to this method are not synchronized and multiple calls my lead to
+	 * undefined behavior.
 	 * 
 	 * @exception IllegalStateException if {@link #extract()} was called before.
+	 * @exception FileNotFoundException if a file from the specified list does not exist.
+	 * @exception IOException if another file related error occurred.
+	 * @exception UnsupportedAttributeTypeException if the attributes in one of the input files
+	 *            are of the wrong format, see the {@link FeatureExtractor class documentation}.
 	 * @see AsyncTask
 	 */
-	public void extract()
+	public void extract() throws IOException, UnsupportedAttributeTypeException
 	{
 		if(mCalculated)
 			throw new IllegalStateException();
 		
-		// mCalculated = true;
+		for(File f : mFiles)
+		{
+			final BufferedReader reader = new BufferedReader(new FileReader(f));
+			final ArffReader arff = new ArffReader(reader);
+			final Instances input = arff.getData();
+			
+			if(input.numAttributes() == 5)
+				input.setClassIndex(input.numAttributes() - 1);
+			else
+				throw new UnsupportedAttributeTypeException("File " + f.toString());
+
+			// Initialize output Instances object
+			if(mOutput == null)
+			{
+				mOutput = initOutput(input);
+				
+				// If RAW was specified, merge input files and return
+				if(mOutputFeatures == 0)
+				{
+					reader.close();
+					mergeFiles();
+					mCalculated = true;
+					return;
+				}
+			}
+			
+			try
+			{
+				SlidingWindow.slide(input, mWindowSize, mJumpSize, new WindowListener() {
+					@Override
+					public void onWindowChanged(Iterable<Instance> window)
+					{
+						final Instance raw = extractFeatures(window);
+						final Instance features = new Instance(mOutput.numAttributes());
+						features.setDataset(mOutput);
+						features.setClassValue(raw.classValue());
+						
+						for(int j = 1; j < mOutput.numAttributes() - 1; j++)
+							features.setValue(j - 1, raw.value(j));
+						
+						mOutput.add(features);
+					}
+				});
+			}
+			catch(UnsupportedAttributeTypeException ex)
+			{
+				throw new UnsupportedAttributeTypeException("File " + f.toString());
+			}
+			
+			reader.close();
+		}
+		
+		mCalculated = true;
+	}
+	
+	/**
+	 * Just merges all input file into a single {@link Instances} data set. Also checks that all
+	 * input files have the same features.
+	 */
+	private void mergeFiles() throws IOException, UnsupportedAttributeTypeException
+	{
+		HashSet<String> featureSet = new HashSet<String>();
+		for(Feature f : Feature.getFeatures(mOutputFeatures))
+			featureSet.add(f.getAttribute());
+		
+		for(File f : mFiles)
+		{
+			final BufferedReader reader = new BufferedReader(new FileReader(f));
+			final ArffReader arff = new ArffReader(reader);
+			final Instances input = arff.getData();
+			
+			if(input.numAttributes() == mOutput.numAttributes())
+				input.setClassIndex(input.numAttributes() - 1);
+			else
+				throw new UnsupportedAttributeTypeException("RAW File " + f.toString());
+			
+			// Check if all input attributes are wanted
+			for(int j = 0; j < input.numAttributes() - 1; j++)
+			{
+				final Attribute a = input.attribute(j);
+				if(!a.isNumeric() || !featureSet.contains(a.name()))
+					throw new UnsupportedAttributeTypeException("RAW File " + f.toString());
+			}
+			
+			@SuppressWarnings("unchecked")
+			Enumeration<Instance> instances = input.enumerateInstances();
+			while(instances.hasMoreElements())
+				mOutput.add(instances.nextElement());
+			
+			reader.close();
+		}
+	}
+	
+	private Instances initOutput(Instances input)
+	{
+		final FastVector attributes = new FastVector(mFeatures.length + 1);
+		for(Feature f : Feature.getFeatures(mOutputFeatures))
+			attributes.addElement(new Attribute(f.getAttribute()));
+		
+		@SuppressWarnings("unchecked")
+		final Enumeration<String> names = input.classAttribute().enumerateValues();
+		final FastVector values = new FastVector();
+		while(names.hasMoreElements())
+			values.addElement(names.nextElement());
+		attributes.addElement(new Attribute("class", values));
+		
+		// Make an educated guess for the needed capacity of the output set
+		double cap = mFiles.length;
+		if(mOutputFeatures != 0)
+			cap *= (input.lastInstance().value(0) - input.firstInstance().value(0)) / mJumpSize;
+		else
+			cap *= input.numInstances();
+		
+		Instances out =
+			new Instances("lazybird-train-" + System.currentTimeMillis(), attributes, (int)cap);
+		out.setClassIndex(mOutput.numAttributes() - 1);
+		
+		return out;
+	}
+	
+	private Instance extractFeatures(Iterable<Instance> instances)
+	{
+		return extractFeatures(instances, mOutputFeatures);
 	}
 	
 	/**
 	 * Extracts the features specified in the bit mask from the specified instances.
 	 * <p>
 	 * For more information on the expected instance format see the {@link FeatureExtractor class
-	 * documentation}.
+	 * documentation}. In the case of this method however, the class attribute is optional.
 	 * 
 	 * @param instances the instances to extract features from.
 	 * @param flags a bit mask, as returned by {@link Feature#getMask(Feature[])}.
@@ -226,7 +371,7 @@ public class FeatureExtractor
 			{
 				double sum = 0.0;
 				int num = 0;
-				for(Instance i: mag)
+				for(Instance i : mag)
 				{
 					num++;
 					sum += i.value(1);
@@ -365,7 +510,7 @@ public class FeatureExtractor
 	{
 		final LinkedList<Instance> out = new LinkedList<Instance>();
 		
-		for(Instance i: instances)
+		for(Instance i : instances)
 		{
 			final Instance mag = new Instance(i.numValues() - 2);
 			mag.setValue(0, i.value(0));
