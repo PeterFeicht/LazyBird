@@ -124,8 +124,7 @@ public enum Feature
 	}
 	
 	/**
-	 * Gets an array of {@link Feature} objects corresponding to the bits set in the specified
-	 * number.
+	 * Gets an array of {@link Feature} objects for all bits set in the specified number.
 	 * 
 	 * @param flags the flags.
 	 * @return an array containing the features for which corresponding bits are set, or
@@ -143,7 +142,7 @@ public enum Feature
 		if(flags == 0)
 			return new Feature[] { RAW };
 		
-		for(Feature f: Feature.values())
+		for(Feature f : Feature.values())
 		{
 			if(f.isSet(flags))
 			{
@@ -174,7 +173,7 @@ public enum Feature
 			throw new NullPointerException();
 		
 		int out = 0;
-		for(Feature f: features)
+		for(Feature f : features)
 			out |= f.mBit;
 		
 		return out;
