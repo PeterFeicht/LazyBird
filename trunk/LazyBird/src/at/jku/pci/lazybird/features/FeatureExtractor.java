@@ -266,6 +266,46 @@ public class FeatureExtractor
 	}
 	
 	/**
+	 * A streamlined version of {@link #extractFeatures(Iterable, int)} that extracts only the
+	 * two features {@link Feature#X} and {@link Feature#VARIANCE_Y}.
+	 * 
+	 * @param instances instances the instances to extract features from.
+	 * @return an {@link Instance} with the two features. The features are in the same order that
+	 *         {@link Feature#getFeatures(int)} returns.
+	 * @exception IllegalArgumentException if {@code instances} is empty.
+	 */
+	public static Instance extractFeaturesPE(Iterable<Instance> instances)
+	{
+		final Iterator<Instance> it = instances.iterator();
+		if(!it.hasNext())
+			throw new IllegalArgumentException("instances cannot be empty.");
+		
+		// We need the last instance for the timestamp
+		Instance last = null;
+		while(it.hasNext())
+			last = it.next();
+		
+		// This is needed to put the features in the right order, if that should change any time.
+		final Feature[] features =
+			Feature.getFeatures(Feature.X.getBit() | Feature.VARIANCE_Y.getBit());
+		final EnumMap<Feature, Double> values = new EnumMap<Feature, Double>(Feature.class);
+		
+		values.put(Feature.VARIANCE_Y, variance(instances, 1).value(1));
+		values.put(Feature.X, mean(instances).value(2));
+		
+		final boolean hasClass = (last.numValues() == 5);
+		final Instance out = new Instance(2 + (hasClass ? 2 : 1));
+		out.setValue(0, last.value(0));
+		
+		for(int j = 0; j < features.length; j++)
+			out.setValue(j + 1, values.get(features[j]));
+		if(hasClass)
+			out.setValue(3, last.value(4));
+		
+		return out;
+	}
+	
+	/**
 	 * Extracts the specified features from the specified instances.<br>
 	 * This is a convenience method and {@link #extractFeatures(Iterable, int)} is more
 	 * efficient.
