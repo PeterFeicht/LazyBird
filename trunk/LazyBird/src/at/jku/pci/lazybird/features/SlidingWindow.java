@@ -1,13 +1,10 @@
 package at.jku.pci.lazybird.features;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
 import weka.core.Attribute;
-import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.UnsupportedAttributeTypeException;
@@ -125,8 +122,6 @@ public class SlidingWindow implements Iterable<Instance>
 		INVALID;
 	}
 	
-	private static boolean sAbsMean = false;
-	
 	private int mModCount = 0;
 	private int mWindowSize = 1000;
 	private int mJumpSize = 100;
@@ -147,7 +142,7 @@ public class SlidingWindow implements Iterable<Instance>
 	 * and jump size.
 	 * 
 	 * @param windowSize the window size in ms, needs to be greater than {@code 1}.
-	 * @param jumpSize the jump size in ms, needs to be greater than {@code 1} and less than
+	 * @param jumpSize the jump size in ms, needs to be at least {@code 1} and less than
 	 *        {@code windowSize}.
 	 * @exception IllegalArgumentException if {@code windowSize} is less than {@code 2},
 	 *            {@code jumpSize} is less than {@code 1} or {@code windowSize} is less than
@@ -162,6 +157,24 @@ public class SlidingWindow implements Iterable<Instance>
 		
 		mJumpSize = jumpSize;
 		mWindowSize = windowSize;
+	}
+	
+	/**
+	 * Initializes a new instance of the {@link SlidingWindow} class with the specified window
+	 * size, jump size and listener.
+	 * 
+	 * @param windowSize the window size in ms, needs to be greater than {@code 1}.
+	 * @param jumpSize the jump size in ms, needs to be at least {@code 1} and less than
+	 *        {@code windowSize}.
+	 * @param listener the {@link WindowListener} to be registered, or {@code null}.
+	 * @exception IllegalArgumentException if {@code windowSize} is less than {@code 2},
+	 *            {@code jumpSize} is less than {@code 1} or {@code windowSize} is less than
+	 *            {@code jumpSize}.
+	 */
+	public SlidingWindow(int windowSize, int jumpSize, WindowListener listener)
+	{
+		this(windowSize, jumpSize);
+		mListener = listener;
 	}
 	
 	/**
@@ -254,12 +267,10 @@ public class SlidingWindow implements Iterable<Instance>
 	}
 	
 	/**
-	 * This static method takes a fixed set of data and applies a sliding window, averaging the
-	 * input data over the window or calling a listener. If {@code listener} is {@code null}, the
-	 * input data is averaged over the window and an output data set is returned, otherwise the
-	 * listener is called on every window change and {@code null} is returned.<br>
+	 * This static method takes a fixed set of data and applies a sliding window, calling a
+	 * listener when the window changes.<br>
 	 * This method should be used instead of instantiating a {@link SlidingWindow} when the data
-	 * contains a class.
+	 * is training data that contains a class.
 	 * <p>
 	 * The format of the input data has to match the following conditions:
 	 * <ul>
@@ -270,25 +281,17 @@ public class SlidingWindow implements Iterable<Instance>
 	 * <li>The data only contains one class value (this is not checked, but it leads to undefined
 	 * behavior if there is more than one class).
 	 * </ul>
-	 * If there is a class attribute in the input data set, it will be set in the output data set
-	 * too.<br>
 	 * When these conditions are not met, an exception will be thrown.
 	 * <p>
-	 * Note that the attributes of the resulting data set are the same as the specified one, they
-	 * are not duplicated and changes will affect both data sets.
+	 * The instances in the set given to {@code listener} is associated with the specified
+	 * {@link Instances}.
 	 * 
 	 * @param data the data to apply the sliding window average to.
 	 * @param windowSize the window size in ms, needs to be greater than {@code 1}.
 	 * @param jumpSize the jump size in ms, needs to be at least {@code 1} and less than
 	 *        {@code windowSize}.
-	 * @param listener the {@link WindowListener} to be called on window changes, or {@code null}
-	 *        to return averaged data instead.
-	 * @return <ul>
-	 *         <li>If {@code listener} is {@code null}, an averaged data set of the input, or an
-	 *         empty data set if there are not enough data points for at least one window size.
-	 *         <li>{@code null} otherwise.
-	 *         </ul>
-	 * @exception NullPointerException if {@code data} is {@code null}.
+	 * @param listener the {@link WindowListener} to be called on window changes.
+	 * @exception NullPointerException if {@code data} or {@code listener} is {@code null}.
 	 * @exception IllegalArgumentException if
 	 *            <ul>
 	 *            <li>{@code windowSize} is less than {@code 2} <li>{@code jumpSize} is less than
@@ -297,44 +300,31 @@ public class SlidingWindow implements Iterable<Instance>
 	 * @exception UnsupportedAttributeTypeException if the input data doesn't meet the
 	 *            requirements specified.
 	 */
-	public static Instances slide(Instances data, int windowSize, int jumpSize,
+	public static void slide(Instances data, int windowSize, int jumpSize,
 		WindowListener listener) throws UnsupportedAttributeTypeException
 	{
-		if(data == null)
+		if(data == null || listener == null)
 			throw new NullPointerException();
 		if(windowSize < 2 || jumpSize < 1)
 			throw new IllegalArgumentException("Window and jump size need to be positive.");
 		if(windowSize < jumpSize)
 			throw new IllegalArgumentException("Jump size cannot be larger than window size.");
+		if(data.numInstances() < 1)
+			return;
 		
 		@SuppressWarnings("unchecked")
 		final AttributeOrder attributeOrder = getAttributeOrder(data.enumerateAttributes());
-		
 		if(attributeOrder == AttributeOrder.INVALID)
 			throw new UnsupportedAttributeTypeException();
-		if(data.numInstances() < 1)
-		{
-			if(listener != null)
-				return null;
-			return new Instances(data.relationName() + "_average", getAttributesVector(data), 0);
-		}
 		
 		final double time = data.lastInstance().value(0) - data.firstInstance().value(0);
-		Instances outData = null;
-		if(listener == null)
-		{
-			// The approximate number of jumps assuming that the data is sorted by timestamp
-			final int cap = (int)((time - windowSize) / jumpSize) + 1;
-			outData = new Instances(data.relationName() + "_average",
-				getAttributesVector(data), cap);
-			Log.v("SlidingWindow.average", "capacity = " + cap);
-		}
+		if(time / windowSize < 1.0)
+			return;
 		
 		// FIXME remove debug stuff
 		final long startTime = System.currentTimeMillis();
-		
-		if(time / windowSize < 1.0)
-			return outData;
+		int jumps = 0;
+		int num = 0;
 		
 		final LinkedList<Instance> queue = new LinkedList<Instance>();
 		@SuppressWarnings("unchecked")
@@ -345,44 +335,22 @@ public class SlidingWindow implements Iterable<Instance>
 		{
 			final Instance i = instances.nextElement();
 			queue.add(i);
+			num++;
 			if(i.value(0) > nextJump)
 			{
 				nextJump += jumpSize;
 				final double cut = i.value(0) - windowSize;
 				while(queue.size() > 0 && queue.getFirst().value(0) < cut)
 					queue.removeFirst();
-				if(listener == null)
-					outData.add(sAbsMean ? meanAbs(queue) : mean(queue));
-				else
-					listener.onWindowChanged(queue);
+				listener.onWindowChanged(queue);
+				jumps++;
 			}
 		}
 		
-		if(outData != null)
-		{
-			Log.v("SlidingWindow.average", System.currentTimeMillis() - startTime +
-				"ms, outData count = " + outData.numInstances());
-		}
-		else
-		{
-			Log.v("SlidingWindow.average", System.currentTimeMillis() - startTime + "ms");
-		}
+		Log.v("SlidingWindow.average", System.currentTimeMillis() - startTime + "ms, " + jumps +
+			" jumps, " + num + " instances");
 		
-		return outData;
-	}
-	
-	private static FastVector getAttributesVector(Instances data)
-	{
-		@SuppressWarnings("unchecked")
-		final Collection<Attribute> attrs = Collections.list(data.enumerateAttributes());
-		final FastVector vector = new FastVector(attrs.size());
-		
-		for(Attribute a: attrs)
-		{
-			vector.addElement(a);
-		}
-		
-		return vector;
+		return;
 	}
 	
 	/**
@@ -400,7 +368,7 @@ public class SlidingWindow implements Iterable<Instance>
 		final Iterator<Instance> it = instances.iterator();
 		Instance last = null;
 		double x = 0.0, y = 0.0, z = 0.0;
-		int numInstances = 0;
+		int num = 0;
 		
 		if(!it.hasNext())
 			return null;
@@ -408,7 +376,7 @@ public class SlidingWindow implements Iterable<Instance>
 		while(it.hasNext())
 		{
 			last = it.next();
-			numInstances++;
+			num++;
 			x += last.value(1);
 			y += last.value(2);
 			z += last.value(3);
@@ -418,9 +386,9 @@ public class SlidingWindow implements Iterable<Instance>
 		out.setValue(0, last.value(0));
 		if(out.numValues() == 5)
 			out.setValue(4, last.value(4));
-		out.setValue(1, x / numInstances);
-		out.setValue(2, y / numInstances);
-		out.setValue(3, z / numInstances);
+		out.setValue(1, x / num);
+		out.setValue(2, y / num);
+		out.setValue(3, z / num);
 		
 		return out;
 	}
@@ -440,7 +408,7 @@ public class SlidingWindow implements Iterable<Instance>
 		final Iterator<Instance> it = instances.iterator();
 		Instance last = null;
 		double x = 0.0, y = 0.0, z = 0.0;
-		int numInstances = 0;
+		int num = 0;
 		
 		if(!it.hasNext())
 			return null;
@@ -448,7 +416,7 @@ public class SlidingWindow implements Iterable<Instance>
 		while(it.hasNext())
 		{
 			last = it.next();
-			numInstances++;
+			num++;
 			x += Math.abs(last.value(1));
 			y += Math.abs(last.value(2));
 			z += Math.abs(last.value(3));
@@ -458,9 +426,9 @@ public class SlidingWindow implements Iterable<Instance>
 		out.setValue(0, last.value(0));
 		if(out.numValues() == 5)
 			out.setValue(4, last.value(4));
-		out.setValue(1, x / numInstances);
-		out.setValue(2, y / numInstances);
-		out.setValue(3, z / numInstances);
+		out.setValue(1, x / num);
+		out.setValue(2, y / num);
+		out.setValue(3, z / num);
 		
 		return out;
 	}
