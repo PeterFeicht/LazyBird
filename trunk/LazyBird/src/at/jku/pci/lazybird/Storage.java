@@ -11,7 +11,7 @@ public final class Storage
 	public static final String LOGTAG = "Storage";
 	public static final boolean LOCAL_LOGV = true;
 	
-	public static final String TAG_CLASSIFIER = "at.jku.pci.lazybird.PREFS_CLASSIFIER";
+	public static final String PREFS_CLASSIFIER = "at.jku.pci.lazybird.PREFS_CLASSIFIER";
 	
 	/**
 	 * Shared preference key: {@value}
