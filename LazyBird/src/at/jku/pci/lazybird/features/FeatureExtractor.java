@@ -1,6 +1,9 @@
 package at.jku.pci.lazybird.features;
 
 import java.io.File;
+import java.util.EnumMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import android.os.AsyncTask;
 import at.jku.pci.lazybird.features.SlidingWindow.WindowListener;
 import weka.core.Instance;
@@ -41,6 +44,17 @@ import weka.core.Instances;
  */
 public class FeatureExtractor
 {
+	/**
+	 * A mask with bits set for all features implemented for extraction by this class.<br>
+	 * If a feature is specified for extraction that is not implemented, it will be silently
+	 * ignored. However, you can safely consider all features that have corresponding bits set in
+	 * this mask to be implemented and generate the expected output.
+	 * 
+	 * @see Feature#getMask(Feature[])
+	 * @see Feature#getBit()
+	 */
+	public static final int IMPLEMENTED_FEATURES = 0xFF;
+	
 	private final File[] mFiles;
 	private final Feature[] mFeatures;
 	private final int mWindowSize;
@@ -164,5 +178,162 @@ public class FeatureExtractor
 			throw new IllegalStateException();
 		
 		// mCalculated = true;
+	}
+	
+	/**
+	 * Extracts the features specified in the bit mask from the specified instances.
+	 * <p>
+	 * For more information on the expected instance format see the {@link FeatureExtractor class
+	 * documentation}.
+	 * 
+	 * @param instances the instances to extract features from.
+	 * @param flags a bit mask, as returned by {@link Feature#getMask(Feature[])}.
+	 * @return an {@link Instance} with the specified features. The features are in the same
+	 *         order that {@link Feature#getFeatures(int)} returns.
+	 * @exception IllegalArgumentException if {@code instances} is empty or {@code flags} is
+	 *            {@code 0}.
+	 */
+	public static Instance extractFeatures(Iterable<Instance> instances, int flags)
+	{
+		if(flags == 0)
+			throw new IllegalArgumentException("flags cannot be 0.");
+		
+		final Feature[] features = Feature.getFeatures(flags);
+		final boolean hasMean = (flags & 0x07) != 0;
+		final boolean hasVariance = (flags & 0x70) != 0;
+		final EnumMap<Feature, Double> values = new EnumMap<Feature, Double>(Feature.class);
+		
+		final Iterator<Instance> it = instances.iterator();
+		if(!it.hasNext())
+			throw new IllegalArgumentException("instances cannot be empty.");
+		
+		if(hasMean)
+		{
+			final Instance mean = SlidingWindow.mean(instances);
+			if(Feature.X.isSet(flags))
+				values.put(Feature.X, mean.value(1));
+			if(Feature.Y.isSet(flags))
+				values.put(Feature.Y, mean.value(2));
+			if(Feature.Z.isSet(flags))
+				values.put(Feature.Z, mean.value(3));
+		}
+		
+		if(Feature.MAGNITUDE.isSet(flags) || Feature.VARIANCE_OF_MAGNITUDE.isSet(flags))
+		{
+			final Iterable<Instance> mag = magnitude(instances);
+			
+			if(Feature.MAGNITUDE.isSet(flags))
+			{
+				double sum = 0.0;
+				int num = 0;
+				for(Instance i: mag)
+				{
+					num++;
+					sum += i.value(1);
+				}
+				values.put(Feature.MAGNITUDE, sum / num);
+			}
+			
+			if(Feature.VARIANCE_OF_MAGNITUDE.isSet(flags))
+				values.put(Feature.VARIANCE_OF_MAGNITUDE, variance(mag, 1).value(1));
+		}
+		
+		if(hasVariance)
+		{
+			if(Feature.VARIANCE_X.isSet(flags))
+				values.put(Feature.VARIANCE_X, variance(instances, 1).value(1));
+			if(Feature.VARIANCE_Y.isSet(flags))
+				values.put(Feature.VARIANCE_Y, variance(instances, 2).value(1));
+			if(Feature.VARIANCE_Z.isSet(flags))
+				values.put(Feature.VARIANCE_Z, variance(instances, 3).value(1));
+		}
+		
+		// We need the last instance for the timestamp
+		Instance last = null;
+		while(it.hasNext())
+			last = it.next();
+		
+		final boolean hasClass = (last.numValues() == 5);
+		final Instance out = new Instance(features.length + (hasClass ? 2 : 1));
+		out.setValue(0, last.value(0));
+		
+		for(int j = 0; j < features.length; j++)
+			out.setValue(j + 1, values.get(features[j]));
+		if(hasClass)
+			out.setValue(features.length + 1, last.value(4));
+		
+		return out;
+	}
+	
+	/**
+	 * Extracts the specified features from the specified instances.<br>
+	 * This is a convenience method and {@link #extractFeatures(Iterable, int)} is more
+	 * efficient.
+	 * <p>
+	 * For more information on the expected instance format see the {@link FeatureExtractor class
+	 * documentation}.
+	 * 
+	 * @param instances the instances to extract features from.
+	 * @param features an array of {@link Feature} objects. Occurrences of {@link Feature#RAW}
+	 *        are ignored.
+	 * @return an {@link Instance} with the specified features. The features are in the same
+	 *         order that {@link Feature#getMask(Feature[])} returns.
+	 * @exception IllegalArgumentException if {@code instances} is empty or {@code features}
+	 *            contains no features.
+	 */
+	public static Instance extractFeatures(Iterable<Instance> instances, Feature[] features)
+	{
+		return extractFeatures(instances, Feature.getMask(features));
+	}
+	
+	private static Instance variance(Iterable<Instance> instances, int idx)
+	{
+		Instance last = null;
+		for(Instance i: instances)
+			last = i;
+		
+		final boolean hasClass = (last.numValues() == 5) || (last.numValues() == 3);
+		final Instance out = new Instance(hasClass ? 3 : 2);
+		out.setValue(0, last.value(0));
+		if(hasClass)
+			out.setValue(2, last.value(last.numValues() == 3 ? 2 : 4));
+		
+		double sum = 0.0;
+		int num = 0;
+		
+		for(Instance i: instances)
+		{
+			sum += i.value(idx);
+			num++;
+		}
+		
+		final double mean = sum / num;
+		double var = 0.0;
+		
+		for(Instance i: instances)
+			var += (i.value(idx) - mean) * (i.value(idx) - mean);
+		
+		out.setValue(1, var / num);
+		
+		return out;
+	}
+	
+	private static Iterable<Instance> magnitude(Iterable<Instance> instances)
+	{
+		final LinkedList<Instance> out = new LinkedList<Instance>();
+		
+		for(Instance i: instances)
+		{
+			final Instance mag = new Instance(i.numValues() - 2);
+			mag.setValue(0, i.value(0));
+			if(mag.numValues() > 2)
+				mag.setValue(2, i.value(4));
+			
+			final double tmp = mag.value(1) * mag.value(1) + mag.value(2) * mag.value(2);
+			mag.setValue(1, Math.sqrt(tmp + mag.value(3) * mag.value(3)));
+			out.add(mag);
+		}
+		
+		return out;
 	}
 }
