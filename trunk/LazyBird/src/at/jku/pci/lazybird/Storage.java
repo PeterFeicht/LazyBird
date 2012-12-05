@@ -37,6 +37,13 @@ public final class Storage
 	/**
 	 * Shared preference key: {@value}
 	 * <p>
+	 * The file name for the log file from training the current classifier.
+	 */
+	public static final String KEY_TRAINING_LOG_FILE = "classifierTrainingLogFile";
+	
+	/**
+	 * Shared preference key: {@value}
+	 * <p>
 	 * The type of the current classifier.
 	 */
 	public static final String KEY_CLASSIFIER_TYPE = "classifierType";
