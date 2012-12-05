@@ -51,6 +51,7 @@
     <string name="btnSelectFeatures">Features auswählen&#8230;</string>
     <string name="btnSaveFeatures">Features speichern&#8230;</string>
     <string name="btnTrain">Trainieren</string>
+    <string name="btnValidate">Testen</string>
     <string name="labelSelectClassifier">Wählen Sie einen Classifier:</string>
     <string name="labelSelectWindowSize">Wählen Sie eine Mittelzeit (ms):</string>
     <string name="selectFileNote">Beachten Sie, dass nur Dateien im Ausgabeverzeichnis angezeigt werden.</string>

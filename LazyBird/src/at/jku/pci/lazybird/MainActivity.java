@@ -48,6 +48,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			@Override
 			public void onPageSelected(int position)
 			{
+				// Doesn't work when tabs are collapsed to a list (e.g. when in landscape), this
+				// is an android bug
 				actionBar.setSelectedNavigationItem(position);
 			}
 		});
@@ -83,7 +85,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		@Override
 		public boolean onMenuItemClick(MenuItem item)
 		{
-			// TODO Auto-generated method stub
+			// TODO implement reporting
 			return false;
 		}
 	};
@@ -131,6 +133,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	@Override
 	public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction)
 	{
+		// TODO add animation
 	}
 	
 	public class SectionsPagerAdapter extends FragmentPagerAdapter

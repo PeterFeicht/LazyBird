@@ -2,7 +2,10 @@ package at.jku.pci.lazybird;
 
 import java.io.File;
 import java.io.FileFilter;
+import weka.classifiers.Evaluation;
+import weka.core.Instances;
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
@@ -10,18 +13,19 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemSelectedListener;
 import at.jku.pci.lazybird.features.Feature;
 
 public class TrainFragment extends Fragment
@@ -50,14 +54,18 @@ public class TrainFragment extends Fragment
 	 * @see ARFFRecorderService#getDirname()
 	 */
 	private static String sOutputDir;
+	private static String sClassifierFile;
+	private static String sTrainingFile;
 	
 	private SharedPreferences mPrefs;
+	private SharedPreferences mPrefsClassifier;
 	
 	// Fields
 	private Button mBtnSelectFile;
 	private Button mBtnSelectFeatures;
 	private Button mBtnSaveFeatures;
 	private Button mBtnTrain;
+	private Button mBtnValidate;
 	private Spinner mSpinWindowSize;
 	private Spinner mSpinClassifier;
 	private ProgressBar mProgressTraining;
@@ -69,19 +77,6 @@ public class TrainFragment extends Fragment
 	private FileFilter mArffFilter;
 	private File[] mFiles = new File[0];
 	private Feature[] mFeatures = new Feature[0];
-	
-	// Handlers
-	// private ARFFRecorderService mService = null;
-	private Handler mHandler = new Handler();
-	private Runnable mRunProgress = new Runnable() {
-		public void run()
-		{
-			if(ARFFRecorderService.isRunning())
-			{
-				// TODO update progress if possible, most likely remove
-			}
-		}
-	};
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -99,6 +94,8 @@ public class TrainFragment extends Fragment
 		
 		PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, false);
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		mPrefsClassifier = getActivity().getSharedPreferences(
+			Storage.PREFS_CLASSIFIER, Activity.MODE_PRIVATE);
 		updateSettings();
 		
 		getWidgets(getView());
@@ -121,26 +118,6 @@ public class TrainFragment extends Fragment
 				return pathname.getName().endsWith(RecorderFragment.EXTENSION);
 			}
 		};
-		
-		// if the service is running and we just got created, fill inputs with running data.
-		// setting of input enabled and such things are done in onResume
-		// if(ARFFRecorderService.isRunning())
-		// {
-		// mService = ARFFRecorderService.getInstance();
-		// // double check for an actual instance, just to be sure
-		// if(mService != null)
-		// {
-		// mTxtFilename.setText(mService.getFilename());
-		// // Select appropriate class, if possible
-		// SpinnerAdapter a = mSpinClass.getAdapter();
-		// for(int j = 0, count = a.getCount(); j < count; j++)
-		// if(mService.getAClass().equals(a.getItem(j)))
-		// {
-		// mSpinClass.setSelection(j);
-		// break;
-		// }
-		// }
-		// }
 	}
 	
 	/**
@@ -160,11 +137,30 @@ public class TrainFragment extends Fragment
 		mBtnTrain = (Button)v.findViewById(R.id.btnTrain);
 		mBtnTrain.setOnClickListener(onBtnTrainClick);
 		mBtnTrain.setEnabled(false);
+		mBtnValidate = (Button)v.findViewById(R.id.btnValidate);
+		mBtnValidate.setOnClickListener(onBtnValidateClick);
 		
 		mSpinWindowSize = (Spinner)v.findViewById(R.id.spinWindowSize);
 		if(mSpinWindowSize.getCount() > 1)
 			mSpinWindowSize.setSelection(1);
 		mSpinClassifier = (Spinner)v.findViewById(R.id.spinClassifier);
+		
+		OnItemSelectedListener hideValidateListener = new OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+			{
+				setValidateVisible(false);
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent)
+			{
+				setValidateVisible(false);
+			}
+		};
+		
+		mSpinClassifier.setOnItemSelectedListener(hideValidateListener);
+		mSpinWindowSize.setOnItemSelectedListener(hideValidateListener);
 		
 		mProgressTraining = (ProgressBar)v.findViewById(R.id.progressTraining);
 	}
@@ -174,29 +170,14 @@ public class TrainFragment extends Fragment
 	{
 		super.onPause();
 		
-		// TODO maybe remove progress handler
-		// stop progress update and unregister service receiver when paused
-		mHandler.removeCallbacks(mRunProgress);
+		// TODO cancel training or feature extraction
 	}
 	
 	@Override
 	public void onResume()
 	{
 		super.onResume();
-		
-		// TODO check for running training service
-		// check for running training every time the fragment is resumed, since broadcast can't
-		// be received while paused or stopped
-		// setViewStates(ARFFRecorderService.isRunning());
-		// if(ARFFRecorderService.isRunning())
-		// {
-		// // resume last value update and re-register the service receiver, if service is
-		// // started
-		// mHandler.post(mRunUpdateValues);
-		// mBroadcastManager.registerReceiver(mServiceReceiver, mServiceIntentFilter);
-		// }
-		// else
-		// mService = null;
+		// FIXME save selections when rotating
 	}
 	
 	/**
@@ -218,6 +199,8 @@ public class TrainFragment extends Fragment
 	private void updateSettings()
 	{
 		sOutputDir = mPrefs.getString(SettingsActivity.KEY_OUTPUT_DIR, "");
+		sClassifierFile = mPrefsClassifier.getString(Storage.KEY_CLASSIFIER_FILE, "");
+		sTrainingFile = mPrefsClassifier.getString(Storage.KEY_TRAINING_FILE, "");
 	}
 	
 	/**
@@ -233,6 +216,7 @@ public class TrainFragment extends Fragment
 		mBtnSelectFeatures.setEnabled(!training);
 		mSpinClassifier.setEnabled(!training);
 		mSpinWindowSize.setEnabled(!training);
+		mBtnSaveFeatures.setEnabled(!training);
 		
 		mProgressTraining.setVisibility(training ? View.VISIBLE : View.INVISIBLE);
 	}
@@ -242,6 +226,11 @@ public class TrainFragment extends Fragment
 		boolean enabled = mFiles.length > 0 && mFeatures.length > 0;
 		mBtnTrain.setEnabled(enabled);
 		mBtnSaveFeatures.setEnabled(enabled);
+	}
+	
+	private void setValidateVisible(boolean visible)
+	{
+		mBtnValidate.setVisibility(visible ? View.VISIBLE : View.GONE);
 	}
 	
 	private OnClickListener onBtnSelectFileClick = new OnClickListener() {
@@ -321,6 +310,7 @@ public class TrainFragment extends Fragment
 				{
 					if(which != AlertDialog.BUTTON_POSITIVE)
 						return;
+					setValidateVisible(false);
 					
 					// User clicked OK, count the number of selected files
 					int numSelected = 0;
@@ -424,6 +414,7 @@ public class TrainFragment extends Fragment
 				{
 					if(which != AlertDialog.BUTTON_POSITIVE)
 						return;
+					setValidateVisible(false);
 					
 					if(selected[rawIdx])
 					{
@@ -480,7 +471,7 @@ public class TrainFragment extends Fragment
 		@Override
 		public void onClick(View v)
 		{
-			// TODO Auto-generated method stub
+			// TODO implement saving features
 			
 		}
 	};
@@ -489,6 +480,15 @@ public class TrainFragment extends Fragment
 		@Override
 		public void onClick(View v)
 		{
+			// TODO implement training
+		}
+	};
+	
+	private OnClickListener onBtnValidateClick = new OnClickListener() {
+		@Override
+		public void onClick(View v)
+		{
+			// TODO implement validation
 			
 		}
 	};
