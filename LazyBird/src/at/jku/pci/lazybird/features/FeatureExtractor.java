@@ -209,7 +209,7 @@ public class FeatureExtractor
 		
 		if(hasMean)
 		{
-			final Instance mean = SlidingWindow.mean(instances);
+			final Instance mean = mean(instances);
 			if(Feature.X.isSet(flags))
 				values.put(Feature.X, mean.value(1));
 			if(Feature.Y.isSet(flags))
@@ -288,30 +288,33 @@ public class FeatureExtractor
 	
 	private static Instance variance(Iterable<Instance> instances, int idx)
 	{
+		Iterator<Instance> it = instances.iterator();
 		Instance last = null;
-		for(Instance i: instances)
-			last = i;
-		
-		final boolean hasClass = (last.numValues() == 5) || (last.numValues() == 3);
-		final Instance out = new Instance(hasClass ? 3 : 2);
-		out.setValue(0, last.value(0));
-		if(hasClass)
-			out.setValue(2, last.value(last.numValues() == 3 ? 2 : 4));
 		
 		double sum = 0.0;
 		int num = 0;
 		
-		for(Instance i: instances)
+		while(it.hasNext())
 		{
-			sum += i.value(idx);
+			last = it.next();
+			sum += last.value(idx);
 			num++;
 		}
 		
 		final double mean = sum / num;
 		double var = 0.0;
 		
-		for(Instance i: instances)
-			var += (i.value(idx) - mean) * (i.value(idx) - mean);
+		while(it.hasNext())
+		{
+			last = it.next();
+			var += (last.value(idx) - mean) * (last.value(idx) - mean);
+		}
+		
+		final boolean hasClass = (last.numValues() == 5) || (last.numValues() == 3);
+		final Instance out = new Instance(hasClass ? 3 : 2);
+		out.setValue(0, last.value(0));
+		if(hasClass)
+			out.setValue(2, last.value(last.numValues() == 3 ? 2 : 4));
 		
 		out.setValue(1, var / num);
 		
@@ -333,6 +336,46 @@ public class FeatureExtractor
 			mag.setValue(1, Math.sqrt(tmp + mag.value(3) * mag.value(3)));
 			out.add(mag);
 		}
+		
+		return out;
+	}
+	
+	/**
+	 * Calculates the average of the specified instances.<br>
+	 * For the required attributes of an {@code Instance}, see
+	 * {@link SlidingWindow#slide(Instances, int, int, WindowListener)}. If the instances contain
+	 * a class, it is also set in the output instance, the timestamp is that of the last instance
+	 * in the set.
+	 * 
+	 * @param instances a set of {@link Instance} objects.
+	 * @return an averaged {@code Instance}, or {@code null} if {@code instances} is empty.
+	 */
+	private static Instance mean(Iterable<Instance> instances)
+	{
+		final Iterator<Instance> it = instances.iterator();
+		Instance last = null;
+		double x = 0.0, y = 0.0, z = 0.0;
+		int num = 0;
+		
+		if(!it.hasNext())
+			return null;
+		
+		while(it.hasNext())
+		{
+			last = it.next();
+			num++;
+			x += last.value(1);
+			y += last.value(2);
+			z += last.value(3);
+		}
+		
+		final Instance out = new Instance(last.numValues());
+		out.setValue(0, last.value(0));
+		if(out.numValues() == 5)
+			out.setValue(4, last.value(4));
+		out.setValue(1, x / num);
+		out.setValue(2, y / num);
+		out.setValue(3, z / num);
 		
 		return out;
 	}
