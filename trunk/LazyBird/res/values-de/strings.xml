@@ -28,6 +28,8 @@
     <string name="set_maxNumValues_long">Anzahl der Datenpunkte nach der die Aufnahme beendet wird</string>
     <string name="set_startDelay">Startverzögerung</string>
     <string name="set_startDelay_long">Wartezeit (Sekunden) bevor die Aufnahme gestartet wird</string>
+    <string name="set_numFolds">Anzahl Folds</string>
+    <string name="set_numFolds_long">Die Anzahl von Teilmengen bei der Kreuzvalidierung des trainierten Classifiers.</string>
     
     <!-- Record -->
     <string name="helpRecorder">In diesem Tab können Sie Beschleunigungsdaten in ARFF Dateien aufnehmen um Classifier zu trainieren.\nSie müssen Daten aufnehmen und einen Classifier trainieren, bevor Sie ihre Aktivität an den Server melden können.</string>

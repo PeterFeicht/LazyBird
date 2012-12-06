@@ -10,35 +10,50 @@ import android.preference.PreferenceFragment;
 import android.util.Log;
 import android.view.MenuItem;
 
+/**
+ * All settings the user can change, for other stored values see {@link Storage}.
+ * 
+ * @author Peter
+ */
 public class SettingsActivity extends Activity
 {
-	public static final String LOGTAG = "SettingsActivity";
-	public static final boolean LOCAL_LOGV = true;
-	
 	/**
 	 * Shared preferences key: {@value}
 	 * <p>
 	 * The update delay of the last values during recording.
 	 */
 	public static final String KEY_VALUE_UPDATE_SPEED = "valueUpdateSpeed";
+	
 	/**
 	 * Shared preferences key: {@value}
 	 * <p>
 	 * The directory to write the recorded files to.
 	 */
 	public static final String KEY_OUTPUT_DIR = "outputDir";
+	
 	/**
 	 * Shared preferences key: {@value}
 	 * <p>
 	 * The number of data points after which recording is stopped.
 	 */
 	public static final String KEY_MAX_NUM_VALUES = "maxNumValues";
+	
 	/**
 	 * Shared preferences key: {@value}
 	 * <p>
 	 * The time to wait in seconds before starting the recording.
 	 */
 	public static final String KEY_START_DELAY = "startDelay";
+	
+	/**
+	 * Shared preferences key: {@value}
+	 * <p>
+	 * The number of folds to perform cross validation with.
+	 */
+	public static final String KEY_NUM_FOLDS = "numFolds";
+	
+	public static final String LOGTAG = "SettingsActivity";
+	public static final boolean LOCAL_LOGV = true;
 	
 	public static class SettingsFragment extends PreferenceFragment implements
 			OnSharedPreferenceChangeListener
@@ -47,6 +62,7 @@ public class SettingsActivity extends Activity
 		private EditTextPreference mOutputDir;
 		private ListPreference mMaxNumValues;
 		private NumberPreference mStartDelay;
+		private NumberPreference mNumFolds;
 		
 		@Override
 		public void onCreate(Bundle savedInstanceState)
@@ -60,9 +76,12 @@ public class SettingsActivity extends Activity
 			mOutputDir = (EditTextPreference)findPreference(KEY_OUTPUT_DIR);
 			mMaxNumValues = (ListPreference)findPreference(KEY_MAX_NUM_VALUES);
 			mStartDelay = (NumberPreference)findPreference(KEY_START_DELAY);
+			mNumFolds = (NumberPreference)findPreference(KEY_NUM_FOLDS);
 			
 			// What layout do non-custom preferences use?
-			mStartDelay.setLayoutResource(mValueUpdateSpeed.getLayoutResource());
+			final int layout = mValueUpdateSpeed.getLayoutResource();
+			mStartDelay.setLayoutResource(layout);
+			mNumFolds.setLayoutResource(layout);
 			
 			final SharedPreferences p = getPreferenceScreen().getSharedPreferences();
 			mOutputDir.setSummary(p.getString(KEY_OUTPUT_DIR, ""));
@@ -100,6 +119,8 @@ public class SettingsActivity extends Activity
 				mMaxNumValues.setSummary(mMaxNumValues.getEntry());
 			else if(key.equals(KEY_START_DELAY))
 				mStartDelay.setSummary(Integer.toString(p.getInt(KEY_START_DELAY, 0)));
+			else if(key.equals(KEY_NUM_FOLDS))
+				mNumFolds.setSummary(Integer.toString(p.getInt(KEY_NUM_FOLDS, 4)));
 		}
 	}
 	
