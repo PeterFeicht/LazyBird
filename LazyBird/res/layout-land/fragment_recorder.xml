@@ -6,7 +6,7 @@
     android:paddingBottom="10dp"
     android:paddingLeft="20dp"
     android:paddingRight="20dp"
-    android:paddingTop="10dp" >
+    android:paddingTop="3dp" >
 
     <EditText
         android:id="@+id/txtFilename"
@@ -34,7 +34,7 @@
         android:layout_alignLeft="@+id/labelClass"
         android:layout_alignRight="@+id/swOnOff"
         android:layout_below="@+id/spinClass"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="6dp"
         android:text="@string/labelInstructions" />
 
     <Spinner
@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/btnMakeFilename"
         android:layout_marginLeft="15dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="6dp"
         android:layout_toRightOf="@+id/labelClass"
         android:entries="@+array/classes" />
 
@@ -54,7 +54,7 @@
         android:layout_alignLeft="@+id/labelClass"
         android:layout_alignParentLeft="false"
         android:layout_below="@+id/labelInstructions"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="18dp"
         android:text="@string/txtStatus" />
 
     <TextView
@@ -75,89 +75,77 @@
         android:layout_toRightOf="@+id/btnMakeFilename"
         android:text="@string/btnArff" />
 
-    <TextView
-        android:id="@+id/labelStartTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_below="@+id/txtFilename"
         android:layout_marginLeft="24dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="6dp"
         android:layout_toRightOf="@+id/swOnOff"
-        android:text="@string/startTime"
-        android:textAppearance="?android:attr/textAppearance" />
+        android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/txtStartTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/labelStartTime"
-        android:layout_below="@+id/labelStartTime"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="1dp"
-        android:text="@string/nothing"
-        android:textAppearance="?android:attr/textAppearance" />
+        <TextView
+            android:id="@+id/labelStartTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/startTime"
+            android:textAppearance="?android:attr/textAppearance" />
 
-    <TextView
-        android:id="@+id/labelLastValues"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/labelStartTime"
-        android:layout_below="@+id/txtStartTime"
-        android:layout_marginTop="3dp"
-        android:text="@string/lastValues"
-        android:textAppearance="?android:attr/textAppearance" />
+        <TextView
+            android:id="@+id/txtStartTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="@string/nothing"
+            android:textAppearance="?android:attr/textAppearance" />
 
-    <TextView
-        android:id="@+id/txtLastValues"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/labelLastValues"
-        android:layout_below="@+id/labelLastValues"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="1dp"
-        android:text="@string/nothing"
-        android:textAppearance="?android:attr/textAppearance" />
+        <TextView
+            android:id="@+id/labelLastValues"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:text="@string/lastValues"
+            android:textAppearance="?android:attr/textAppearance" />
 
-    <TextView
-        android:id="@+id/labelNumValues"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/labelLastValues"
-        android:layout_below="@+id/txtLastValues"
-        android:layout_marginTop="3dp"
-        android:text="@string/numValues"
-        android:textAppearance="?android:attr/textAppearance" />
+        <TextView
+            android:id="@+id/txtLastValues"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="@string/nothing"
+            android:textAppearance="?android:attr/textAppearance" />
 
-    <TextView
-        android:id="@+id/txtNumValues"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/labelNumValues"
-        android:layout_below="@+id/labelNumValues"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="1dp"
-        android:text="@string/nothing"
-        android:textAppearance="?android:attr/textAppearance" />
+        <TextView
+            android:id="@+id/labelNumValues"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:text="@string/numValues"
+            android:textAppearance="?android:attr/textAppearance" />
 
-    <TextView
-        android:id="@+id/labelValsPerSecond"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/labelNumValues"
-        android:layout_below="@+id/txtNumValues"
-        android:layout_marginTop="3dp"
-        android:text="@string/valsPerSecond"
-        android:textAppearance="?android:attr/textAppearance" />
+        <TextView
+            android:id="@+id/txtNumValues"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="@string/nothing"
+            android:textAppearance="?android:attr/textAppearance" />
 
-    <TextView
-        android:id="@+id/txtValsPerSecond"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/labelValsPerSecond"
-        android:layout_below="@+id/labelValsPerSecond"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="1dp"
-        android:text="@string/nothing"
-        android:textAppearance="?android:attr/textAppearance" />
+        <TextView
+            android:id="@+id/labelValsPerSecond"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:text="@string/valsPerSecond"
+            android:textAppearance="?android:attr/textAppearance" />
+
+        <TextView
+            android:id="@+id/txtValsPerSecond"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="@string/nothing"
+            android:textAppearance="?android:attr/textAppearance" />
+    </LinearLayout>
 
 </RelativeLayout>
