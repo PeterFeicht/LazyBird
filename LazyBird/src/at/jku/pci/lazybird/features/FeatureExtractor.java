@@ -10,6 +10,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
@@ -69,7 +70,7 @@ public class FeatureExtractor
 	private final Feature[] mFeatures;
 	private final int mWindowSize;
 	private final int mJumpSize;
-	private final int mOutputFeatures;
+	private int mOutputFeatures;
 	private Instances mOutput = null;
 	private boolean mCalculated = false;
 	
@@ -200,31 +201,28 @@ public class FeatureExtractor
 		if(mCalculated)
 			throw new IllegalStateException();
 		
+		// If RAW was specified, merge input files and return
+		if(mOutputFeatures == 0)
+		{
+			mergeFiles();
+			return;
+		}
+		
 		for(File f : mFiles)
 		{
 			final BufferedReader reader = new BufferedReader(new FileReader(f));
 			final ArffReader arff = new ArffReader(reader);
 			final Instances input = arff.getData();
 			
+			// For static feature extraction, files need to have timestamp, class and coordinates
 			if(input.numAttributes() == 5)
 				input.setClassIndex(input.numAttributes() - 1);
 			else
 				throw new UnsupportedAttributeTypeException("File " + f.toString());
-
-			// Initialize output Instances object
+			
+			// Initialize output Instances object from data of the first file
 			if(mOutput == null)
-			{
 				mOutput = initOutput(input);
-				
-				// If RAW was specified, merge input files and return
-				if(mOutputFeatures == 0)
-				{
-					reader.close();
-					mergeFiles();
-					mCalculated = true;
-					return;
-				}
-			}
 			
 			try
 			{
@@ -256,68 +254,139 @@ public class FeatureExtractor
 	}
 	
 	/**
-	 * Just merges all input file into a single {@link Instances} data set. Also checks that all
+	 * Just merges all input files into a single {@link Instances} data set. Also checks that all
 	 * input files have the same features.
 	 */
 	private void mergeFiles() throws IOException, UnsupportedAttributeTypeException
 	{
-		HashSet<String> featureSet = new HashSet<String>();
-		for(Feature f : Feature.getFeatures(mOutputFeatures))
-			featureSet.add(f.getAttribute());
+		HashSet<String> inFeatures = new HashSet<String>();
 		
 		for(File f : mFiles)
 		{
 			final BufferedReader reader = new BufferedReader(new FileReader(f));
 			final ArffReader arff = new ArffReader(reader);
 			final Instances input = arff.getData();
+			input.setClassIndex(input.numAttributes() - 1);
 			
-			if(input.numAttributes() == mOutput.numAttributes())
-				input.setClassIndex(input.numAttributes() - 1);
-			else
+			if(mOutput == null)
+			{
+				mOutput = initOutput(input);
+				for(Feature f2 : Feature.getFeatures(mOutputFeatures))
+					inFeatures.add(f2.getAttribute());
+			}
+			
+			if(input.numAttributes() != mOutput.numAttributes())
 				throw new UnsupportedAttributeTypeException("RAW File " + f.toString());
 			
 			// Check if all input attributes are wanted
 			for(int j = 0; j < input.numAttributes() - 1; j++)
 			{
 				final Attribute a = input.attribute(j);
-				if(!a.isNumeric() || !featureSet.contains(a.name()))
+				if(!a.isNumeric() || !inFeatures.contains(a.name()))
 					throw new UnsupportedAttributeTypeException("RAW File " + f.toString());
 			}
 			
 			@SuppressWarnings("unchecked")
 			Enumeration<Instance> instances = input.enumerateInstances();
 			while(instances.hasMoreElements())
-				mOutput.add(instances.nextElement());
+			{
+				final Instance i = new Instance(instances.nextElement());
+				i.setDataset(mOutput);
+				mOutput.add(i);
+			}
 			
 			reader.close();
 		}
+		
+		mCalculated = true;
 	}
 	
-	private Instances initOutput(Instances input)
+	/**
+	 * Initializes an output set from the specified instances and sets {@link #mOutputFeatures}
+	 * if necessary.
+	 */
+	private Instances initOutput(Instances input) throws UnsupportedAttributeTypeException
 	{
 		final FastVector attributes = new FastVector(mFeatures.length + 1);
-		for(Feature f : Feature.getFeatures(mOutputFeatures))
-			attributes.addElement(new Attribute(f.getAttribute()));
-		
-		@SuppressWarnings("unchecked")
-		final Enumeration<String> names = input.classAttribute().enumerateValues();
-		final FastVector values = new FastVector();
-		while(names.hasMoreElements())
-			values.addElement(names.nextElement());
-		attributes.addElement(new Attribute("class", values));
-		
 		// Make an educated guess for the needed capacity of the output set
 		double cap = mFiles.length;
-		if(mOutputFeatures != 0)
-			cap *= (input.lastInstance().value(0) - input.firstInstance().value(0)) / mJumpSize;
-		else
-			cap *= input.numInstances();
 		
-		Instances out =
-			new Instances("lazybird-train-" + System.currentTimeMillis(), attributes, (int)cap);
+		// Features have been specified, no extraction from input file necessary
+		if(mOutputFeatures != 0)
+		{
+			for(Feature f : Feature.getFeatures(mOutputFeatures))
+				attributes.addElement(new Attribute(f.getAttribute()));
+			
+			attributes.addElement(
+				new Attribute("class", getValueVector(input.classAttribute())));
+			
+			cap *= (input.lastInstance().value(0) - input.firstInstance().value(0)) / mJumpSize;
+		}
+		else
+		{
+			// Extract output features from input file
+			final Map<String, Feature> map = Feature.getAttributes();
+			@SuppressWarnings("unchecked")
+			final Enumeration<Attribute> inAttributes = input.enumerateAttributes();
+			
+			while(inAttributes.hasMoreElements())
+			{
+				final Attribute a = inAttributes.nextElement();
+				if(a.isNumeric())
+				{
+					// If name matches celebrate, otherwise try to find a matching name
+					if(map.containsKey(a.name()))
+					{
+						attributes.addElement(a);
+						mOutputFeatures |= map.get(a.name()).getBit();
+					}
+					else
+					{
+						boolean added = false;
+						for(Feature f : map.values())
+						{
+							if(a.name().contains(f.getAttribute()))
+							{
+								attributes.addElement(a.copy(f.getAttribute()));
+								added = true;
+								break;
+							}
+						}
+						
+						if(!added)
+							throw new UnsupportedAttributeTypeException();
+					}
+				}
+				else if(a.isNominal())
+				{
+					// Class attribute has to be the last one
+					if(inAttributes.hasMoreElements())
+						throw new UnsupportedAttributeTypeException();
+					
+					attributes.addElement(new Attribute("class", getValueVector(a)));
+				}
+				else
+					throw new UnsupportedAttributeTypeException();
+			}
+			
+			cap *= input.numInstances();
+		}
+		
+		Instances out = new Instances("lazybird-train-" + System.currentTimeMillis(),
+			attributes, (int)cap);
 		out.setClassIndex(mOutput.numAttributes() - 1);
 		
 		return out;
+	}
+	
+	private FastVector getValueVector(Attribute a)
+	{
+		@SuppressWarnings("unchecked")
+		final Enumeration<String> names = a.enumerateValues();
+		final FastVector values = new FastVector();
+		while(names.hasMoreElements())
+			values.addElement(names.nextElement());
+		return values;
 	}
 	
 	private Instance extractFeatures(Iterable<Instance> instances)
