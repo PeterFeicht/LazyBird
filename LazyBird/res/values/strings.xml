@@ -27,6 +27,8 @@
     <string name="set_maxNumValues_long">Number of data points after which recording is stopped</string>
     <string name="set_startDelay">Start delay</string>
     <string name="set_startDelay_long">Time to wait (in seconds) before starting to record</string>
+    <string name="set_numFolds">Number of folds</string>
+    <string name="set_numFolds_long">The number of folds to be used when cross-validating the trained classifier.</string>
     
     <!-- Record -->
     <string name="helpRecorder">In this tab, you can record accelerometer data to ARFF files to train a classifier with.\nYou have to record data and train a classifier, before you can report your activity to the server.</string>
