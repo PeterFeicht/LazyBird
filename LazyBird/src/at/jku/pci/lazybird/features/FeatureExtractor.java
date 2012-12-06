@@ -136,20 +136,18 @@ public class FeatureExtractor
 	}
 	
 	/**
-	 * Gets the features in the output data set.<br>
-	 * Note that the features are not necessarily in the same order as specified in the
-	 * constructor. Also, all occurrences of {@link Feature#RAW} are ignored, if other features
-	 * are specified.
+	 * Gets the mask for the features in the output data set.<br>
+	 * All occurrences of {@link Feature#RAW} are ignored, if other features are specified.
 	 * 
 	 * @exception IllegalStateException if {@link #extract()} has not been called yet.
 	 * @see #FeatureExtractor(File[], Feature[], int, int)
 	 */
-	public Feature[] getOutputFeatures()
+	public int getOutputFeatures()
 	{
 		if(!mCalculated)
 			throw new IllegalStateException();
 		else
-			return Feature.getFeatures(mOutputFeatures);
+			return mOutputFeatures;
 	}
 	
 	/**
