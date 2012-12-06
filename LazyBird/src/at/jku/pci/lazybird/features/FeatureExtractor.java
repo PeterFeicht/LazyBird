@@ -372,7 +372,7 @@ public class FeatureExtractor
 		
 		Instances out = new Instances("lazybird-train-" + System.currentTimeMillis(),
 			attributes, (int)cap);
-		out.setClassIndex(mOutput.numAttributes() - 1);
+		out.setClassIndex(out.numAttributes() - 1);
 		
 		return out;
 	}
