@@ -23,7 +23,7 @@ public final class Storage
 	/**
 	 * Shared preference key: {@value}
 	 * <p>
-	 * The flags for all preferences the current classifier was trained with.
+	 * The flags for all features the current classifier was trained with.
 	 */
 	public static final String KEY_FEATURES = "classifierFeatures";
 	
@@ -44,9 +44,9 @@ public final class Storage
 	/**
 	 * Shared preference key: {@value}
 	 * <p>
-	 * The file name for the log file from training the current classifier.
+	 * The file name for the log file from validating the current classifier.
 	 */
-	public static final String KEY_TRAINING_LOG_FILE = "classifierTrainingLogFile";
+	public static final String KEY_VALIDATION_LOG_FILE = "classifierValidationLogFile";
 	
 	/**
 	 * Shared preference key: {@value}
