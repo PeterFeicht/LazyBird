@@ -1,5 +1,8 @@
 package at.jku.pci.lazybird.features;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Enum with available features for extraction from ARFF Files by {@link FeatureExtractor}.
  * <p>
@@ -175,6 +178,20 @@ public enum Feature
 		int out = 0;
 		for(Feature f : features)
 			out |= f.mBit;
+		
+		return out;
+	}
+	
+	/**
+	 * Gets a map of all features, mapping attribute name to {@link Feature} instance.
+	 */
+	public static Map<String, Feature> getAttributes()
+	{
+		final Feature[] all = values();
+		final Map<String, Feature> out = new HashMap<String, Feature>(all.length);
+		
+		for(Feature f : all)
+			out.put(f.mAttribute, f);
 		
 		return out;
 	}
