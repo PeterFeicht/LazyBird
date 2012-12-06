@@ -216,7 +216,7 @@ public class FeatureExtractor
 			if(input.numAttributes() == 5)
 				input.setClassIndex(input.numAttributes() - 1);
 			else
-				throw new UnsupportedAttributeTypeException("File " + f.toString());
+				throw new UnsupportedAttributeTypeException(f.toString());
 			
 			// Initialize output Instances object from data of the first file
 			if(mOutput == null)
@@ -242,7 +242,7 @@ public class FeatureExtractor
 			}
 			catch(UnsupportedAttributeTypeException ex)
 			{
-				throw new UnsupportedAttributeTypeException("File " + f.toString());
+				throw new UnsupportedAttributeTypeException(f.toString());
 			}
 			
 			reader.close();
@@ -274,14 +274,14 @@ public class FeatureExtractor
 			}
 			
 			if(input.numAttributes() != mOutput.numAttributes())
-				throw new UnsupportedAttributeTypeException("RAW File " + f.toString());
+				throw new UnsupportedAttributeTypeException(f.toString());
 			
 			// Check if all input attributes are wanted
 			for(int j = 0; j < input.numAttributes() - 1; j++)
 			{
 				final Attribute a = input.attribute(j);
 				if(!a.isNumeric() || !inFeatures.contains(a.name()))
-					throw new UnsupportedAttributeTypeException("RAW File " + f.toString());
+					throw new UnsupportedAttributeTypeException(f.toString());
 			}
 			
 			@SuppressWarnings("unchecked")
