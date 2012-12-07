@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import weka.classifiers.Classifier;
@@ -14,11 +16,14 @@ import weka.core.Instances;
 import weka.core.UnsupportedAttributeTypeException;
 import weka.core.converters.ArffLoader;
 import weka.core.converters.ArffSaver;
+import weka.core.converters.SerializedInstancesSaver;
 import android.app.ActionBar;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -60,13 +65,8 @@ public class TrainFragment extends Fragment
 		}
 	}
 	
-	// Extras
-	public static final String EXTRA_TODO = "at.jku.pci.lazybird.TODO";
-	// Intents
-	public static final String BCAST_SERVICE_STOPPED = "at.jku.pci.lazybird.TRA_SERVICE_STOPPED";
-	public static final String BCAST_SERVICE_STARTED = "at.jku.pci.lazybird.TRA_SERVICE_STARTED";
 	// Constants
-	public static final String LOGTAG = "ARFFRecorderFragment";
+	public static final String LOGTAG = "TrainFragment";
 	public static final boolean LOCAL_LOGV = true;
 	/**
 	 * Gets the default title associated with this fragment for use in an {@link ActionBar} tab.
@@ -114,6 +114,8 @@ public class TrainFragment extends Fragment
 	private Feature[] mFeatures = new Feature[0];
 	private Instances mCalculatedFeatures = null;
 	private Classifier mClassifier = null;
+	@SuppressWarnings("rawtypes")
+	private AsyncTask mTask = null;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -132,7 +134,7 @@ public class TrainFragment extends Fragment
 		PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, false);
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		mPrefsClassifier = Storage.getClassifierPreferences(getActivity());
-		updateSettings();
+		readSettings();
 		
 		initClassifiers();
 		
@@ -186,7 +188,7 @@ public class TrainFragment extends Fragment
 		mSpinClassifier = (Spinner)v.findViewById(R.id.spinClassifier);
 		
 		ArrayAdapter<ClassifierEntry> adapter = new ArrayAdapter<TrainFragment.ClassifierEntry>(
-				getActivity(), android.R.layout.simple_spinner_item, mClassifiers);
+			getActivity(), android.R.layout.simple_spinner_item, mClassifiers);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		mSpinClassifier.setAdapter(adapter);
 		mSpinClassifier.setSelection(0);
@@ -211,7 +213,7 @@ public class TrainFragment extends Fragment
 		mProgressTraining = (ProgressBar)v.findViewById(R.id.progressTraining);
 		mProgressExtract = (ProgressBar)v.findViewById(R.id.progressExtract);
 	}
-
+	
 	private void initClassifiers()
 	{
 		mClassifiers = new ArrayList<TrainFragment.ClassifierEntry>(4);
@@ -221,17 +223,19 @@ public class TrainFragment extends Fragment
 	}
 	
 	@Override
-	public void onPause()
+	public void onStop()
 	{
-		super.onPause();
+		super.onStop();
 		
-		// TODO cancel training or feature extraction
+		if(mTask != null)
+			mTask.cancel(true);
 	}
 	
 	@Override
 	public void onResume()
 	{
 		super.onResume();
+		
 		// FIXME save selections when rotating
 	}
 	
@@ -251,12 +255,25 @@ public class TrainFragment extends Fragment
 	/**
 	 * Sets all appropriate private fields from the shared preferences.
 	 */
-	private void updateSettings()
+	private void readSettings()
 	{
 		sOutputDir = mPrefs.getString(SettingsActivity.KEY_OUTPUT_DIR, "");
 		sClassifierFile = mPrefsClassifier.getString(Storage.KEY_CLASSIFIER_FILE, "");
 		sTrainingFile = mPrefsClassifier.getString(Storage.KEY_TRAINING_FILE, "");
 		sTrainedFeatures = mPrefsClassifier.getInt(Storage.KEY_FEATURES, 0);
+	}
+	
+	/**
+	 * Writes the settings for classifier file and type, training file and trained features.
+	 */
+	private void writeSettings()
+	{
+		Editor e = mPrefsClassifier.edit();
+		e.putString(Storage.KEY_CLASSIFIER_FILE, sClassifierFile);
+		e.putString(Storage.KEY_TRAINING_FILE, sTrainingFile);
+		e.putInt(Storage.KEY_FEATURES, sTrainedFeatures);
+		e.putString(Storage.KEY_CLASSIFIER_TYPE, mClassifier.getClass().getSimpleName());
+		e.apply();
 	}
 	
 	/**
@@ -305,7 +322,7 @@ public class TrainFragment extends Fragment
 				return;
 			}
 			
-			updateSettings();
+			readSettings();
 			final File dir = new File(Environment.getExternalStorageDirectory(), sOutputDir);
 			
 			if(!dir.exists() || !dir.isDirectory())
@@ -532,7 +549,9 @@ public class TrainFragment extends Fragment
 				FeatureExtractor fe =
 					new FeatureExtractor(mFiles, mFeatures, windowSize, JUMP_SIZE);
 				
-				(new SaveFeaturesTask()).execute(fe);
+				SaveFeaturesTask t = new SaveFeaturesTask();
+				mTask = t;
+				t.execute(fe);
 			}
 			else
 				saveFeatures();
@@ -543,7 +562,12 @@ public class TrainFragment extends Fragment
 		@Override
 		public void onClick(View v)
 		{
-			// TODO implement training
+			int windowSize = Integer.parseInt((String)mSpinWindowSize.getSelectedItem());
+			FeatureExtractor fe = new FeatureExtractor(mFiles, mFeatures, windowSize, JUMP_SIZE);
+			
+			TrainClassifierTask t = new TrainClassifierTask();
+			mTask = t;
+			t.execute(fe);
 		}
 	};
 	
@@ -561,10 +585,32 @@ public class TrainFragment extends Fragment
 		btn.setCompoundDrawables(d, null, null, null);
 	}
 	
+	private void showExceptionDialog(Exception ex)
+	{
+		AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+		b.setIcon(android.R.drawable.ic_dialog_alert);
+		b.setTitle(R.string.error);
+		b.setNeutralButton(android.R.string.ok, null);
+		
+		if(ex instanceof UnsupportedAttributeTypeException)
+		{
+			b.setMessage(
+				getString(R.string.error_attributes, ex.getMessage()));
+		}
+		else if(ex instanceof FileNotFoundException)
+			b.setMessage(R.string.error_nofile);
+		else if(ex instanceof IOException)
+			b.setMessage(R.string.error_io);
+		else
+			b.setMessage(R.string.error_generic);
+		
+		b.show();
+	}
+	
 	private void saveFeatures()
 	{
 		final EditText e = new EditText(getActivity());
-		AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+		final AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
 		b.setTitle(R.string.btnSaveFeatures);
 		b.setMessage(R.string.saveFeaturesNote);
 		b.setView(e);
@@ -581,7 +627,7 @@ public class TrainFragment extends Fragment
 					return;
 				}
 				
-				updateSettings();
+				readSettings();
 				String name = e.getText().toString();
 				if(!name.endsWith(ArffLoader.FILE_EXTENSION))
 					name += ArffLoader.FILE_EXTENSION;
@@ -636,26 +682,7 @@ public class TrainFragment extends Fragment
 			if(result == null)
 			{
 				if(mException != null)
-				{
-					AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
-					b.setIcon(android.R.drawable.ic_dialog_alert);
-					b.setTitle(R.string.error);
-					b.setNeutralButton(android.R.string.ok, null);
-					
-					if(mException instanceof UnsupportedAttributeTypeException)
-					{
-						b.setMessage(
-							getString(R.string.error_attributes, mException.getMessage()));
-					}
-					else if(mException instanceof FileNotFoundException)
-						b.setMessage(R.string.error_nofile);
-					else if(mException instanceof IOException)
-						b.setMessage(R.string.error_io);
-					else
-						b.setMessage(R.string.error_generic);
-					
-					b.show();
-				}
+					showExceptionDialog(mException);
 				mCalculatedFeatures = null;
 			}
 			else
@@ -697,12 +724,14 @@ public class TrainFragment extends Fragment
 			mProgressExtract.setVisibility(View.GONE);
 			mBtnSaveFeatures.setOnClickListener(onBtnSaveFeaturesClick);
 			mBtnSaveFeatures.setText(R.string.btnSaveFeatures);
+			mTask = null;
 		}
 	}
 	
 	private class TrainClassifierTask extends AsyncTask<FeatureExtractor, Instances, Classifier>
 	{
 		private Exception mException = null;
+		private int mOutputFeatures = 0;
 		private ClassifierEntry mType = null;
 		
 		@Override
@@ -712,15 +741,44 @@ public class TrainFragment extends Fragment
 			{
 				FeatureExtractor fe = params[0];
 				fe.extract();
+				mOutputFeatures = fe.getOutputFeatures();
 				
+				if(isCancelled())
+					return null;
 				publishProgress(fe.getOutput());
-				// TODO save
 				
 				// TODO maybe set options for classifiers
 				Classifier out = mType.type.newInstance();
 				
 				out.buildClassifier(fe.getOutput());
-				// TODO save
+				
+				final String oldClassifierFile = sClassifierFile;
+				final String oldTrainingFile = sTrainingFile;
+				sClassifierFile = String.format("classifier-%X%s", out.hashCode(), ".bin");
+				sTrainingFile = String.format("trainfile-%X%s",
+					out.hashCode(), Instances.SERIALIZED_OBJ_FILE_EXTENSION);
+				
+				OutputStream os =
+					getActivity().openFileOutput(sClassifierFile, Context.MODE_PRIVATE);
+				final ObjectOutputStream oos = new ObjectOutputStream(os);
+				oos.writeObject(out);
+				oos.close();
+				
+				if(isCancelled())
+					return null;
+				
+				os = getActivity().openFileOutput(sTrainingFile, Context.MODE_PRIVATE);
+				final SerializedInstancesSaver saver = new SerializedInstancesSaver();
+				saver.setDestination(os);
+				saver.setInstances(fe.getOutput());
+				saver.writeBatch();
+				// saver.writeBatch() closes the stream
+				
+				if(!oldClassifierFile.equals(sClassifierFile))
+					(new File(getActivity().getFilesDir(), oldClassifierFile)).delete();
+				if(!oldTrainingFile.equals(sTrainingFile))
+					(new File(getActivity().getFilesDir(), oldTrainingFile)).delete();
+				
 				return out;
 			}
 			catch(Exception ex)
@@ -734,18 +792,42 @@ public class TrainFragment extends Fragment
 		protected void onProgressUpdate(Instances... values)
 		{
 			mCalculatedFeatures = values[0];
+			sTrainedFeatures = mOutputFeatures;
 			mTxtTrainStatus.setText(R.string.statusTrain);
 		}
 		
 		@Override
 		protected void onPostExecute(Classifier result)
 		{
-			// TODO Auto-generated method stub
+			resetViews();
+			mClassifier = result;
+			
+			if(result == null)
+			{
+				readSettings();
+				
+				if(mException != null)
+					showExceptionDialog(mException);
+			}
+			else
+			{
+				setValidateVisible(true);
+				
+				final AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+				b.setTitle(R.string.trainingFinished);
+				b.setMessage(R.string.trainingFinished_long);
+				b.setNeutralButton(android.R.string.ok, null);
+				b.show();
+				
+				writeSettings();
+			}
 		}
 		
 		@Override
 		protected void onPreExecute()
 		{
+			// TODO stop reporting
+			
 			setViewStates(true);
 			mBtnSaveFeatures.setEnabled(false);
 			mProgressTraining.setVisibility(View.VISIBLE);
@@ -780,6 +862,7 @@ public class TrainFragment extends Fragment
 			mProgressTraining.setVisibility(View.INVISIBLE);
 			mBtnTrain.setOnClickListener(onBtnTrainClick);
 			mBtnTrain.setText(R.string.btnTrain);
+			mTask = null;
 		}
 	}
 }
