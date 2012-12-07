@@ -28,6 +28,7 @@
         android:id="@+id/labelSelectWindowSize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
         android:text="@string/labelSelectWindowSize"
         android:textAppearance="?android:attr/textAppearance" />
 
@@ -35,6 +36,8 @@
         android:id="@+id/spinWindowSize"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp"
         android:entries="@array/slidingWindowSizes"
         android:minWidth="120dp" />
 
@@ -42,6 +45,7 @@
         android:id="@+id/labelSelectClassifier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
         android:text="@string/labelSelectClassifier"
         android:textAppearance="?android:attr/textAppearance" />
 
@@ -49,6 +53,8 @@
         android:id="@+id/spinClassifier"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp"
         android:minWidth="120dp" />
 
     <LinearLayout
@@ -65,7 +71,7 @@
             android:id="@+id/progressExtract"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="24dp"
+            android:layout_marginLeft="3dp"
             android:visibility="invisible" />
 
     </LinearLayout>
@@ -80,7 +86,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="12dp"
             android:text="@string/btnTrain" />
 
         <Button
@@ -96,7 +101,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="24dp"
+            android:layout_marginLeft="3dp"
             android:indeterminate="true"
             android:visibility="invisible" />
 
@@ -105,6 +110,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:layout_marginLeft="3dp"
             android:visibility="invisible" />
 
     </LinearLayout>
