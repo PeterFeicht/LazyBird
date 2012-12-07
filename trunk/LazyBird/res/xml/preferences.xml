@@ -58,7 +58,7 @@
             android:key="numFolds"
             android:title="@string/set_numFolds"
             custom:maxValue="10"
-            custom:minValue="0" />
+            custom:minValue="2" />
         
     </PreferenceCategory>
 
