@@ -59,19 +59,25 @@
     <string name="trainClassifierNote">TODO.</string>
     <string name="selectFeaturesNote">Select the features used to train the classifier.</string>
     <string name="noFiles">No ARFF files in output directory.\nPut files you want to use in the output directory.</string>
+    <string name="extractionCancelled">Feature extraction cancelled</string>
+    <string name="saveFeaturesNote">Enter a filename to save the calculated features to. If it exists it will be overwritten.</string>
+    <string name="fileSaved">File saved</string>
     
     <!-- Report -->
     
     
-    <string name="fileNotFound">File not found</string>
-    <string name="fileDeleted">File deleted</string>
-    <string name="fileNotDeleted">File &lt;i&gt;not&lt;/i&gt; deleted</string>
-    
+    <!-- Errors and stuff -->
     <string name="error">Error</string>
     <string name="error_generic">An error occurred, please tell the developer.</string>
     <string name="error_filename">Not a valid filename</string>
     <string name="error_extstorage">External storage not writable</string>
     <string name="error_extstorage_read">External storage not readable</string>
     <string name="error_nodir">Output directory doesn\'t exist</string>
+    <string name="error_nofile">A file was not found</string>
+    <string name="error_io">An IO error occurred</string>
+    <string name="error_attributes">Input file %s is of the wrong format.</string>
+    
+    <!-- Words -->
+    <string name="save">Save</string>
 
 </resources>
