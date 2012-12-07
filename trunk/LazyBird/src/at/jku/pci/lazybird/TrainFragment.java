@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import weka.classifiers.Classifier;
 import weka.core.Instances;
 import weka.core.UnsupportedAttributeTypeException;
 import weka.core.converters.ArffLoader;
@@ -87,6 +88,7 @@ public class TrainFragment extends Fragment
 	private File[] mFiles = new File[0];
 	private Feature[] mFeatures = new Feature[0];
 	private Instances mCalculatedFeatures = null;
+	private Classifier mClassifier = null;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -566,30 +568,21 @@ public class TrainFragment extends Fragment
 	
 	private class SaveFeaturesTask extends AsyncTask<FeatureExtractor, Void, FeatureExtractor>
 	{
-		private FeatureExtractor mExtractor = null;
 		private Exception mException = null;
 		
 		@Override
 		protected FeatureExtractor doInBackground(FeatureExtractor... params)
 		{
-			mExtractor = params[0];
-			
 			try
 			{
-				mExtractor.extract();
+				params[0].extract();
+				return params[0];
 			}
-			catch(UnsupportedAttributeTypeException ex)
+			catch(Exception ex)
 			{
 				mException = ex;
 				return null;
 			}
-			catch(IOException ex)
-			{
-				mException = ex;
-				return null;
-			}
-			
-			return mExtractor;
 		}
 		
 		@Override
