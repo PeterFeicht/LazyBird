@@ -66,6 +66,8 @@ public class FeatureExtractor
 	 */
 	public static final int IMPLEMENTED_FEATURES = 0xFF;
 	
+	public static final String LOGTAG = "FeatureExtractor";
+	
 	private final File[] mFiles;
 	private final Feature[] mFeatures;
 	private final int mWindowSize;
@@ -206,6 +208,22 @@ public class FeatureExtractor
 			return;
 		}
 		
+		final WindowListener windowListener = new WindowListener() {
+			@Override
+			public void onWindowChanged(Iterable<Instance> window)
+			{
+				final Instance raw = extractFeatures(window);
+				final Instance features = new Instance(mOutput.numAttributes());
+				features.setDataset(mOutput);
+				features.setClassValue(raw.value(raw.numValues() - 1));
+				
+				for(int j = 0; j < mOutput.numAttributes() - 1; j++)
+					features.setValue(j, raw.value(j + 1));
+				
+				mOutput.add(features);
+			}
+		};
+		
 		for(File f : mFiles)
 		{
 			final BufferedReader reader = new BufferedReader(new FileReader(f));
@@ -224,21 +242,7 @@ public class FeatureExtractor
 			
 			try
 			{
-				SlidingWindow.slide(input, mWindowSize, mJumpSize, new WindowListener() {
-					@Override
-					public void onWindowChanged(Iterable<Instance> window)
-					{
-						final Instance raw = extractFeatures(window);
-						final Instance features = new Instance(mOutput.numAttributes());
-						features.setDataset(mOutput);
-						features.setClassValue(raw.classValue());
-						
-						for(int j = 1; j < mOutput.numAttributes() - 1; j++)
-							features.setValue(j - 1, raw.value(j));
-						
-						mOutput.add(features);
-					}
-				});
+				SlidingWindow.slide(input, mWindowSize, mJumpSize, windowListener);
 			}
 			catch(UnsupportedAttributeTypeException ex)
 			{
@@ -412,7 +416,6 @@ public class FeatureExtractor
 		
 		final Feature[] features = Feature.getFeatures(flags);
 		final boolean hasMean = (flags & 0x07) != 0;
-		final boolean hasVariance = (flags & 0x70) != 0;
 		final EnumMap<Feature, Double> values = new EnumMap<Feature, Double>(Feature.class);
 		
 		final Iterator<Instance> it = instances.iterator();
@@ -450,15 +453,12 @@ public class FeatureExtractor
 				values.put(Feature.VARIANCE_OF_MAGNITUDE, variance(mag, 1).value(1));
 		}
 		
-		if(hasVariance)
-		{
-			if(Feature.VARIANCE_X.isSet(flags))
-				values.put(Feature.VARIANCE_X, variance(instances, 1).value(1));
-			if(Feature.VARIANCE_Y.isSet(flags))
-				values.put(Feature.VARIANCE_Y, variance(instances, 2).value(1));
-			if(Feature.VARIANCE_Z.isSet(flags))
-				values.put(Feature.VARIANCE_Z, variance(instances, 3).value(1));
-		}
+		if(Feature.VARIANCE_X.isSet(flags))
+			values.put(Feature.VARIANCE_X, variance(instances, 1).value(1));
+		if(Feature.VARIANCE_Y.isSet(flags))
+			values.put(Feature.VARIANCE_Y, variance(instances, 2).value(1));
+		if(Feature.VARIANCE_Z.isSet(flags))
+			values.put(Feature.VARIANCE_Z, variance(instances, 3).value(1));
 		
 		// We need the last instance for the timestamp
 		Instance last = null;
@@ -473,46 +473,6 @@ public class FeatureExtractor
 			out.setValue(j + 1, values.get(features[j]));
 		if(hasClass)
 			out.setValue(features.length + 1, last.value(4));
-		
-		return out;
-	}
-	
-	/**
-	 * A streamlined version of {@link #extractFeatures(Iterable, int)} that extracts only the
-	 * two features {@link Feature#X} and {@link Feature#VARIANCE_Y}.
-	 * 
-	 * @param instances instances the instances to extract features from.
-	 * @return an {@link Instance} with the two features. The features are in the same order that
-	 *         {@link Feature#getFeatures(int)} returns.
-	 * @exception IllegalArgumentException if {@code instances} is empty.
-	 */
-	public static Instance extractFeaturesPE(Iterable<Instance> instances)
-	{
-		final Iterator<Instance> it = instances.iterator();
-		if(!it.hasNext())
-			throw new IllegalArgumentException("instances cannot be empty.");
-		
-		// We need the last instance for the timestamp
-		Instance last = null;
-		while(it.hasNext())
-			last = it.next();
-		
-		// This is needed to put the features in the right order, if that should change any time.
-		final Feature[] features =
-			Feature.getFeatures(Feature.X.getBit() | Feature.VARIANCE_Y.getBit());
-		final EnumMap<Feature, Double> values = new EnumMap<Feature, Double>(Feature.class);
-		
-		values.put(Feature.VARIANCE_Y, variance(instances, 1).value(1));
-		values.put(Feature.X, mean(instances).value(2));
-		
-		final boolean hasClass = (last.numValues() == 5);
-		final Instance out = new Instance(2 + (hasClass ? 2 : 1));
-		out.setValue(0, last.value(0));
-		
-		for(int j = 0; j < features.length; j++)
-			out.setValue(j + 1, values.get(features[j]));
-		if(hasClass)
-			out.setValue(3, last.value(4));
 		
 		return out;
 	}
@@ -556,6 +516,7 @@ public class FeatureExtractor
 		final double mean = sum / num;
 		double var = 0.0;
 		
+		it = instances.iterator();
 		while(it.hasNext())
 		{
 			last = it.next();

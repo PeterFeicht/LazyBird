@@ -8,7 +8,6 @@ import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.UnsupportedAttributeTypeException;
-import android.util.Log;
 
 /**
  * Represents a sliding window over a set of {@link Instance} objects with a defined window and
@@ -321,11 +320,6 @@ public class SlidingWindow implements Iterable<Instance>
 		if(time / windowSize < 1.0)
 			return;
 		
-		// FIXME remove debug stuff
-		final long startTime = System.currentTimeMillis();
-		int jumps = 0;
-		int num = 0;
-		
 		final LinkedList<Instance> queue = new LinkedList<Instance>();
 		@SuppressWarnings("unchecked")
 		final Enumeration<Instance> instances = data.enumerateInstances();
@@ -335,7 +329,6 @@ public class SlidingWindow implements Iterable<Instance>
 		{
 			final Instance i = instances.nextElement();
 			queue.add(i);
-			num++;
 			if(i.value(0) > nextJump)
 			{
 				nextJump += jumpSize;
@@ -343,12 +336,8 @@ public class SlidingWindow implements Iterable<Instance>
 				while(queue.size() > 0 && queue.getFirst().value(0) < cut)
 					queue.removeFirst();
 				listener.onWindowChanged(queue);
-				jumps++;
 			}
 		}
-		
-		Log.v("SlidingWindow.average", System.currentTimeMillis() - startTime + "ms, " + jumps +
-			" jumps, " + num + " instances");
 		
 		return;
 	}
