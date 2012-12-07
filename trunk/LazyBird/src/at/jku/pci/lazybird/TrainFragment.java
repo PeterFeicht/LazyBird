@@ -9,11 +9,13 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import weka.classifiers.Classifier;
+import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.lazy.IBk;
 import weka.classifiers.trees.J48;
 import weka.core.Instances;
 import weka.core.UnsupportedAttributeTypeException;
+import weka.core.Utils;
 import weka.core.converters.ArffLoader;
 import weka.core.converters.ArffSaver;
 import weka.core.converters.SerializedInstancesSaver;
@@ -24,12 +26,17 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -39,6 +46,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
@@ -85,6 +93,7 @@ public class TrainFragment extends Fragment
 	 * @see ARFFRecorderService#getDirname()
 	 */
 	private static String sOutputDir;
+	private static int sNumFolds;
 	private static String sClassifierFile;
 	private static String sTrainingFile;
 	private static int sTrainedFeatures;
@@ -113,6 +122,7 @@ public class TrainFragment extends Fragment
 	private File[] mFiles = new File[0];
 	private Feature[] mFeatures = new Feature[0];
 	private Instances mCalculatedFeatures = null;
+	private Evaluation mEvaluation = null;
 	private Classifier mClassifier = null;
 	@SuppressWarnings("rawtypes")
 	private AsyncTask mTask = null;
@@ -229,6 +239,7 @@ public class TrainFragment extends Fragment
 		
 		if(mTask != null)
 			mTask.cancel(true);
+		mTask = null;
 	}
 	
 	@Override
@@ -258,6 +269,7 @@ public class TrainFragment extends Fragment
 	private void readSettings()
 	{
 		sOutputDir = mPrefs.getString(SettingsActivity.KEY_OUTPUT_DIR, "");
+		sNumFolds = mPrefs.getInt(SettingsActivity.KEY_NUM_FOLDS, 4);
 		sClassifierFile = mPrefsClassifier.getString(Storage.KEY_CLASSIFIER_FILE, "");
 		sTrainingFile = mPrefsClassifier.getString(Storage.KEY_TRAINING_FILE, "");
 		sTrainedFeatures = mPrefsClassifier.getInt(Storage.KEY_FEATURES, 0);
@@ -280,8 +292,6 @@ public class TrainFragment extends Fragment
 	 * Sets the states of the buttons and spinners according to the specified value.
 	 * <p>
 	 * Inputs are disabled if extraction or training is running.
-	 * 
-	 * @param running
 	 */
 	private void setViewStates(boolean extracting)
 	{
@@ -301,7 +311,10 @@ public class TrainFragment extends Fragment
 	private void setValidateVisible(boolean visible)
 	{
 		if(!visible)
+		{
 			mCalculatedFeatures = null;
+			mEvaluation = null;
+		}
 		mBtnValidate.setVisibility(visible ? View.VISIBLE : View.GONE);
 	}
 	
@@ -575,8 +588,31 @@ public class TrainFragment extends Fragment
 		@Override
 		public void onClick(View v)
 		{
-			// TODO implement validation
-			
+			if(mEvaluation == null)
+			{
+				readSettings();
+				final Bundle bu = new Bundle(4);
+				bu.putInt(ValidateClassifierTask.KEY_NUM_FOLDS, sNumFolds);
+				bu.putSerializable(ValidateClassifierTask.KEY_INSTANCES, mCalculatedFeatures);
+				bu.putSerializable(ValidateClassifierTask.KEY_CLASSIFIER, mClassifier);
+				
+				final AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+				b.setTitle(R.string.btnValidate);
+				b.setMessage(R.string.validateNote);
+				b.setNegativeButton(R.string.no, null);
+				b.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which)
+					{
+						ValidateClassifierTask t = new ValidateClassifierTask();
+						mTask = t;
+						t.execute(bu);
+					}
+				});
+				b.show();
+			}
+			else
+				showEvaluation();
 		}
 	};
 	
@@ -655,6 +691,68 @@ public class TrainFragment extends Fragment
 		b.show();
 	}
 	
+	private void showEvaluation()
+	{
+		final Evaluation e = mEvaluation;
+		StringBuilder sb = new StringBuilder();
+		
+		try
+		{
+			final int width = 12;
+			final int after = 4;
+			
+			sb.append("=== Summary ===\n");
+			sb.append("Correctly Classified Instances\n");
+			sb.append(Utils.doubleToString(e.correct(), width, after) + "    " +
+				Utils.doubleToString(e.pctCorrect(), width, after) + " %\n");
+			sb.append("Incorrectly Classified Instances\n");
+			sb.append(Utils.doubleToString(e.incorrect(), width, after) + "    " +
+				Utils.doubleToString(e.pctIncorrect(), width, after) + " %\n");
+			
+			sb.append("\nKappa statistic\n");
+			sb.append(Utils.doubleToString(e.kappa(), width, after) + "\n");
+			sb.append("Mean absolute error\n");
+			sb.append(Utils.doubleToString(e.meanAbsoluteError(), width, after) + "\n");
+			sb.append("Root mean squared error\n");
+			sb.append(Utils.doubleToString(e.rootMeanSquaredError(), width, after) + "\n");
+			sb.append("Relative absolute error\n");
+			sb.append(Utils.doubleToString(e.relativeAbsoluteError(), width, after) + " %\n");
+			sb.append("Root relative squared error\n");
+			sb.append(Utils.doubleToString(e.rootRelativeSquaredError(), width, after) + " %\n");
+			
+			if(Utils.gr(e.unclassified(), 0))
+			{
+				sb.append("UnClassified Instances\n");
+				sb.append(Utils.doubleToString(e.unclassified(), width, after) + "    " +
+					Utils.doubleToString(e.pctUnclassified(), width, after) + " %\n");
+			}
+			sb.append("Total Number of Instances\n");
+			sb.append(Utils.doubleToString(e.numInstances(), width, after));
+			
+			sb.append(mEvaluation.toMatrixString("\n\nConfusion Matrix"));
+		}
+		catch(Exception ex)
+		{
+			sb = new StringBuilder("Error showing the evaluation.");
+		}
+		
+		final TextView txt = new TextView(getActivity());
+		txt.setText(sb.toString());
+		txt.setTypeface(Typeface.MONOSPACE);
+		txt.setTextSize(12f);
+		
+		final int pixels = (int)(Resources.getSystem().getDisplayMetrics().density * 12);
+		txt.setPadding(pixels, 0, pixels, 0);
+		
+		
+		AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+		b.setTitle(R.string.btnValidate);
+		b.setNeutralButton(android.R.string.ok, null);
+		b.setMessage(mClassifier.getClass().getSimpleName());
+		b.setView(txt);
+		b.show();
+	}
+	
 	private class SaveFeaturesTask extends AsyncTask<FeatureExtractor, Void, FeatureExtractor>
 	{
 		private Exception mException = null;
@@ -669,6 +767,7 @@ public class TrainFragment extends Fragment
 			}
 			catch(Exception ex)
 			{
+				ex.printStackTrace();
 				mException = ex;
 				return null;
 			}
@@ -783,6 +882,7 @@ public class TrainFragment extends Fragment
 			}
 			catch(Exception ex)
 			{
+				ex.printStackTrace();
 				mException = ex;
 				return null;
 			}
@@ -863,6 +963,111 @@ public class TrainFragment extends Fragment
 			mBtnTrain.setOnClickListener(onBtnTrainClick);
 			mBtnTrain.setText(R.string.btnTrain);
 			mTask = null;
+		}
+	}
+	
+	private class ValidateClassifierTask extends AsyncTask<Bundle, Void, Evaluation>
+	{
+		public static final String KEY_NUM_FOLDS = "numFolds";
+		public static final String KEY_INSTANCES = "instances";
+		public static final String KEY_CLASSIFIER = "classifier";
+		
+		private Exception mException = null;
+		
+		@Override
+		protected Evaluation doInBackground(Bundle... params)
+		{
+			try
+			{
+				final Bundle b = params[0];
+				final Classifier classifier = (Classifier)b.getSerializable(KEY_CLASSIFIER);
+				final Instances instances = (Instances)b.getSerializable(KEY_INSTANCES);
+				final int numFolds = b.getInt(KEY_NUM_FOLDS);
+				
+				instances.stratify(numFolds);
+				Evaluation eval = new Evaluation(instances);
+				
+				for(int fold = 0; fold < numFolds; fold++)
+				{
+					if(LOCAL_LOGV)
+						Log.v("ValidateClassifierTask", "Fold " + fold + "/" + numFolds);
+					if(isCancelled())
+						return null;
+					
+					Instances train = instances.trainCV(numFolds, fold);
+					Instances test = instances.testCV(numFolds, fold);
+					Classifier run = Classifier.makeCopy(classifier);
+					
+					eval.setPriors(train);
+					run.buildClassifier(train);
+					for(int j = 0; j < test.numInstances(); j++)
+						eval.evaluateModelOnceAndRecordPrediction(run, test.instance(j));
+				}
+				
+				return eval;
+			}
+			catch(Exception ex)
+			{
+				ex.printStackTrace();
+				mException = ex;
+				return null;
+			}
+		}
+		
+		@Override
+		protected void onPreExecute()
+		{
+			setViewStates(true);
+			mBtnSaveFeatures.setEnabled(false);
+			mBtnTrain.setEnabled(false);
+			
+			mTxtTrainStatus.setText(R.string.statusValidate);
+			mTxtTrainStatus.setVisibility(View.VISIBLE);
+			mProgressTraining.setVisibility(View.VISIBLE);
+			
+			mBtnValidate.setText(android.R.string.cancel);
+			mBtnValidate.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v)
+				{
+					ValidateClassifierTask.this.cancel(true);
+				}
+			});
+		}
+		
+		@Override
+		protected void onPostExecute(Evaluation result)
+		{
+			resetViews();
+			mEvaluation = result;
+			
+			if(result == null)
+			{
+				if(mException != null)
+					showExceptionDialog(mException);
+			}
+			else
+				showEvaluation();
+		}
+		
+		@Override
+		protected void onCancelled(Evaluation result)
+		{
+			Toast.makeText(getActivity(), R.string.validationCancelled, Toast.LENGTH_LONG)
+				.show();
+			resetViews();
+		}
+		
+		private void resetViews()
+		{
+			setViewStates(false);
+			updateTrainEnabled();
+			
+			mTxtTrainStatus.setVisibility(View.INVISIBLE);
+			mProgressTraining.setVisibility(View.INVISIBLE);
+			
+			mBtnValidate.setText(R.string.btnValidate);
+			mBtnValidate.setOnClickListener(onBtnValidateClick);
 		}
 	}
 }
