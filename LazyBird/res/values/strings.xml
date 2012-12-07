@@ -65,6 +65,9 @@
     <string name="trainingCancelled">Training cancelled</string>
     <string name="statusExtract">Extracting features&#8230;</string>
     <string name="statusTrain">Training classifier&#8230;</string>
+    <string name="statusValidate">Validating classifier&#8230;</string>
+    <string name="trainingFinished">Training finished</string>
+    <string name="trainingFinished_long">The classifier was trained successfully and set as the default classifier.\nYou can now cross-validate the created classifier.</string>
     
     <!-- Report -->
     

@@ -66,6 +66,9 @@
     <string name="trainingCancelled">Training abgebrochen</string>
     <string name="statusExtract">Extrahiere Features&#8230;</string>
     <string name="statusTrain">Trainiere Classifier&#8230;</string>
+    <string name="statusValidate">Validiere Classifier&#8230;</string>
+    <string name="trainingFinished">Training fertig</string>
+    <string name="trainingFinished_long">Der Classifier wurde erfolgreich trainiert und als Standard eingestellt.\nSie können nun eine Kreuzvalidierung des Classifiers machen.</string>
     
     <!-- Report -->
     
