@@ -2,6 +2,7 @@
 <resources>
     
     <!-- Settings -->
+    
     <string-array name="update_speeds">
         <item >Slow</item>
         <item >Normal</item>
@@ -37,6 +38,7 @@
     </string-array>
     
     <!-- Record -->
+    
     <string-array name="classes">
         <item>none</item>
         <item>sitting</item>
@@ -45,11 +47,6 @@
     </string-array>
     
     <!-- Train -->
-    <string-array name="classifiers">
-        <item>IBk</item>
-        <item>NaiveBayes</item>
-        <item>J48</item>
-    </string-array>
     
     <string-array name="slidingWindowSizes">
         <item>300</item>
