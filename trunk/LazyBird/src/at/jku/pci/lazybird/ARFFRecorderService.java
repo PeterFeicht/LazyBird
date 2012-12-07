@@ -35,6 +35,7 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 	 * Format string used to format the acceleration values written to the output file.
 	 */
 	private static final String DATA_FORMAT = "%d,%.2f,%.2f,%.2f";
+	private static final String DATE_FORMAT = "yyyy-MM-dd kk:mm";
 	
 	/**
 	 * The attribute specification for the output ARFF file.<br>
@@ -140,8 +141,8 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 			// get information from the intent
 			mFilename = intent.getStringExtra(RecorderFragment.EXTRA_FILENAME);
 			mDirname = intent.getStringExtra(RecorderFragment.EXTRA_DIRNAME);
-			mClass = intent.getStringExtra(RecorderFragment.EXTRA_CLASS);
-			String[] classes = intent.getStringArrayExtra(RecorderFragment.EXTRA_CLASSES);
+			final int clazz = intent.getIntExtra(RecorderFragment.EXTRA_CLASS, 0);
+			final String[] classes = intent.getStringArrayExtra(RecorderFragment.EXTRA_CLASSES);
 			
 			if(mFilename == null)
 			{
@@ -162,16 +163,17 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 				
 				// write the file header
 				mOutfile.write("% Group: Feichtinger, Hager\n% Date: ");
-				mOutfile.write(DateFormat.format("yyyy-MM-dd HH:mm", new Date()).toString());
+				mOutfile.write(DateFormat.format(DATE_FORMAT, new Date()).toString());
 				mOutfile.write(String.format(
 					(Locale)null, "\n\n@RELATION lazybird-%d\n\n", System.currentTimeMillis()));
 				
 				mOutfile.write(ATTRIBUTE_STRING);
 				
-				if(mClass != null && classes != null)
+				if(clazz != 0 && classes != null)
 				{
 					mOutfile.write("@ATTRIBUTE class            ");
 					mOutfile.write(getClassesString(classes) + "\n");
+					mClass = classes[clazz];
 				}
 				
 				mOutfile.write("\n@DATA\n");
@@ -389,14 +391,11 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 	 */
 	private String getClassesString(String[] c)
 	{
-		StringBuilder sb = new StringBuilder();
-		sb.append("{ ");
-		
 		if(c.length < 2)
 			throw new IllegalArgumentException("classes array has too few entries!");
 		
-		sb.append(c[0]);
-		for(int j = 1; j < c.length; j++)
+		StringBuilder sb = (new StringBuilder()).append("{ ").append(c[1]);
+		for(int j = 2; j < c.length; j++)
 			sb.append(", " + c[j]);
 		
 		return sb.append(" }").toString();
