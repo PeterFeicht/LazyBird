@@ -545,8 +545,8 @@ public class FeatureExtractor
 			if(mag.numValues() > 2)
 				mag.setValue(2, i.value(4));
 			
-			final double tmp = mag.value(1) * mag.value(1) + mag.value(2) * mag.value(2);
-			mag.setValue(1, Math.sqrt(tmp + mag.value(3) * mag.value(3)));
+			final double tmp = i.value(1) * i.value(1) + i.value(2) * i.value(2);
+			mag.setValue(1, Math.sqrt(tmp + i.value(3) * i.value(3)));
 			out.add(mag);
 		}
 		
