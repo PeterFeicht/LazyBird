@@ -1,24 +1,5 @@
 package at.jku.pci.lazybird;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import weka.classifiers.Classifier;
-import weka.classifiers.Evaluation;
-import weka.classifiers.bayes.NaiveBayes;
-import weka.classifiers.lazy.IBk;
-import weka.classifiers.trees.J48;
-import weka.core.Instances;
-import weka.core.UnsupportedAttributeTypeException;
-import weka.core.Utils;
-import weka.core.converters.ArffLoader;
-import weka.core.converters.ArffSaver;
-import weka.core.converters.SerializedInstancesSaver;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -34,9 +15,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -46,7 +24,6 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
@@ -54,6 +31,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 import at.jku.pci.lazybird.features.Feature;
 import at.jku.pci.lazybird.features.FeatureExtractor;
+import weka.classifiers.Classifier;
+import weka.classifiers.Evaluation;
+import weka.classifiers.bayes.NaiveBayes;
+import weka.classifiers.lazy.IBk;
+import weka.classifiers.trees.J48;
+import weka.core.Instances;
+import weka.core.UnsupportedAttributeTypeException;
+import weka.core.Utils;
+import weka.core.converters.ArffLoader;
+import weka.core.converters.ArffSaver;
+import weka.core.converters.SerializedInstancesSaver;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TrainFragment extends Fragment
 {
@@ -76,6 +72,15 @@ public class TrainFragment extends Fragment
 	// Constants
 	public static final String LOGTAG = "TrainFragment";
 	public static final boolean LOCAL_LOGV = true;
+	/**
+	 * Bundle key for the selected files.
+	 */
+	public static final String KEY_FILES = "at.jku.pci.lazybird.FILES";
+	/**
+	 * Bundle key for the selected features.
+	 */
+	public static final String KEY_FEATURES = "at.jku.pci.lazybird.FEATURES";
+	
 	/**
 	 * Gets the default title associated with this fragment for use in an {@link ActionBar} tab.
 	 * 
@@ -151,12 +156,12 @@ public class TrainFragment extends Fragment
 		getWidgets(getView());
 		
 		// Get drawables for the select buttons, bounds are from a button in XML
-		mCompoundUncheck =
-			getResources().getDrawable(android.R.drawable.checkbox_off_background);
+		Resources r = getResources();
+		mCompoundUncheck = r.getDrawable(android.R.drawable.checkbox_off_background);
 		mCompoundUncheck.setBounds(mBtnSelectFile.getCompoundDrawables()[0].copyBounds());
-		mCompoundCheck = getResources().getDrawable(android.R.drawable.checkbox_on_background);
+		mCompoundCheck = r.getDrawable(android.R.drawable.checkbox_on_background);
 		mCompoundCheck.setBounds(mCompoundUncheck.copyBounds());
-		mCompoundAlert = getResources().getDrawable(android.R.drawable.ic_dialog_alert);
+		mCompoundAlert = r.getDrawable(android.R.drawable.ic_dialog_alert);
 		mCompoundAlert.setBounds(mCompoundUncheck.copyBounds());
 		
 		mArffFilter = new FileFilter() {
@@ -243,11 +248,30 @@ public class TrainFragment extends Fragment
 	}
 	
 	@Override
-	public void onResume()
+	public void onSaveInstanceState(Bundle outState)
 	{
-		super.onResume();
+		super.onSaveInstanceState(outState);
 		
-		// FIXME save selections when rotating
+		outState.putSerializable(KEY_FILES, mFiles);
+		outState.putInt(KEY_FEATURES, Feature.getMask(mFeatures));
+	}
+	
+	@Override
+	public void onViewStateRestored(Bundle savedInstanceState)
+	{
+		super.onViewStateRestored(savedInstanceState);
+		
+		if(savedInstanceState != null)
+		{
+			mFiles = (File[])savedInstanceState.getSerializable(KEY_FILES);
+			if(mFiles == null)
+				mFiles = new File[0];
+			int tmp = savedInstanceState.getInt(KEY_FEATURES, 0);
+			if(tmp != 0)
+				mFeatures = Feature.getFeatures(tmp);
+			updateTrainEnabled();
+			updateCheckButtons();
+		}
 	}
 	
 	/**
@@ -304,8 +328,17 @@ public class TrainFragment extends Fragment
 	private void updateTrainEnabled()
 	{
 		boolean enabled = mFiles.length > 0 && mFeatures.length > 0;
+		enabled = enabled && mSpinClassifier.getSelectedItem() != null;
+		enabled = enabled && mSpinWindowSize.getSelectedItem() != null;
 		mBtnTrain.setEnabled(enabled);
 		mBtnSaveFeatures.setEnabled(enabled);
+	}
+	
+	private void updateCheckButtons()
+	{
+		setLeftDrawable(mBtnSelectFile, (mFiles.length > 0) ? mCompoundCheck : mCompoundUncheck);
+		setLeftDrawable(mBtnSelectFeatures,
+			(mFeatures.length > 0) ? mCompoundCheck : mCompoundUncheck);
 	}
 	
 	private void setValidateVisible(boolean visible)
@@ -382,7 +415,8 @@ public class TrainFragment extends Fragment
 			{
 				b.setNeutralButton(android.R.string.ok, null);
 				b.setMessage(R.string.noFiles);
-				setLeftDrawable(mBtnSelectFile, mCompoundUncheck);
+				mFiles = new File[0];
+				updateCheckButtons();
 			}
 			
 			b.show();
@@ -415,12 +449,8 @@ public class TrainFragment extends Fragment
 							if(selected[j])
 								mFiles[idx++] = allFiles[j].getAbsoluteFile();
 						}
-						setLeftDrawable(mBtnSelectFile, mCompoundCheck);
 					}
-					else
-					{
-						setLeftDrawable(mBtnSelectFile, mCompoundUncheck);
-					}
+					updateCheckButtons();
 					updateTrainEnabled();
 				}
 			};
@@ -504,7 +534,7 @@ public class TrainFragment extends Fragment
 					if(selected[rawIdx])
 					{
 						mFeatures = new Feature[] { Feature.RAW };
-						setLeftDrawable(mBtnSelectFeatures, mCompoundCheck);
+						updateCheckButtons();
 						updateTrainEnabled();
 						
 						return;
@@ -528,12 +558,8 @@ public class TrainFragment extends Fragment
 							if(selected[j])
 								mFeatures[idx++] = allFeatures[j];
 						}
-						setLeftDrawable(mBtnSelectFeatures, mCompoundCheck);
 					}
-					else
-					{
-						setLeftDrawable(mBtnSelectFeatures, mCompoundUncheck);
-					}
+					updateCheckButtons();
 					updateTrainEnabled();
 				}
 			};
@@ -744,7 +770,6 @@ public class TrainFragment extends Fragment
 		final int pixels = (int)(Resources.getSystem().getDisplayMetrics().density * 12);
 		txt.setPadding(pixels, 0, pixels, 0);
 		
-		
 		AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
 		b.setTitle(R.string.btnValidate);
 		b.setNeutralButton(android.R.string.ok, null);
@@ -929,6 +954,7 @@ public class TrainFragment extends Fragment
 			// TODO stop reporting
 			
 			setViewStates(true);
+			setValidateVisible(false);
 			mBtnSaveFeatures.setEnabled(false);
 			mProgressTraining.setVisibility(View.VISIBLE);
 			mBtnTrain.setOnClickListener(new OnClickListener() {
@@ -989,8 +1015,6 @@ public class TrainFragment extends Fragment
 				
 				for(int fold = 0; fold < numFolds; fold++)
 				{
-					if(LOCAL_LOGV)
-						Log.v("ValidateClassifierTask", "Fold " + fold + "/" + numFolds);
 					if(isCancelled())
 						return null;
 					
