@@ -4,7 +4,12 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import weka.classifiers.Classifier;
+import weka.classifiers.bayes.NaiveBayes;
+import weka.classifiers.lazy.IBk;
+import weka.classifiers.trees.J48;
 import weka.core.Instances;
 import weka.core.UnsupportedAttributeTypeException;
 import weka.core.converters.ArffLoader;
@@ -26,6 +31,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -37,6 +43,22 @@ import at.jku.pci.lazybird.features.FeatureExtractor;
 
 public class TrainFragment extends Fragment
 {
+	private static class ClassifierEntry
+	{
+		public final Class<? extends Classifier> type;
+		
+		public ClassifierEntry(Class<? extends Classifier> type)
+		{
+			this.type = type;
+		}
+		
+		@Override
+		public String toString()
+		{
+			return type.getSimpleName();
+		}
+	}
+	
 	// Extras
 	public static final String EXTRA_TODO = "at.jku.pci.lazybird.TODO";
 	// Intents
@@ -84,6 +106,7 @@ public class TrainFragment extends Fragment
 	private Drawable mCompoundUncheck;
 	private Drawable mCompoundAlert;
 	
+	private List<ClassifierEntry> mClassifiers;
 	private FileFilter mArffFilter;
 	private File[] mFiles = new File[0];
 	private Feature[] mFeatures = new Feature[0];
@@ -108,6 +131,8 @@ public class TrainFragment extends Fragment
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		mPrefsClassifier = Storage.getClassifierPreferences(getActivity());
 		updateSettings();
+		
+		initClassifiers();
 		
 		getWidgets(getView());
 		
@@ -156,6 +181,12 @@ public class TrainFragment extends Fragment
 			mSpinWindowSize.setSelection(1);
 		mSpinClassifier = (Spinner)v.findViewById(R.id.spinClassifier);
 		
+		ArrayAdapter<ClassifierEntry> adapter = new ArrayAdapter<TrainFragment.ClassifierEntry>(
+				getActivity(), android.R.layout.simple_spinner_item, mClassifiers);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		mSpinClassifier.setAdapter(adapter);
+		mSpinClassifier.setSelection(0);
+		
 		OnItemSelectedListener hideValidateListener = new OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
@@ -175,6 +206,14 @@ public class TrainFragment extends Fragment
 		
 		mProgressTraining = (ProgressBar)v.findViewById(R.id.progressTraining);
 		mProgressExtract = (ProgressBar)v.findViewById(R.id.progressExtract);
+	}
+
+	private void initClassifiers()
+	{
+		mClassifiers = new ArrayList<TrainFragment.ClassifierEntry>(4);
+		mClassifiers.add(new ClassifierEntry(IBk.class));
+		mClassifiers.add(new ClassifierEntry(NaiveBayes.class));
+		mClassifiers.add(new ClassifierEntry(J48.class));
 	}
 	
 	@Override
@@ -613,6 +652,7 @@ public class TrainFragment extends Fragment
 					
 					b.show();
 				}
+				mCalculatedFeatures = null;
 			}
 			else
 			{
@@ -653,6 +693,47 @@ public class TrainFragment extends Fragment
 			mProgressExtract.setVisibility(View.GONE);
 			mBtnSaveFeatures.setOnClickListener(onBtnSaveFeaturesClick);
 			mBtnSaveFeatures.setText(R.string.btnSaveFeatures);
+		}
+	}
+	
+	private class TrainClassifierTask extends AsyncTask<FeatureExtractor, Instances, Classifier>
+	{
+		private Exception mException = null;
+		
+		@Override
+		protected Classifier doInBackground(FeatureExtractor... params)
+		{
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+		@Override
+		protected void onProgressUpdate(Instances... values)
+		{
+			mCalculatedFeatures = values[0];
+		}
+		
+		@Override
+		protected void onPostExecute(Classifier result)
+		{
+			// TODO Auto-generated method stub
+		}
+		
+		@Override
+		protected void onPreExecute()
+		{
+			// TODO Auto-generated method stub
+		}
+		
+		@Override
+		protected void onCancelled(Classifier result)
+		{
+			// TODO Auto-generated method stub
+		}
+		
+		private void resetViews()
+		{
+			
 		}
 	}
 }

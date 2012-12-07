@@ -49,7 +49,6 @@
         android:id="@+id/spinClassifier"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:entries="@array/classifiers"
         android:minWidth="120dp" />
 
     <LinearLayout

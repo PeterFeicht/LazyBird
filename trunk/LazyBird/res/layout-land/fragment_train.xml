@@ -63,8 +63,7 @@
             android:id="@+id/spinClassifier"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="fill_horizontal|center_vertical"
-            android:entries="@array/classifiers" />
+            android:layout_gravity="fill_horizontal|center_vertical" />
 
     </GridLayout>
 
