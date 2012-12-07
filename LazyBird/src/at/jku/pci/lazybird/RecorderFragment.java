@@ -49,8 +49,7 @@ public class RecorderFragment extends Fragment
 	public static final boolean LOCAL_LOGV = true;
 	/**
 	 * Standard extension for ARFF files.
-	 * <p>
-	 * {@value}
+	 * <p> {@value}
 	 */
 	public static final String EXTENSION = ".arff";
 	/**
@@ -438,15 +437,11 @@ public class RecorderFragment extends Fragment
 				updateSettings();
 				Intent i = new Intent(ARFFRecorderService.ARFF_SERVICE);
 				i.putExtra(EXTRA_FILENAME, filename);
-				// TODO make classes customizable
-				i.putExtra(EXTRA_CLASSES, getResources().getStringArray(R.array.classes));
 				i.putExtra(EXTRA_DIRNAME, sOutputDir);
 				
-				Object aclass = mSpinClass.getSelectedItem();
-				if(aclass == null || !String.class.isAssignableFrom(aclass.getClass()))
-					i.putExtra(EXTRA_CLASS, (String)null);
-				else
-					i.putExtra(EXTRA_CLASS, (String)aclass);
+				// TODO make classes customizable
+				i.putExtra(EXTRA_CLASSES, getResources().getStringArray(R.array.classes));
+				i.putExtra(EXTRA_CLASS, mSpinClass.getSelectedItemPosition());
 				
 				getActivity().startService(i);
 				mBroadcastManager.registerReceiver(mServiceReceiver, mServiceIntentFilter);
