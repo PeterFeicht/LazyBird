@@ -2,15 +2,19 @@ package at.jku.pci.lazybird;
 
 import java.io.File;
 import java.io.FileFilter;
-import weka.classifiers.Evaluation;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import weka.core.Instances;
+import weka.core.UnsupportedAttributeTypeException;
+import weka.core.converters.ArffLoader;
+import weka.core.converters.ArffSaver;
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -20,13 +24,15 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemSelectedListener;
 import at.jku.pci.lazybird.features.Feature;
+import at.jku.pci.lazybird.features.FeatureExtractor;
 
 public class TrainFragment extends Fragment
 {
@@ -44,6 +50,7 @@ public class TrainFragment extends Fragment
 	 * @see #getTitle()
 	 */
 	public static final CharSequence TITLE = "Train";
+	public static final int JUMP_SIZE = 100;
 	// Settings
 	/**
 	 * Output directory for recorded files, the base directory is always
@@ -56,6 +63,7 @@ public class TrainFragment extends Fragment
 	private static String sOutputDir;
 	private static String sClassifierFile;
 	private static String sTrainingFile;
+	private static int sTrainedFeatures;
 	
 	private SharedPreferences mPrefs;
 	private SharedPreferences mPrefsClassifier;
@@ -69,6 +77,7 @@ public class TrainFragment extends Fragment
 	private Spinner mSpinWindowSize;
 	private Spinner mSpinClassifier;
 	private ProgressBar mProgressTraining;
+	private ProgressBar mProgressExtract;
 	
 	private Drawable mCompoundCheck;
 	private Drawable mCompoundUncheck;
@@ -77,6 +86,7 @@ public class TrainFragment extends Fragment
 	private FileFilter mArffFilter;
 	private File[] mFiles = new File[0];
 	private Feature[] mFeatures = new Feature[0];
+	private Instances mCalculatedFeatures = null;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -94,8 +104,7 @@ public class TrainFragment extends Fragment
 		
 		PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, false);
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-		mPrefsClassifier = getActivity().getSharedPreferences(
-			Storage.PREFS_CLASSIFIER, Activity.MODE_PRIVATE);
+		mPrefsClassifier = Storage.getClassifierPreferences(getActivity());
 		updateSettings();
 		
 		getWidgets(getView());
@@ -151,7 +160,7 @@ public class TrainFragment extends Fragment
 			{
 				setValidateVisible(false);
 			}
-
+			
 			@Override
 			public void onNothingSelected(AdapterView<?> parent)
 			{
@@ -163,6 +172,7 @@ public class TrainFragment extends Fragment
 		mSpinWindowSize.setOnItemSelectedListener(hideValidateListener);
 		
 		mProgressTraining = (ProgressBar)v.findViewById(R.id.progressTraining);
+		mProgressExtract = (ProgressBar)v.findViewById(R.id.progressExtract);
 	}
 	
 	@Override
@@ -201,24 +211,22 @@ public class TrainFragment extends Fragment
 		sOutputDir = mPrefs.getString(SettingsActivity.KEY_OUTPUT_DIR, "");
 		sClassifierFile = mPrefsClassifier.getString(Storage.KEY_CLASSIFIER_FILE, "");
 		sTrainingFile = mPrefsClassifier.getString(Storage.KEY_TRAINING_FILE, "");
+		sTrainedFeatures = mPrefsClassifier.getInt(Storage.KEY_FEATURES, 0);
 	}
 	
 	/**
 	 * Sets the states of the buttons and spinners according to the specified value.
 	 * <p>
-	 * Inputs are disabled if the training is running.
+	 * Inputs are disabled if extraction or training is running.
 	 * 
 	 * @param running
 	 */
-	private void setViewStates(boolean training)
+	private void setViewStates(boolean extracting)
 	{
-		mBtnSelectFile.setEnabled(!training);
-		mBtnSelectFeatures.setEnabled(!training);
-		mSpinClassifier.setEnabled(!training);
-		mSpinWindowSize.setEnabled(!training);
-		mBtnSaveFeatures.setEnabled(!training);
-		
-		mProgressTraining.setVisibility(training ? View.VISIBLE : View.INVISIBLE);
+		mBtnSelectFile.setEnabled(!extracting);
+		mBtnSelectFeatures.setEnabled(!extracting);
+		mSpinClassifier.setEnabled(!extracting);
+		mSpinWindowSize.setEnabled(!extracting);
 	}
 	
 	private void updateTrainEnabled()
@@ -230,6 +238,8 @@ public class TrainFragment extends Fragment
 	
 	private void setValidateVisible(boolean visible)
 	{
+		if(!visible)
+			mCalculatedFeatures = null;
 		mBtnValidate.setVisibility(visible ? View.VISIBLE : View.GONE);
 	}
 	
@@ -471,8 +481,16 @@ public class TrainFragment extends Fragment
 		@Override
 		public void onClick(View v)
 		{
-			// TODO implement saving features
-			
+			if(mCalculatedFeatures == null)
+			{
+				int windowSize = Integer.parseInt((String)mSpinWindowSize.getSelectedItem());
+				FeatureExtractor fe =
+					new FeatureExtractor(mFiles, mFeatures, windowSize, JUMP_SIZE);
+				
+				(new SaveFeaturesTask()).execute(fe);
+			}
+			else
+				saveFeatures();
 		}
 	};
 	
@@ -496,5 +514,152 @@ public class TrainFragment extends Fragment
 	private void setLeftDrawable(Button btn, Drawable d)
 	{
 		btn.setCompoundDrawables(d, null, null, null);
+	}
+	
+	private void saveFeatures()
+	{
+		final EditText e = new EditText(getActivity());
+		AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+		b.setTitle(R.string.btnSaveFeatures);
+		b.setMessage(R.string.saveFeaturesNote);
+		b.setView(e);
+		b.setNegativeButton(android.R.string.cancel, null);
+		b.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				if(!Environment.getExternalStorageState().equals(
+					Environment.MEDIA_MOUNTED))
+				{
+					Toast.makeText(getActivity(), R.string.error_extstorage,
+						Toast.LENGTH_LONG).show();
+					return;
+				}
+				
+				updateSettings();
+				String name = e.getText().toString();
+				if(!name.endsWith(ArffLoader.FILE_EXTENSION))
+					name += ArffLoader.FILE_EXTENSION;
+				
+				File out = new File(new File(Environment.getExternalStorageDirectory(),
+					sOutputDir), name);
+				if(out.exists())
+					out.delete();
+				ArffSaver saver = new ArffSaver();
+				try
+				{
+					saver.setFile(out);
+					saver.setInstances(mCalculatedFeatures);
+					saver.writeBatch();
+					Toast.makeText(getActivity(), R.string.fileSaved, Toast.LENGTH_LONG)
+						.show();
+				}
+				catch(IOException ex)
+				{
+					Toast.makeText(getActivity(), R.string.error_io, Toast.LENGTH_LONG)
+						.show();
+				}
+			}
+		});
+		b.show();
+	}
+	
+	private class SaveFeaturesTask extends AsyncTask<FeatureExtractor, Void, FeatureExtractor>
+	{
+		private FeatureExtractor mExtractor = null;
+		private Exception mException = null;
+		
+		@Override
+		protected FeatureExtractor doInBackground(FeatureExtractor... params)
+		{
+			mExtractor = params[0];
+			
+			try
+			{
+				mExtractor.extract();
+			}
+			catch(UnsupportedAttributeTypeException ex)
+			{
+				mException = ex;
+				return null;
+			}
+			catch(IOException ex)
+			{
+				mException = ex;
+				return null;
+			}
+			
+			return mExtractor;
+		}
+		
+		@Override
+		protected void onPostExecute(FeatureExtractor result)
+		{
+			resetViews();
+			
+			if(result == null)
+			{
+				if(mException != null)
+				{
+					AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+					b.setIcon(android.R.drawable.ic_dialog_alert);
+					b.setTitle(R.string.error);
+					b.setNeutralButton(android.R.string.ok, null);
+					
+					if(mException instanceof UnsupportedAttributeTypeException)
+					{
+						b.setMessage(
+							getString(R.string.error_attributes, mException.getMessage()));
+					}
+					else if(mException instanceof FileNotFoundException)
+						b.setMessage(R.string.error_nofile);
+					else if(mException instanceof IOException)
+						b.setMessage(R.string.error_io);
+					else
+						b.setMessage(R.string.error_generic);
+					
+					b.show();
+				}
+			}
+			else
+			{
+				mCalculatedFeatures = result.getOutput();
+				
+				saveFeatures();
+			}
+		}
+		
+		@Override
+		protected void onPreExecute()
+		{
+			setViewStates(true);
+			mBtnTrain.setEnabled(false);
+			mProgressExtract.setVisibility(View.VISIBLE);
+			mBtnSaveFeatures.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v)
+				{
+					SaveFeaturesTask.this.cancel(true);
+				}
+			});
+			mBtnSaveFeatures.setText(android.R.string.cancel);
+		}
+		
+		@Override
+		protected void onCancelled(FeatureExtractor result)
+		{
+			Toast.makeText(getActivity(), R.string.extractionCancelled, Toast.LENGTH_LONG)
+				.show();
+			resetViews();
+		}
+		
+		private void resetViews()
+		{
+			setViewStates(false);
+			updateTrainEnabled();
+			mProgressExtract.setVisibility(View.GONE);
+			mBtnSaveFeatures.setOnClickListener(onBtnSaveFeaturesClick);
+			mBtnSaveFeatures.setText(R.string.btnSaveFeatures);
+		}
 	}
 }
