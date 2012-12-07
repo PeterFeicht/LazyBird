@@ -62,6 +62,9 @@
     <string name="extractionCancelled">Feature extraction cancelled</string>
     <string name="saveFeaturesNote">Enter a filename to save the calculated features to. If it exists it will be overwritten.</string>
     <string name="fileSaved">File saved</string>
+    <string name="trainingCancelled">Training cancelled</string>
+    <string name="statusExtract">Extracting features&#8230;</string>
+    <string name="statusTrain">Training classifier&#8230;</string>
     
     <!-- Report -->
     

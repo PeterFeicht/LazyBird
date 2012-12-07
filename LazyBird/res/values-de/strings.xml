@@ -63,6 +63,9 @@
     <string name="extractionCancelled">Feature Extraction abgebrochen</string>
     <string name="saveFeaturesNote">Geben Sie einen Dateinamen ein um die berechneten Features zu speichern. Wenn die Datei existiert wird sie überschrieben.</string>
     <string name="fileSaved">Datei gespeichert</string>
+    <string name="trainingCancelled">Training abgebrochen</string>
+    <string name="statusExtract">Extrahiere Features&#8230;</string>
+    <string name="statusTrain">Trainiere Classifier&#8230;</string>
     
     <!-- Report -->
     
