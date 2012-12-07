@@ -56,18 +56,19 @@
     <string name="labelSelectClassifier">Select a classifier:</string>
     <string name="labelSelectWindowSize">Select sliding window size (ms):</string>
     <string name="selectFileNote">Note that only files in the output directory are listed.</string>
-    <string name="trainClassifierNote">TODO.</string>
     <string name="selectFeaturesNote">Select the features used to train the classifier.</string>
     <string name="noFiles">No ARFF files in output directory.\nPut files you want to use in the output directory.</string>
     <string name="extractionCancelled">Feature extraction cancelled</string>
     <string name="saveFeaturesNote">Enter a filename to save the calculated features to. If it exists it will be overwritten.</string>
     <string name="fileSaved">File saved</string>
     <string name="trainingCancelled">Training cancelled</string>
-    <string name="statusExtract">Extracting features&#8230;</string>
-    <string name="statusTrain">Training classifier&#8230;</string>
-    <string name="statusValidate">Validating classifier&#8230;</string>
+    <string name="statusExtract">Extracting&#8230;</string>
+    <string name="statusTrain">Training&#8230;</string>
+    <string name="statusValidate">Validating&#8230;</string>
     <string name="trainingFinished">Training finished</string>
-    <string name="trainingFinished_long">The classifier was trained successfully and set as the default classifier.\nYou can now cross-validate the created classifier.</string>
+    <string name="trainingFinished_long">The classifier was trained successfully and set as the default classifier.\nYou can now perform a cross-validation.</string>
+    <string name="validateNote">This will perform a cross-validation of the generated classifier, to determine how well it classifies instances.\nThis can take some time, do you want to continue?</string>
+    <string name="validationCancelled">Validation cancelled</string>
     
     <!-- Report -->
     
@@ -85,5 +86,7 @@
     
     <!-- Words -->
     <string name="save">Save</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
 
 </resources>

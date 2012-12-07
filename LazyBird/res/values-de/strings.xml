@@ -57,18 +57,19 @@
     <string name="labelSelectClassifier">Wählen Sie einen Classifier:</string>
     <string name="labelSelectWindowSize">Wählen Sie eine Mittelzeit (ms):</string>
     <string name="selectFileNote">Beachten Sie, dass nur Dateien im Ausgabeverzeichnis angezeigt werden.</string>
-    <string name="trainClassifierNote">TODO.</string>
     <string name="selectFeaturesNote">Wählen Sie die Features, mit denen der Classifier trainiert wird.</string>
     <string name="noFiles">Keine ARFF Dateien im Ausgabeverzeichnis.\nKopieren Sie Dateien die Sie verwenden wollen ins Ausgabeverzeichnis.</string>
     <string name="extractionCancelled">Feature Extraction abgebrochen</string>
     <string name="saveFeaturesNote">Geben Sie einen Dateinamen ein um die berechneten Features zu speichern. Wenn die Datei existiert wird sie überschrieben.</string>
     <string name="fileSaved">Datei gespeichert</string>
     <string name="trainingCancelled">Training abgebrochen</string>
-    <string name="statusExtract">Extrahiere Features&#8230;</string>
-    <string name="statusTrain">Trainiere Classifier&#8230;</string>
-    <string name="statusValidate">Validiere Classifier&#8230;</string>
+    <string name="statusExtract">Extrahierung&#8230;</string>
+    <string name="statusTrain">Training&#8230;</string>
+    <string name="statusValidate">Validierung&#8230;</string>
     <string name="trainingFinished">Training fertig</string>
-    <string name="trainingFinished_long">Der Classifier wurde erfolgreich trainiert und als Standard eingestellt.\nSie können nun eine Kreuzvalidierung des Classifiers machen.</string>
+    <string name="trainingFinished_long">Der Classifier wurde erfolgreich trainiert und als Standard eingestellt.\nSie können nun eine Kreuzvalidierung durchführen.</string>
+    <string name="validateNote">Es wird eine Kreuzvalidierung des generierten Classifiers durchgeführt, um zu bestimmen wie gut dieser Datenpunkte klassifiziert.\nDas kann einige Zeit dauern, wollen Sie fortfahren?</string>
+    <string name="validationCancelled">Validierung abgebrochen</string>
     
     <!-- Report -->
     
@@ -85,5 +86,7 @@
     
     <!-- Words -->
     <string name="save">Speichern</string>
+    <string name="no">Nein</string>
+    <string name="yes">Ja</string>
     
 </resources>
