@@ -37,6 +37,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import at.jku.pci.lazybird.features.Feature;
 import at.jku.pci.lazybird.features.FeatureExtractor;
@@ -101,6 +102,7 @@ public class TrainFragment extends Fragment
 	private Spinner mSpinClassifier;
 	private ProgressBar mProgressTraining;
 	private ProgressBar mProgressExtract;
+	private TextView mTxtTrainStatus;
 	
 	private Drawable mCompoundCheck;
 	private Drawable mCompoundUncheck;
@@ -136,7 +138,7 @@ public class TrainFragment extends Fragment
 		
 		getWidgets(getView());
 		
-		// Get drawables for the select buttons
+		// Get drawables for the select buttons, bounds are from a button in XML
 		mCompoundUncheck =
 			getResources().getDrawable(android.R.drawable.checkbox_off_background);
 		mCompoundUncheck.setBounds(mBtnSelectFile.getCompoundDrawables()[0].copyBounds());
@@ -175,6 +177,8 @@ public class TrainFragment extends Fragment
 		mBtnTrain.setEnabled(false);
 		mBtnValidate = (Button)v.findViewById(R.id.btnValidate);
 		mBtnValidate.setOnClickListener(onBtnValidateClick);
+		
+		mTxtTrainStatus = (TextView)v.findViewById(R.id.txtTrainStatus);
 		
 		mSpinWindowSize = (Spinner)v.findViewById(R.id.spinWindowSize);
 		if(mSpinWindowSize.getCount() > 1)
@@ -699,18 +703,38 @@ public class TrainFragment extends Fragment
 	private class TrainClassifierTask extends AsyncTask<FeatureExtractor, Instances, Classifier>
 	{
 		private Exception mException = null;
+		private ClassifierEntry mType = null;
 		
 		@Override
 		protected Classifier doInBackground(FeatureExtractor... params)
 		{
-			// TODO Auto-generated method stub
-			return null;
+			try
+			{
+				FeatureExtractor fe = params[0];
+				fe.extract();
+				
+				publishProgress(fe.getOutput());
+				// TODO save
+				
+				// TODO maybe set options for classifiers
+				Classifier out = mType.type.newInstance();
+				
+				out.buildClassifier(fe.getOutput());
+				// TODO save
+				return out;
+			}
+			catch(Exception ex)
+			{
+				mException = ex;
+				return null;
+			}
 		}
 		
 		@Override
 		protected void onProgressUpdate(Instances... values)
 		{
 			mCalculatedFeatures = values[0];
+			mTxtTrainStatus.setText(R.string.statusTrain);
 		}
 		
 		@Override
@@ -722,18 +746,40 @@ public class TrainFragment extends Fragment
 		@Override
 		protected void onPreExecute()
 		{
-			// TODO Auto-generated method stub
+			setViewStates(true);
+			mBtnSaveFeatures.setEnabled(false);
+			mProgressTraining.setVisibility(View.VISIBLE);
+			mBtnTrain.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v)
+				{
+					TrainClassifierTask.this.cancel(true);
+				}
+			});
+			mBtnTrain.setText(android.R.string.cancel);
+			
+			mTxtTrainStatus.setText(R.string.statusExtract);
+			mTxtTrainStatus.setVisibility(View.VISIBLE);
+			
+			mType = (ClassifierEntry)mSpinClassifier.getSelectedItem();
 		}
 		
 		@Override
 		protected void onCancelled(Classifier result)
 		{
-			// TODO Auto-generated method stub
+			Toast.makeText(getActivity(), R.string.trainingCancelled, Toast.LENGTH_LONG)
+				.show();
+			resetViews();
 		}
 		
 		private void resetViews()
 		{
-			
+			setViewStates(false);
+			updateTrainEnabled();
+			mTxtTrainStatus.setVisibility(View.INVISIBLE);
+			mProgressTraining.setVisibility(View.INVISIBLE);
+			mBtnTrain.setOnClickListener(onBtnTrainClick);
+			mBtnTrain.setText(R.string.btnTrain);
 		}
 	}
 }
