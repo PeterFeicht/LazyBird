@@ -429,9 +429,7 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 	 * Creates or updates a notification, announcing that the service is waiting to start
 	 * recording.
 	 * 
-	 * @param n the {@link Notification} to update, or {@code null} to create a new one.
 	 * @param seconds the number of seconds until recording starts.
-	 * @return the specified notification, or the created one if none was specified.
 	 * @see #setStartDelay(int)
 	 */
 	private void notifyWaiting(int seconds)
