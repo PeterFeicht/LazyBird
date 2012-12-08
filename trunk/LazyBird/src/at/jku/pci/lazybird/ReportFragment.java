@@ -8,13 +8,12 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ListView;
 import android.widget.Switch;
-import android.widget.TextView;
 import weka.classifiers.Classifier;
 
 public class ReportFragment extends Fragment
@@ -60,7 +59,7 @@ public class ReportFragment extends Fragment
 	Switch mSwClassifiy;
 	CheckBox mChkTts;
 	CheckBox mChkReport;
-	TextView mTxtLog;
+	ListView mListLog;
 	
 	private Classifier mClassifier = null;
 	
@@ -101,7 +100,7 @@ public class ReportFragment extends Fragment
 		mChkReport = (CheckBox)v.findViewById(R.id.chkReport);
 		mChkReport.setOnCheckedChangeListener(onChkReportCheckedChange);
 		
-		mTxtLog = (TextView)v.findViewById(R.id.txtLog);
+		mListLog = (ListView)v.findViewById(R.id.listLog);
 	}
 	
 	/**
