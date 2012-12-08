@@ -64,11 +64,14 @@
             android:dialogMessage="@string/set_reportServer_long"
             android:dialogTitle="@string/set_reportServer"
             android:key="reportServer"
+            android:selectAllOnFocus="true"
             android:title="@string/set_reportServer" />
         <EditTextPreference
             android:dialogMessage="@string/set_reportUser_long"
             android:dialogTitle="@string/set_reportUser"
+            android:inputType="number"
             android:key="reportUser"
+            android:selectAllOnFocus="true"
             android:title="@string/set_reportUser" />
 
         <CheckBoxPreference
@@ -80,10 +83,11 @@
 
         <EditTextPreference
             android:defaultValue="activity.log"
-            android:dependency="set_writeLog"
+            android:dependency="writeLog"
             android:dialogMessage="@string/set_logFilename_long"
             android:dialogTitle="@string/set_logFilename"
             android:key="logFilename"
+            android:selectAllOnFocus="true"
             android:title="@string/set_logFilename" />
     </PreferenceCategory>
 
