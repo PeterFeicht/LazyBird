@@ -2,8 +2,11 @@ package at.jku.pci.lazybird;
 
 import android.app.ActionBar;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -15,6 +18,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -75,11 +80,11 @@ public class TrainFragment extends Fragment
 	/**
 	 * Bundle key for the selected files.
 	 */
-	public static final String KEY_FILES = "at.jku.pci.lazybird.FILES";
+	public static final String STATE_FILES = "at.jku.pci.lazybird.FILES";
 	/**
 	 * Bundle key for the selected features.
 	 */
-	public static final String KEY_FEATURES = "at.jku.pci.lazybird.FEATURES";
+	public static final String STATE_FEATURES = "at.jku.pci.lazybird.FEATURES";
 	
 	/**
 	 * Gets the default title associated with this fragment for use in an {@link ActionBar} tab.
@@ -132,6 +137,22 @@ public class TrainFragment extends Fragment
 	@SuppressWarnings("rawtypes")
 	private AsyncTask mTask = null;
 	
+	// Handlers
+	private LocalBroadcastManager mBroadcastManager;
+	private IntentFilter mServiceIntentFilter;
+	private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+		public void onReceive(Context context, Intent intent)
+		{
+			if(LOCAL_LOGV) Log.v(LOGTAG, "Received broadcast: " + intent);
+			
+			if(intent.getAction().equals(ReportFragment.BCAST_SERVICE_STARTED) ||
+				intent.getAction().equals(ReportFragment.BCAST_SERVICE_STOPPED))
+			{
+				updateTrainEnabled();
+			}
+		}
+	};
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 		Bundle savedInstanceState)
@@ -145,6 +166,11 @@ public class TrainFragment extends Fragment
 	public void onActivityCreated(Bundle savedInstanceState)
 	{
 		super.onActivityCreated(savedInstanceState);
+		
+		mBroadcastManager = LocalBroadcastManager.getInstance(getActivity());
+		mServiceIntentFilter = new IntentFilter();
+		mServiceIntentFilter.addAction(ReportFragment.BCAST_SERVICE_STARTED);
+		mServiceIntentFilter.addAction(ReportFragment.BCAST_SERVICE_STOPPED);
 		
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		mPrefsClassifier = Storage.getClassifierPreferences(getActivity());
@@ -237,6 +263,13 @@ public class TrainFragment extends Fragment
 	}
 	
 	@Override
+	public void onPause()
+	{
+		super.onPause();
+		mBroadcastManager.unregisterReceiver(mBroadcastReceiver);
+	}
+	
+	@Override
 	public void onStop()
 	{
 		super.onStop();
@@ -247,12 +280,21 @@ public class TrainFragment extends Fragment
 	}
 	
 	@Override
+	public void onResume()
+	{
+		super.onResume();
+		mBroadcastManager.registerReceiver(mBroadcastReceiver, mServiceIntentFilter);
+		updateTrainEnabled();
+		
+	}
+	
+	@Override
 	public void onSaveInstanceState(Bundle outState)
 	{
 		super.onSaveInstanceState(outState);
 		
-		outState.putSerializable(KEY_FILES, mFiles);
-		outState.putInt(KEY_FEATURES, Feature.getMask(mFeatures));
+		outState.putSerializable(STATE_FILES, mFiles);
+		outState.putInt(STATE_FEATURES, Feature.getMask(mFeatures));
 	}
 	
 	@Override
@@ -262,10 +304,10 @@ public class TrainFragment extends Fragment
 		
 		if(savedInstanceState != null)
 		{
-			mFiles = (File[])savedInstanceState.getSerializable(KEY_FILES);
+			mFiles = (File[])savedInstanceState.getSerializable(STATE_FILES);
 			if(mFiles == null)
 				mFiles = new File[0];
-			int tmp = savedInstanceState.getInt(KEY_FEATURES, 0);
+			int tmp = savedInstanceState.getInt(STATE_FEATURES, 0);
 			if(tmp != 0)
 				mFeatures = Feature.getFeatures(tmp);
 			updateTrainEnabled();
@@ -329,6 +371,7 @@ public class TrainFragment extends Fragment
 		boolean enabled = mFiles.length > 0 && mFeatures.length > 0;
 		enabled = enabled && mSpinClassifier.getSelectedItem() != null;
 		enabled = enabled && mSpinWindowSize.getSelectedItem() != null;
+		enabled = enabled && !ClassifierService.isRunning();
 		mBtnTrain.setEnabled(enabled);
 		mBtnSaveFeatures.setEnabled(enabled);
 	}
@@ -944,14 +987,15 @@ public class TrainFragment extends Fragment
 				b.show();
 				
 				writeSettings();
-				// TODO Notify report fragment of new classifier
+				mBroadcastManager.sendBroadcast(new Intent(ReportFragment.BCAST_NEW_CLASSIFIER));
 			}
 		}
 		
 		@Override
 		protected void onPreExecute()
 		{
-			// TODO stop reporting
+			if(ClassifierService.isRunning())
+				cancel(true);
 			
 			setViewStates(true);
 			setValidateVisible(false);
