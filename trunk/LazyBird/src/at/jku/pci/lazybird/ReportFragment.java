@@ -79,6 +79,10 @@ public class ReportFragment extends Fragment
 	private static int sTrainedFeatures;
 	private static int sWindowSize;
 	private static int sJumpSize;
+	private static String sReportServer;
+	private static String sReportUser;
+	private static boolean sWriteLog;
+	private static String sLogFilename;
 	
 	private SharedPreferences mPrefs;
 	private SharedPreferences mPrefsClassifier;
@@ -127,6 +131,7 @@ public class ReportFragment extends Fragment
 		mServiceIntentFilter = new IntentFilter();
 		mServiceIntentFilter.addAction(BCAST_SERVICE_STARTED);
 		mServiceIntentFilter.addAction(BCAST_SERVICE_STOPPED);
+		mServiceIntentFilter.addAction(BCAST_NEW_ACTIVITY);
 		
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		mPrefsClassifier = Storage.getClassifierPreferences(getActivity());
@@ -214,6 +219,10 @@ public class ReportFragment extends Fragment
 		sTrainedFeatures = mPrefsClassifier.getInt(Storage.KEY_FEATURES, 0);
 		sWindowSize = mPrefsClassifier.getInt(Storage.KEY_WINDOW_SIZE, 1000);
 		sJumpSize = 100;
+		sReportServer = mPrefs.getString(SettingsActivity.KEY_REPORT_SERVER, "");
+		sReportUser = mPrefs.getString(SettingsActivity.KEY_REPORT_USER, "");
+		sWriteLog = mPrefs.getBoolean(SettingsActivity.KEY_WRITE_LOG, false);
+		sLogFilename = mPrefs.getString(SettingsActivity.KEY_LOG_FILENAME, "");
 	}
 	
 	private void setClassifierPresent(boolean present)
@@ -277,35 +286,9 @@ public class ReportFragment extends Fragment
 		public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
 		{
 			if(isChecked)
-			{
-				readSettings();
-				Intent i = new Intent(ClassifierService.CLASSIFIER_SERVICE);
-				i.putExtra(EXTRA_CLASSIFIER, mClassifier);
-				i.putExtra(EXTRA_WINDOW, sWindowSize);
-				i.putExtra(EXTRA_JUMP, sJumpSize);
-				i.putExtra(EXTRA_FEATURES, sTrainedFeatures);
-				
-				i.putExtra(EXTRA_TTS, false);
-				i.putExtra(EXTRA_TTS_ENABLE, mChkTts.isChecked());
-				// Language
-				
-				i.putExtra(EXTRA_LOG, false);
-				// Log enable
-				// Filename
-				i.putExtra(EXTRA_DIRNAME, sOutputDir);
-				
-				i.putExtra(EXTRA_REPORT, false);
-				i.putExtra(EXTRA_REPORT_ENABLE, mChkReport.isChecked());
-				// Server
-				// User
-				
-				getActivity().startService(i);
-				mBroadcastManager.registerReceiver(mBroadcastReceiver, mServiceIntentFilter);
-			}
+				startService();
 			else
-			{
-				getActivity().stopService(new Intent(ClassifierService.CLASSIFIER_SERVICE));
-			}
+				stopService();
 		}
 	};
 	
@@ -336,6 +319,7 @@ public class ReportFragment extends Fragment
 	private void onServiceStarted()
 	{
 		mService = ClassifierService.getInstance();
+		mSwClassifiy.setChecked(true);
 		// TODO log
 	}
 	
@@ -344,5 +328,37 @@ public class ReportFragment extends Fragment
 		mBroadcastManager.unregisterReceiver(mBroadcastReceiver);
 		mSwClassifiy.setChecked(false);
 		// TODO log
+	}
+	
+	public void startService()
+	{
+		readSettings();
+		Intent i = new Intent(ClassifierService.CLASSIFIER_SERVICE);
+		i.putExtra(EXTRA_CLASSIFIER, mClassifier);
+		i.putExtra(EXTRA_WINDOW, sWindowSize);
+		i.putExtra(EXTRA_JUMP, sJumpSize);
+		i.putExtra(EXTRA_FEATURES, sTrainedFeatures);
+		
+		i.putExtra(EXTRA_TTS, false);
+		i.putExtra(EXTRA_TTS_ENABLE, mChkTts.isChecked());
+		// Language
+		
+		i.putExtra(EXTRA_LOG, true);
+		i.putExtra(EXTRA_LOG_ENABLE, sWriteLog);
+		i.putExtra(EXTRA_FILENAME, sLogFilename);
+		i.putExtra(EXTRA_DIRNAME, sOutputDir);
+		
+		i.putExtra(EXTRA_REPORT, true);
+		i.putExtra(EXTRA_REPORT_ENABLE, mChkReport.isChecked());
+		i.putExtra(EXTRA_REPORT_SERVER, sReportServer);
+		i.putExtra(EXTRA_REPORT_USER, sReportUser);
+		
+		getActivity().startService(i);
+		mBroadcastManager.registerReceiver(mBroadcastReceiver, mServiceIntentFilter);
+	}
+	
+	public void stopService()
+	{
+		getActivity().stopService(new Intent(ClassifierService.CLASSIFIER_SERVICE));
 	}
 }

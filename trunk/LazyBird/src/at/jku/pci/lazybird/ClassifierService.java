@@ -58,6 +58,8 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	 * Intent for the service.
 	 */
 	public static final String CLASSIFIER_SERVICE = "at.jku.pci.lazybird.CLASSIFIER_SERVICE";
+	public static final String DEFAULT_HOST =
+		CoordinatorClient.DEFAULT_SERVER_HOST + ":" + CoordinatorClient.DEFAULT_SERVER_PORT;
 	// Extras
 	public static final String EXTRA_ACTIVITY_NAME = "at.jku.pci.lazybird.ACTIVITY_NAME";
 	public static final String EXTRA_LOG_ENTRY = "at.jku.pci.lazybird.LOG_ENTRY";
@@ -445,6 +447,9 @@ public class ClassifierService extends Service implements SensorEventListener, W
 		{
 			String host;
 			int port;
+			
+			if(mUsername == null || mUsername.isEmpty())
+				return;
 			
 			if(mServer == null || mServer.isEmpty())
 			{
