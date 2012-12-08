@@ -116,7 +116,7 @@ public class RecorderFragment extends Fragment
 	};
 	private LocalBroadcastManager mBroadcastManager;
 	private IntentFilter mServiceIntentFilter;
-	private BroadcastReceiver mServiceReceiver = new BroadcastReceiver() {
+	private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
 		public void onReceive(Context context, Intent intent)
 		{
 			if(LOCAL_LOGV) Log.v(LOGTAG, "Received broadcast: " + intent);
@@ -229,7 +229,7 @@ public class RecorderFragment extends Fragment
 		
 		// stop last value update and unregister service receiver when paused
 		mHandler.removeCallbacks(mRunUpdateValues);
-		mBroadcastManager.unregisterReceiver(mServiceReceiver);
+		mBroadcastManager.unregisterReceiver(mBroadcastReceiver);
 		mTxtNumValues.setTextColor(mDisabledColor);
 		mTxtLastValues.setTextColor(mDisabledColor);
 		mTxtStartTime.setTextColor(mDisabledColor);
@@ -250,7 +250,7 @@ public class RecorderFragment extends Fragment
 			// resume last value update and re-register the service receiver, if service is
 			// started
 			mHandler.post(mRunUpdateValues);
-			mBroadcastManager.registerReceiver(mServiceReceiver, mServiceIntentFilter);
+			mBroadcastManager.registerReceiver(mBroadcastReceiver, mServiceIntentFilter);
 		}
 		else
 			mService = null;
@@ -443,7 +443,7 @@ public class RecorderFragment extends Fragment
 				i.putExtra(EXTRA_CLASS, mSpinClass.getSelectedItemPosition());
 				
 				getActivity().startService(i);
-				mBroadcastManager.registerReceiver(mServiceReceiver, mServiceIntentFilter);
+				mBroadcastManager.registerReceiver(mBroadcastReceiver, mServiceIntentFilter);
 				setViewStates(true);
 			}
 		}
@@ -470,6 +470,7 @@ public class RecorderFragment extends Fragment
 	private void onServiceStopped()
 	{
 		mHandler.removeCallbacks(mRunUpdateValues);
+		mBroadcastManager.unregisterReceiver(mBroadcastReceiver);
 		setViewStates(false);
 		mSwOnOff.setChecked(false);
 	}
