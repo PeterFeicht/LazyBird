@@ -10,7 +10,7 @@
 
     <TextView
         android:id="@+id/lblNoClassifier"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="6dp"
         android:text="@string/lblNoClassifier"
@@ -52,19 +52,15 @@
         android:text="@string/lblLog"
         android:textAppearance="?android:attr/textAppearance" />
 
-    <TextView
-        android:id="@+id/txtLog"
+    <ListView
+        android:id="@+id/listLog"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:layout_marginBottom="6dp"
         android:layout_marginTop="3dp"
+        android:layout_weight="1"
         android:background="@drawable/text_view_border"
-        android:inputType="none"
-        android:scrollbarAlwaysDrawVerticalTrack="true"
-        android:scrollbarStyle="insideInset"
-        android:scrollbars="vertical"
-        android:textColor="@android:color/primary_text_light"
-        android:textSize="12sp"
-        android:typeface="monospace" />
+        android:choiceMode="none"
+        android:fastScrollEnabled="true" />
 
 </LinearLayout>
