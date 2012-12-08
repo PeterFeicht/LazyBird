@@ -2,6 +2,7 @@
 <resources>
     
     <!-- Settings -->
+    
     <string-array name="update_speeds">
         <item >Langsam</item>
         <item >Normal</item>
@@ -17,6 +18,15 @@
         <item >500 000</item>
         <item >1 000 000</item>
         <item >Unbegrenzt (!)</item>
+    </string-array>
+    
+    <!-- Record -->
+    
+    <string-array name="classes">
+        <item>Keine</item>
+        <item>sitting</item>
+        <item>walking</item>
+        <item>standing</item>
     </string-array>
     
 </resources>
