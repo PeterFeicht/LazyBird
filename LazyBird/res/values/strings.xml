@@ -19,6 +19,14 @@
     <string name="service_waiting">Recording will start in %s seconds</string>
     <string name="service_waiting_ticker">Recorder service waiting</string>
     
+    <string name="rservice_started">Reporter service started</string>
+    <string name="rservice_stopped">Reporter service stopped</string>
+    <string name="rservice_label">Reporter Service</string>
+    <string name="write_fail">Error writing file</string>
+    <string name="write_fail_long">Error writing the log file</string>
+    <string name="conn_fail">Connection lost</string>
+    <string name="conn_fail_long">Connection to the server lost</string>
+    
     <string name="set_valueUpdateSpeed">Update speed (display)</string>
     <string name="set_ValueUpdateSpeed_long">Update speed of the last values displayed</string>
     <string name="set_outputDir">Output directory</string>
@@ -78,6 +86,7 @@
     <string name="chkTts">Text-to-speech</string>
     <string name="chkReport">Report to server</string>
     <string name="lblLog">Log:</string>
+    <string name="log_new_activity">Activity changed: %s</string>
     
     <!-- Errors and stuff -->
     <string name="error">Error</string>
