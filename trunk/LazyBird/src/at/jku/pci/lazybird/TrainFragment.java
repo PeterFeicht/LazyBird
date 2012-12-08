@@ -896,12 +896,12 @@ public class TrainFragment extends Fragment
 				saver.setDestination(os);
 				saver.setInstances(fe.getOutput());
 				saver.writeBatch();
-				// saver.writeBatch() closes the stream
+				// writeBatch() closes the stream
 				
 				if(!oldClassifierFile.equals(sClassifierFile))
-					(new File(getActivity().getFilesDir(), oldClassifierFile)).delete();
+					getActivity().deleteFile(oldClassifierFile);
 				if(!oldTrainingFile.equals(sTrainingFile))
-					(new File(getActivity().getFilesDir(), oldTrainingFile)).delete();
+					getActivity().deleteFile(oldTrainingFile);
 				
 				return out;
 			}
@@ -945,6 +945,7 @@ public class TrainFragment extends Fragment
 				b.show();
 				
 				writeSettings();
+				// TODO Notify report fragment of new classifier
 			}
 		}
 		
