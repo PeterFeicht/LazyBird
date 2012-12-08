@@ -58,6 +58,9 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	 * Intent for the service.
 	 */
 	public static final String CLASSIFIER_SERVICE = "at.jku.pci.lazybird.CLASSIFIER_SERVICE";
+	/**
+	 * The default server and port to be used when nothing is specified.
+	 */
 	public static final String DEFAULT_HOST =
 		CoordinatorClient.DEFAULT_SERVER_HOST + ":" + CoordinatorClient.DEFAULT_SERVER_PORT;
 	// Extras
