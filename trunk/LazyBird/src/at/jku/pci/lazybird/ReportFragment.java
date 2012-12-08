@@ -17,11 +17,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import weka.classifiers.Classifier;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -67,10 +67,6 @@ public class ReportFragment extends Fragment
 	public static final CharSequence TITLE = "Report";
 	// Settings
 	/**
-	 * TODO Setting: {@link SettingsActivity#KEY_VALUE_UPDATE_SPEED}
-	 */
-	private static long sValueUpdateDelay;
-	/**
 	 * Output directory for log files, the base directory is always
 	 * {@link Environment#getExternalStorageDirectory()}.
 	 * <p>
@@ -81,6 +77,8 @@ public class ReportFragment extends Fragment
 	private static String sOutputDir;
 	private static String sClassifierFile;
 	private static int sTrainedFeatures;
+	private static int sWindowSize;
+	private static int sJumpSize;
 	
 	private SharedPreferences mPrefs;
 	private SharedPreferences mPrefsClassifier;
@@ -97,7 +95,7 @@ public class ReportFragment extends Fragment
 	private ClassifierService mService = null;
 	private LocalBroadcastManager mBroadcastManager;
 	private IntentFilter mServiceIntentFilter;
-	private BroadcastReceiver mServiceReceiver = new BroadcastReceiver() {
+	private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
 		public void onReceive(Context context, Intent intent)
 		{
 			if(LOCAL_LOGV) Log.v(LOGTAG, "Received broadcast: " + intent);
@@ -145,6 +143,7 @@ public class ReportFragment extends Fragment
 			if(mService != null)
 			{
 				mClassifier = mService.getClassifier();
+				mLblNoClassifier.setVisibility(View.GONE);
 			}
 		}
 		else
@@ -175,7 +174,7 @@ public class ReportFragment extends Fragment
 	public void onPause()
 	{
 		super.onPause();
-		mBroadcastManager.unregisterReceiver(mServiceReceiver);
+		mBroadcastManager.unregisterReceiver(mBroadcastReceiver);
 	}
 	
 	@Override
@@ -186,7 +185,10 @@ public class ReportFragment extends Fragment
 		// check for running service every time the fragment is resumed, since broadcast can't
 		// be received while paused or stopped
 		mSwClassifiy.setChecked(ClassifierService.isRunning());
-		mBroadcastManager.registerReceiver(mServiceReceiver, mServiceIntentFilter);
+		if(ClassifierService.isRunning())
+			mBroadcastManager.registerReceiver(mBroadcastReceiver, mServiceIntentFilter);
+		else
+			mService = null;
 	}
 	
 	/**
@@ -210,6 +212,8 @@ public class ReportFragment extends Fragment
 		sOutputDir = mPrefs.getString(SettingsActivity.KEY_OUTPUT_DIR, "");
 		sClassifierFile = mPrefsClassifier.getString(Storage.KEY_CLASSIFIER_FILE, "");
 		sTrainedFeatures = mPrefsClassifier.getInt(Storage.KEY_FEATURES, 0);
+		sWindowSize = mPrefsClassifier.getInt(Storage.KEY_WINDOW_SIZE, 1000);
+		sJumpSize = 100;
 	}
 	
 	private void setClassifierPresent(boolean present)
@@ -272,7 +276,36 @@ public class ReportFragment extends Fragment
 		@Override
 		public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
 		{
-			// TODO Auto-generated method stub
+			if(isChecked)
+			{
+				readSettings();
+				Intent i = new Intent(ClassifierService.CLASSIFIER_SERVICE);
+				i.putExtra(EXTRA_CLASSIFIER, mClassifier);
+				i.putExtra(EXTRA_WINDOW, sWindowSize);
+				i.putExtra(EXTRA_JUMP, sJumpSize);
+				i.putExtra(EXTRA_FEATURES, sTrainedFeatures);
+				
+				i.putExtra(EXTRA_TTS, false);
+				i.putExtra(EXTRA_TTS_ENABLE, mChkTts.isChecked());
+				// Language
+				
+				i.putExtra(EXTRA_LOG, false);
+				// Log enable
+				// Filename
+				i.putExtra(EXTRA_DIRNAME, sOutputDir);
+				
+				i.putExtra(EXTRA_REPORT, false);
+				i.putExtra(EXTRA_REPORT_ENABLE, mChkReport.isChecked());
+				// Server
+				// User
+				
+				getActivity().startService(i);
+				mBroadcastManager.registerReceiver(mBroadcastReceiver, mServiceIntentFilter);
+			}
+			else
+			{
+				getActivity().stopService(new Intent(ClassifierService.CLASSIFIER_SERVICE));
+			}
 		}
 	};
 	
@@ -280,8 +313,8 @@ public class ReportFragment extends Fragment
 		@Override
 		public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
 		{
-			// TODO Auto-generated method stub
-			
+			if(ClassifierService.isRunning() && mService != null)
+				mService.setTextToSpeech(isChecked);
 		}
 	};
 	
@@ -289,8 +322,8 @@ public class ReportFragment extends Fragment
 		@Override
 		public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
 		{
-			// TODO Auto-generated method stub
-			
+			if(ClassifierService.isRunning() && mService != null)
+				mService.setReportToServer(isChecked);
 		}
 	};
 	
@@ -302,13 +335,14 @@ public class ReportFragment extends Fragment
 	
 	private void onServiceStarted()
 	{
-		// TODO Auto-generated method stub
-		
+		mService = ClassifierService.getInstance();
+		// TODO log
 	}
 	
 	private void onServiceStopped()
 	{
-		// TODO Auto-generated method stub
-		
+		mBroadcastManager.unregisterReceiver(mBroadcastReceiver);
+		mSwClassifiy.setChecked(false);
+		// TODO log
 	}
 }
