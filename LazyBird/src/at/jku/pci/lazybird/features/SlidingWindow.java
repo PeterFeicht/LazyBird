@@ -247,7 +247,9 @@ public class SlidingWindow implements Iterable<Instance>
 		if(i.numValues() != 4)
 			throw new IllegalArgumentException();
 		
-		final double nextJump = mInstances.getFirst().value(0) + mWindowSize;
+		double nextJump = 0.0;
+		if(!mInstances.isEmpty())
+			nextJump = mInstances.getFirst().value(0) + mWindowSize;
 		
 		mInstances.add(i);
 		mModCount++;
