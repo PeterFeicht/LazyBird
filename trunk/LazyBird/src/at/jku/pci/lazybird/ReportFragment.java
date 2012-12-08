@@ -37,11 +37,14 @@ public class ReportFragment extends Fragment
 	public static final String EXTRA_JUMP = "at.jku.pci.lazybird.JUMP";
 	public static final String EXTRA_FEATURES = "at.jku.pci.lazybird.FEATURES";
 	public static final String EXTRA_TTS = "at.jku.pci.lazybird.TTS";
+	public static final String EXTRA_TTS_ENABLE = "at.jku.pci.lazybird.TTS_ENABLE";
 	public static final String EXTRA_LANGUAGE = "at.jku.pci.lazybird.LANGUAGE";
-	public static final String EXTRA_WRITE_LOG = "at.jku.pci.lazybird.WRITE_LOG";
+	public static final String EXTRA_LOG = "at.jku.pci.lazybird.LOG";
+	public static final String EXTRA_LOG_ENABLE = "at.jku.pci.lazybird.LOG_ENABLE";
 	public static final String EXTRA_FILENAME = "at.jku.pci.lazybird.LOG_FILENAME";
 	public static final String EXTRA_DIRNAME = "at.jku.pci.lazybird.LOG_DIRNAME";
 	public static final String EXTRA_REPORT = "at.jku.pci.lazybird.REPORT";
+	public static final String EXTRA_REPORT_ENABLE = "at.jku.pci.lazybird.REPORT_ENABLE";
 	public static final String EXTRA_REPORT_SERVER = "at.jku.pci.lazybird.REPORT_SERVER";
 	public static final String EXTRA_REPORT_USER = "at.jku.pci.lazybird.REPORT_USER";
 	// Intents
@@ -91,7 +94,7 @@ public class ReportFragment extends Fragment
 	
 	private Classifier mClassifier = null;
 	// Handlers
-	// private ClassifierService mService = null;
+	private ClassifierService mService = null;
 	private LocalBroadcastManager mBroadcastManager;
 	private IntentFilter mServiceIntentFilter;
 	private BroadcastReceiver mServiceReceiver = new BroadcastReceiver() {
@@ -132,11 +135,20 @@ public class ReportFragment extends Fragment
 		readSettings();
 		
 		getWidgets(getView());
-		checkForClassifier();
 		
-		// if the service is running and we just got created, fill inputs with running data.
+		// if the service is running and we just got created, get working classifier.
 		// setting of input enabled and such things are done in onResume.
-		// TODO get classifier from service
+		if(ClassifierService.isRunning())
+		{
+			mService = ClassifierService.getInstance();
+			// double check for an actual instance, just to be sure
+			if(mService != null)
+			{
+				mClassifier = mService.getClassifier();
+			}
+		}
+		else
+			checkForClassifier();
 	}
 	
 	/**
@@ -173,7 +185,7 @@ public class ReportFragment extends Fragment
 		
 		// check for running service every time the fragment is resumed, since broadcast can't
 		// be received while paused or stopped
-		//mSwClassifiy.setChecked(ClassifierService.isRunning());
+		mSwClassifiy.setChecked(ClassifierService.isRunning());
 		mBroadcastManager.registerReceiver(mServiceReceiver, mServiceIntentFilter);
 	}
 	

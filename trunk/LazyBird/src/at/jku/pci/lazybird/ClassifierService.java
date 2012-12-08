@@ -79,19 +79,22 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	private SensorManager mSensorManager;
 	private LocalBroadcastManager mBrodcastManager;
 	private PendingIntent mNotificationIntent;
+	private SimpleDateFormat mDateFormat;
 	
-	private int mLastActivity;
 	private boolean mTextToSpeech;
 	private String mLanguage;
+	
 	private boolean mWriteToFile;
 	private String mFilename;
 	private String mDirname;
 	private BufferedWriter mOutfile = null;
-	private SimpleDateFormat mDateFormat = null;
+	
 	private boolean mReport;
 	private String mServer;
 	private String mUsername;
 	private CoordinatorClient mClient = null;
+
+	private int mLastActivity;
 	private Classifier mClassifier;
 	private Instances mHeader;
 	private int mFeatures;
@@ -109,6 +112,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 		mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 		mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
 		mBrodcastManager = LocalBroadcastManager.getInstance(this);
+		mDateFormat = new SimpleDateFormat(LOG_FORMAT, Locale.US);
 		sRunning = false;
 		
 		// Make the pending intent bring the app to the front rather than starting a new activity
@@ -145,27 +149,38 @@ public class ClassifierService extends Service implements SensorEventListener, W
 			int windowSize = intent.getIntExtra(ReportFragment.EXTRA_WINDOW, 1000);
 			int jumpSize = intent.getIntExtra(ReportFragment.EXTRA_JUMP, 100);
 			mSlidingWindow = new SlidingWindow(windowSize, jumpSize, this);
+			mTextToSpeech = intent.getBooleanExtra(ReportFragment.EXTRA_TTS, false);
+			mWriteToFile = intent.getBooleanExtra(ReportFragment.EXTRA_LOG, false);
+			mReport = intent.getBooleanExtra(ReportFragment.EXTRA_REPORT, false);
 			
-			if(intent.getBooleanExtra(ReportFragment.EXTRA_TTS, false))
+			// TTS is possible
+			if(mTextToSpeech)
 			{
 				mLanguage = intent.getStringExtra(ReportFragment.EXTRA_LANGUAGE);
-				setTextToSpeech(true);
+				// TTS is enabled
+				if(intent.getBooleanExtra(ReportFragment.EXTRA_TTS_ENABLE, false))
+					setTextToSpeech(true);
 			}
 			
-			if(intent.getBooleanExtra(ReportFragment.EXTRA_WRITE_LOG, false))
+			// Log is possible
+			if(mWriteToFile)
 			{
 				mFilename = intent.getStringExtra(ReportFragment.EXTRA_FILENAME);
 				mDirname = intent.getStringExtra(ReportFragment.EXTRA_DIRNAME);
-				mDateFormat = new SimpleDateFormat(LOG_FORMAT, Locale.US);
-				setWriteToFile(true);
+				// Log is enabled
+				if(intent.getBooleanExtra(ReportFragment.EXTRA_LOG_ENABLE, false))
+					setWriteToFile(true);
 				log(getString(R.string.rservice_started));
 			}
 			
-			if(intent.getBooleanExtra(ReportFragment.EXTRA_REPORT, false))
+			// Report is possible
+			if(mReport)
 			{
 				mServer = intent.getStringExtra(ReportFragment.EXTRA_REPORT_SERVER);
 				mUsername = intent.getStringExtra(ReportFragment.EXTRA_REPORT_USER);
-				setReportToServer(true);
+				// Report is enabled
+				if(intent.getBooleanExtra(ReportFragment.EXTRA_REPORT_ENABLE, false));
+					setReportToServer(true);
 			}
 			
 			startReporting();
@@ -296,6 +311,10 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	 */
 	public void setTextToSpeech(boolean enabled)
 	{
+		// TTS not enabled
+		if(!mTextToSpeech)
+			return;
+		
 		// TODO set text to speech
 	}
 	
@@ -321,12 +340,15 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	 */
 	public void setWriteToFile(boolean write)
 	{
-		// No filename was specified with the intent, so nothing to do
+		// Log file not enabled
 		if(!mWriteToFile)
 			return;
 		
 		if(mOutfile == null && write)
 		{
+			if(mFilename == null || mFilename.isEmpty() || mDirname == null)
+				return;
+			
 			final File dir = new File(Environment.getExternalStorageDirectory(), mDirname);
 			if(!dir.exists())
 				dir.mkdir();
@@ -410,7 +432,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	 */
 	public void setReportToServer(boolean report)
 	{
-		// No server and user specified with the intent, so nothing to do
+		// Reporting not enabled
 		if(!mReport)
 			return;
 		
