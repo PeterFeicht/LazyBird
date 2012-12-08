@@ -7,8 +7,11 @@
     <uses-sdk
         android:minSdkVersion="15"
         android:targetSdkVersion="15" />
-    
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -26,7 +29,9 @@
         </activity>
 
         <service
-            android:name="ARFFRecorderService" android:exported="false" android:enabled="true">
+            android:name="ARFFRecorderService"
+            android:enabled="true"
+            android:exported="false" >
             <intent-filter>
                 <action android:name="at.jku.pci.lazybird.ARFF_SERVICE" />
             </intent-filter>
