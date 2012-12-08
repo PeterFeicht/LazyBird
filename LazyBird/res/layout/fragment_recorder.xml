@@ -28,16 +28,23 @@
         android:layout_below="@+id/txtFilename"
         android:text="@string/btnMakeFilename" />
 
-    <TextView
-        android:id="@+id/labelInstructions"
+    <Button
+        android:id="@+id/btnArff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/labelClass"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/spinClass"
-        android:layout_marginTop="12dp"
-        android:text="@string/labelInstructions" />
+        android:layout_alignBaseline="@+id/btnMakeFilename"
+        android:layout_toRightOf="@+id/btnMakeFilename"
+        android:text="@string/btnArff" />
+
+    <TextView
+        android:id="@+id/labelClass"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/spinClass"
+        android:layout_alignLeft="@+id/btnMakeFilename"
+        android:layout_marginLeft="5dp"
+        android:text="@string/labelClass"
+        android:textAppearance="?android:attr/textAppearance" />
 
     <Spinner
         android:id="@+id/spinClass"
@@ -50,6 +57,17 @@
         android:entries="@+array/classes"
         android:minWidth="120dp" />
 
+    <TextView
+        android:id="@+id/labelInstructions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/labelClass"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/spinClass"
+        android:layout_marginTop="12dp"
+        android:text="@string/labelInstructions" />
+
     <Switch
         android:id="@+id/swOnOff"
         android:layout_width="wrap_content"
@@ -58,24 +76,6 @@
         android:layout_below="@+id/labelInstructions"
         android:layout_marginTop="12dp"
         android:text="@string/txtStatus" />
-
-    <TextView
-        android:id="@+id/labelClass"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/spinClass"
-        android:layout_alignLeft="@+id/btnMakeFilename"
-        android:layout_marginLeft="5dp"
-        android:text="@string/labelClass"
-        android:textAppearance="?android:attr/textAppearance" />
-
-    <Button
-        android:id="@+id/btnArff"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/spinClass"
-        android:layout_toRightOf="@+id/btnMakeFilename"
-        android:text="@string/btnArff" />
 
     <TextView
         android:id="@+id/labelStartTime"
@@ -108,22 +108,22 @@
         android:textAppearance="?android:attr/textAppearance" />
 
     <TextView
-        android:id="@+id/txtNumValues"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/labelNumValues"
-        android:layout_marginLeft="15dp"
-        android:layout_toRightOf="@+id/labelNumValues"
-        android:text="@string/nothing"
-        android:textAppearance="?android:attr/textAppearance" />
-
-    <TextView
         android:id="@+id/txtLastValues"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/labelLastValues"
         android:layout_marginLeft="15dp"
         android:layout_toRightOf="@+id/labelLastValues"
+        android:text="@string/nothing"
+        android:textAppearance="?android:attr/textAppearance" />
+
+    <TextView
+        android:id="@+id/txtNumValues"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/labelNumValues"
+        android:layout_marginLeft="15dp"
+        android:layout_toRightOf="@+id/labelNumValues"
         android:text="@string/nothing"
         android:textAppearance="?android:attr/textAppearance" />
 
