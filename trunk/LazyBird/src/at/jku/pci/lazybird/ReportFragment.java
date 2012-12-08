@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -51,9 +52,11 @@ public class ReportFragment extends Fragment
 	public static final String BCAST_SERVICE_STOPPED = "at.jku.pci.lazybird.REP_SERVICE_STOPPED";
 	public static final String BCAST_SERVICE_STARTED = "at.jku.pci.lazybird.REP_SERVICE_STARTED";
 	public static final String BCAST_NEW_ACTIVITY = "at.jku.pci.lazybird.REP_NEW_ACTIVITY";
+	public static final String BCAST_NEW_CLASSIFIER = "at.jku.pci.lazybird.NEW_CLASSIFIER";
 	// Constants
 	public static final String LOGTAG = "ReportFragment";
 	public static final boolean LOCAL_LOGV = true;
+	public static final String STATE_CLASSIFIER = "at.jku.pci.lazybird.STATE_CLASSIFIER";
 	/**
 	 * Standard extension for log files.
 	 * <p> {@value}
@@ -110,6 +113,8 @@ public class ReportFragment extends Fragment
 				onServiceStarted();
 			else if(intent.getAction().equals(BCAST_NEW_ACTIVITY))
 				onNewActivity(intent);
+			else if(intent.getAction().equals(BCAST_NEW_CLASSIFIER))
+				checkForClassifier();
 		}
 	};
 	
@@ -117,6 +122,7 @@ public class ReportFragment extends Fragment
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 		Bundle savedInstanceState)
 	{
+		if(LOCAL_LOGV) Log.v(LOGTAG, "View created.");
 		// Just return the inflated layout, other initializations will be done when the host
 		// activity is created
 		return inflater.inflate(R.layout.fragment_report, container, false);
@@ -126,6 +132,7 @@ public class ReportFragment extends Fragment
 	public void onActivityCreated(Bundle savedInstanceState)
 	{
 		super.onActivityCreated(savedInstanceState);
+		if(LOCAL_LOGV) Log.v(LOGTAG, "Activity created.");
 		
 		mBroadcastManager = LocalBroadcastManager.getInstance(getActivity());
 		mServiceIntentFilter = new IntentFilter();
@@ -139,8 +146,9 @@ public class ReportFragment extends Fragment
 		
 		getWidgets(getView());
 		
-		// if the service is running and we just got created, get working classifier.
-		// setting of input enabled and such things are done in onResume.
+		// If the service is running and we just got created, get working classifier.
+		// Setting of input enabled and such things are done in onResume.
+		// It seems savedInstanceState is null when the fragment is recreated while paging.
 		if(ClassifierService.isRunning())
 		{
 			mService = ClassifierService.getInstance();
@@ -148,11 +156,24 @@ public class ReportFragment extends Fragment
 			if(mService != null)
 			{
 				mClassifier = mService.getClassifier();
-				mLblNoClassifier.setVisibility(View.GONE);
+				setClassifierPresent(true);
 			}
+		}
+		else if(savedInstanceState != null)
+		{
+			mClassifier = (Classifier)savedInstanceState.getSerializable(STATE_CLASSIFIER);
+			if(mClassifier == null)
+				checkForClassifier();
 		}
 		else
 			checkForClassifier();
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle outState)
+	{
+		super.onSaveInstanceState(outState);
+		outState.putSerializable(STATE_CLASSIFIER, mClassifier);
 	}
 	
 	/**
@@ -166,6 +187,7 @@ public class ReportFragment extends Fragment
 		
 		mSwClassifiy = (Switch)v.findViewById(R.id.swClassify);
 		mSwClassifiy.setOnCheckedChangeListener(onSwClassifyCheckedChange);
+		mSwClassifiy.setEnabled(false);
 		
 		mChkTts = (CheckBox)v.findViewById(R.id.chkTts);
 		mChkTts.setOnCheckedChangeListener(onChkTtsCheckedChange);
@@ -233,52 +255,23 @@ public class ReportFragment extends Fragment
 			mClassifier = null;
 	}
 	
+	/**
+	 * Checks static variable {@link #sClassifierFile} for a filename and deserializes the
+	 * classifier if there is one. Does nothing if the {@link ClassifierService} is running.
+	 */
 	private void checkForClassifier()
 	{
+		if(LOCAL_LOGV) Log.v(LOGTAG, "checkForClassifier called");
+		if(ClassifierService.isRunning())
+			return;
+		
 		readSettings();
 		boolean fileSet = (sClassifierFile != null && !sClassifierFile.isEmpty());
-		mSwClassifiy.setEnabled(fileSet);
 		
 		if(fileSet)
-		{
-			try
-			{
-				InputStream is = getActivity().openFileInput(sClassifierFile);
-				ObjectInputStream ois = new ObjectInputStream(is);
-				mClassifier = (Classifier)ois.readObject();
-				ois.close();
-				setClassifierPresent(true);
-			}
-			catch(FileNotFoundException ex)
-			{
-				Log.w(LOGTAG, "Classifier file from preference not found.", ex);
-				sClassifierFile = "";
-				mPrefsClassifier.edit().putString(Storage.KEY_CLASSIFIER_FILE, "").apply();
-				setClassifierPresent(false);
-			}
-			catch(StreamCorruptedException ex)
-			{
-				Log.e(LOGTAG, "Serialized classifier is corrupted.", ex);
-				sClassifierFile = "";
-				mPrefsClassifier.edit().putString(Storage.KEY_CLASSIFIER_FILE, "").apply();
-				setClassifierPresent(false);
-			}
-			catch(IOException ex)
-			{
-				Toast.makeText(getActivity(), R.string.error_io, Toast.LENGTH_LONG).show();
-				Log.e(LOGTAG, "IOException while reading serialized classifier.", ex);
-				setClassifierPresent(false);
-			}
-			catch(ClassNotFoundException ex)
-			{
-				Log.wtf(LOGTAG, "Class of the serialized classifier not found??", ex);
-				throw new InternalError();
-			}
-		}
+			new CheckForClassifierTask().execute();
 		else
-		{
 			setClassifierPresent(false);
-		}
 	}
 	
 	private OnCheckedChangeListener onSwClassifyCheckedChange = new OnCheckedChangeListener() {
@@ -360,5 +353,54 @@ public class ReportFragment extends Fragment
 	public void stopService()
 	{
 		getActivity().stopService(new Intent(ClassifierService.CLASSIFIER_SERVICE));
+	}
+	
+	private class CheckForClassifierTask extends AsyncTask<Void, Void, Classifier>
+	{
+		@Override
+		protected Classifier doInBackground(Void... params)
+		{
+			try
+			{
+				InputStream is = getActivity().openFileInput(sClassifierFile);
+				ObjectInputStream ois = new ObjectInputStream(is);
+				Classifier out = (Classifier)ois.readObject();
+				ois.close();
+				return out;
+			}
+			catch(FileNotFoundException ex)
+			{
+				Log.e(LOGTAG, "Classifier file from preference not found.", ex);
+				sClassifierFile = "";
+				mPrefsClassifier.edit().putString(Storage.KEY_CLASSIFIER_FILE, "").apply();
+				return null;
+			}
+			catch(StreamCorruptedException ex)
+			{
+				Log.e(LOGTAG, "Serialized classifier is corrupted.", ex);
+				sClassifierFile = "";
+				mPrefsClassifier.edit().putString(Storage.KEY_CLASSIFIER_FILE, "").apply();
+				return null;
+			}
+			catch(IOException ex)
+			{
+				Toast.makeText(getActivity(), R.string.error_io, Toast.LENGTH_LONG).show();
+				Log.e(LOGTAG, "IOException while reading serialized classifier.", ex);
+				return null;
+			}
+			catch(ClassNotFoundException ex)
+			{
+				Log.wtf(LOGTAG, "Class of the serialized classifier not found??", ex);
+				throw new InternalError();
+			}
+		}
+		
+		@Override
+		protected void onPostExecute(Classifier result)
+		{
+			setClassifierPresent(result != null);
+			mClassifier = result;
+			if(LOCAL_LOGV) Log.v(LOGTAG, "CheckForClassifierTask finished");
+		}
 	}
 }
