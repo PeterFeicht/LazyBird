@@ -120,7 +120,7 @@ public class SettingsActivity extends Activity
 			// Set summaries to preference values
 			final SharedPreferences p = getPreferenceScreen().getSharedPreferences();
 			mOutputDir.setSummary(p.getString(KEY_OUTPUT_DIR, ""));
-			mReportServer.setSummary(p.getString(KEY_REPORT_SERVER, ""));
+			setReportServerSummary(p);
 			mReportUser.setSummary(p.getString(KEY_REPORT_USER, ""));
 			mLogFilename.setSummary(p.getString(KEY_LOG_FILENAME, ""));
 		}
@@ -161,11 +161,19 @@ public class SettingsActivity extends Activity
 			else if(key.equals(KEY_NUM_FOLDS))
 				mNumFolds.setSummary(Integer.toString(p.getInt(KEY_NUM_FOLDS, 4)));
 			else if(key.equals(KEY_REPORT_SERVER))
-				mReportServer.setSummary(p.getString(KEY_REPORT_SERVER, ""));
+				setReportServerSummary(p);
 			else if(key.equals(KEY_REPORT_USER))
 				mReportUser.setSummary(p.getString(KEY_REPORT_USER, ""));
 			else if(key.equals(KEY_LOG_FILENAME))
 				mLogFilename.setSummary(p.getString(KEY_LOG_FILENAME, ""));
+		}
+		
+		private void setReportServerSummary(SharedPreferences p)
+		{
+			if(p.getString(KEY_REPORT_SERVER, "").isEmpty())
+				mReportServer.setSummary(ClassifierService.DEFAULT_HOST);
+			else
+				mReportServer.setSummary(p.getString(KEY_REPORT_SERVER, ""));
 		}
 	}
 	
