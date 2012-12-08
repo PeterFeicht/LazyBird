@@ -11,7 +11,6 @@
     <string name="menu_report_off">Senden ist AUS</string>
     <string name="menu_help">Hilfe</string>
     
-    
     <string name="service_started">ARFF Recorder service gestartet</string>
     <string name="service_stopped">ARFF Recorder service gestoppt</string>
     <string name="service_label">ARFF Recorder Service</string>
@@ -19,6 +18,14 @@
     <string name="too_many_values_long">Aufzeichnung gestoppt nach %d Werten</string>
     <string name="service_waiting">Aufnahme startet in %s Sekunden</string>
     <string name="service_waiting_ticker">Recorder service wartet</string>
+    
+    <string name="rservice_started">Reporter service gestartet</string>
+    <string name="rservice_stopped">Reporter service gestoppt</string>
+    <string name="rservice_label">Reporter Service</string>
+    <string name="write_fail">Schreibfehler</string>
+    <string name="write_fail_long">Schreibfehler bei der Logdatei</string>
+    <string name="conn_fail">Verbindung weg</string>
+    <string name="conn_fail_long">Verbindung zum Server verloren</string>
     
     <string name="set_valueUpdateSpeed">Anzeigegeschwindigkeit</string>
     <string name="set_ValueUpdateSpeed_long">Geschwindigkeit der Anzeige der letzten Werte</string>
@@ -72,6 +79,14 @@
     <string name="validationCancelled">Validierung abgebrochen</string>
     
     <!-- Report -->
+    <string name="helpReport">Hier können Sie ihre Aktivität klassifizieren und sie dem Sever melden oder anders ausgeben.\nSie müssen Daten aufnehmen und einen Classifier trainieren, bevor Sie Ihre Aktivität an den Server melden können.</string>
+    <string name="lblNoClassifier">Sie müssen zuerst einen Classifier trainieren</string>
+    <string name="swClassify">Klassifizierung:</string>
+    <string name="lblOutputOptions">Ausgabe:</string>
+    <string name="chkTts">Text-to-speech</string>
+    <string name="chkReport">An Server melden</string>
+    <string name="lblLog">Log:</string>
+    <string name="log_new_activity">Neue Aktivität: %s</string>
     
     <!-- Errors and stuff -->
     <string name="error">Fehler</string>
