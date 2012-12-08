@@ -52,6 +52,34 @@ public class SettingsActivity extends Activity
 	 */
 	public static final String KEY_NUM_FOLDS = "numFolds";
 	
+	/**
+	 * Shared preferences key: {@value}
+	 * <p>
+	 * The server to report to.
+	 */
+	public static final String KEY_REPORT_SERVER = "reportServer";
+	
+	/**
+	 * Shared preferences key: {@value}
+	 * <p>
+	 * The user name used for the report server.
+	 */
+	public static final String KEY_REPORT_USER = "reportUser";
+	
+	/**
+	 * Shared preferences key: {@value}
+	 * <p>
+	 * Whether to write the log to a file.
+	 */
+	public static final String KEY_WRITE_LOG = "writeLog";
+	
+	/**
+	 * Shared preferences key: {@value}
+	 * <p>
+	 * The log file name.
+	 */
+	public static final String KEY_LOG_FILENAME = "logFilename";
+	
 	public static final String LOGTAG = "SettingsActivity";
 	public static final boolean LOCAL_LOGV = true;
 	
@@ -63,6 +91,9 @@ public class SettingsActivity extends Activity
 		private ListPreference mMaxNumValues;
 		private NumberPreference mStartDelay;
 		private NumberPreference mNumFolds;
+		private EditTextPreference mReportServer;
+		private EditTextPreference mReportUser;
+		private EditTextPreference mLogFilename;
 		
 		@Override
 		public void onCreate(Bundle savedInstanceState)
@@ -77,14 +108,21 @@ public class SettingsActivity extends Activity
 			mMaxNumValues = (ListPreference)findPreference(KEY_MAX_NUM_VALUES);
 			mStartDelay = (NumberPreference)findPreference(KEY_START_DELAY);
 			mNumFolds = (NumberPreference)findPreference(KEY_NUM_FOLDS);
+			mReportServer = (EditTextPreference)findPreference(KEY_REPORT_SERVER);
+			mReportUser = (EditTextPreference)findPreference(KEY_REPORT_USER);
+			mLogFilename = (EditTextPreference)findPreference(KEY_LOG_FILENAME);
 			
 			// What layout do non-custom preferences use?
 			final int layout = mValueUpdateSpeed.getLayoutResource();
 			mStartDelay.setLayoutResource(layout);
 			mNumFolds.setLayoutResource(layout);
 			
+			// Set summaries to preference values
 			final SharedPreferences p = getPreferenceScreen().getSharedPreferences();
 			mOutputDir.setSummary(p.getString(KEY_OUTPUT_DIR, ""));
+			mReportServer.setSummary(p.getString(KEY_REPORT_SERVER, ""));
+			mReportUser.setSummary(p.getString(KEY_REPORT_USER, ""));
+			mLogFilename.setSummary(p.getString(KEY_LOG_FILENAME, ""));
 		}
 		
 		@Override
@@ -111,6 +149,7 @@ public class SettingsActivity extends Activity
 		{
 			if(LOCAL_LOGV) Log.v(LOGTAG, "SharedPreference changed: " + key);
 			
+			// Update summary only for changed preference
 			if(key.equals(KEY_VALUE_UPDATE_SPEED))
 				mValueUpdateSpeed.setSummary(mValueUpdateSpeed.getEntry());
 			else if(key.equals(KEY_OUTPUT_DIR))
@@ -121,6 +160,12 @@ public class SettingsActivity extends Activity
 				mStartDelay.setSummary(Integer.toString(p.getInt(KEY_START_DELAY, 0)));
 			else if(key.equals(KEY_NUM_FOLDS))
 				mNumFolds.setSummary(Integer.toString(p.getInt(KEY_NUM_FOLDS, 4)));
+			else if(key.equals(KEY_REPORT_SERVER))
+				mReportServer.setSummary(p.getString(KEY_REPORT_SERVER, ""));
+			else if(key.equals(KEY_REPORT_USER))
+				mReportUser.setSummary(p.getString(KEY_REPORT_USER, ""));
+			else if(key.equals(KEY_LOG_FILENAME))
+				mLogFilename.setSummary(p.getString(KEY_LOG_FILENAME, ""));
 		}
 	}
 	
