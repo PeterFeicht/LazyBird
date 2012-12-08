@@ -147,7 +147,6 @@ public class RecorderFragment extends Fragment
 		mServiceIntentFilter.addAction(BCAST_SERVICE_STARTED);
 		mServiceIntentFilter.addAction(BCAST_SERVICE_STOPPED);
 		
-		PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, false);
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		updateSettings();
 		

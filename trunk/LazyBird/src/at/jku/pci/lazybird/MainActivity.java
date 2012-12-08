@@ -5,20 +5,15 @@ import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.MenuItem.OnMenuItemClickListener;
-import android.widget.TextView;
 
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener
 {
@@ -30,11 +25,14 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	private SectionsPagerAdapter mPagerAdapter;
 	private ViewPager mViewPager;
 	
+	private MenuItem mMenuReport;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		
 		// Set up the action bar
 		final ActionBar actionBar = getActionBar();
@@ -66,8 +64,10 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		getMenuInflater().inflate(R.menu.activity_main, menu);
+		
 		// TODO enable report button in layout
-		menu.findItem(R.id.menu_report).setOnMenuItemClickListener(onMenuReportClick);
+		mMenuReport = menu.findItem(R.id.menu_report);
+		mMenuReport.setOnMenuItemClickListener(onMenuReportClick);
 		menu.findItem(R.id.menu_settings).setOnMenuItemClickListener(onMenuSettingsClick);
 		menu.findItem(R.id.menu_help).setOnMenuItemClickListener(onMenuHelpClick);
 		return true;
@@ -101,6 +101,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			
 			switch(getActionBar().getSelectedNavigationIndex())
 			{
+				case 0:
+					b.setMessage(R.string.helpReport);
+					break;
 				case 1:
 					b.setMessage(R.string.helpTrain);
 					break;
@@ -109,7 +112,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 					break;
 				
 				default:
-					b.setMessage("");
+					b.setMessage("Oops");
 					break;
 			}
 			
@@ -136,16 +139,18 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		// TODO add animation
 	}
 	
-	public class SectionsPagerAdapter extends FragmentPagerAdapter
+	private class SectionsPagerAdapter extends FragmentPagerAdapter
 	{
-		private RecorderFragment mRecorderFragment;
-		private TrainFragment mTrainFragment;
+		RecorderFragment mRecorderFragment;
+		TrainFragment mTrainFragment;
+		ReportFragment mReportFragment;
 		
 		public SectionsPagerAdapter(FragmentManager fm)
 		{
 			super(fm);
 			mRecorderFragment = new RecorderFragment();
 			mTrainFragment = new TrainFragment();
+			mReportFragment = new ReportFragment();
 		}
 		
 		@Override
@@ -153,17 +158,15 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		{
 			switch(position)
 			{
+				case 0:
+					return mReportFragment;
 				case 1:
 					return mTrainFragment;
 				case 2:
 					return mRecorderFragment;
 					
 				default:
-					Fragment fragment = new DummySectionFragment();
-					Bundle args = new Bundle();
-					args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
-					fragment.setArguments(args);
-					return fragment;
+					return null;
 			}
 			
 		}
@@ -179,42 +182,16 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		{
 			switch(position)
 			{
+				case 0:
+					return mReportFragment.getTitle();
 				case 1:
 					return mTrainFragment.getTitle();
 				case 2:
 					return mRecorderFragment.getTitle();
 					
 				default:
-					return Integer.toString(position + 1);
+					return null;
 			}
 		}
 	}
-	
-	/**
-	 * A dummy fragment representing a section of the app, but that simply displays dummy text.
-	 */
-	public static class DummySectionFragment extends Fragment
-	{
-		/**
-		 * The fragment argument representing the section number for this fragment.
-		 */
-		public static final String ARG_SECTION_NUMBER = "section_number";
-		
-		public DummySectionFragment()
-		{
-		}
-		
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState)
-		{
-			// Create a new TextView and set its text to the fragment's section number argument
-			// value
-			TextView textView = new TextView(getActivity());
-			textView.setGravity(Gravity.CENTER);
-			textView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
-			return textView;
-		}
-	}
-	
 }

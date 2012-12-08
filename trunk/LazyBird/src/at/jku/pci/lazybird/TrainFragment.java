@@ -146,7 +146,6 @@ public class TrainFragment extends Fragment
 	{
 		super.onActivityCreated(savedInstanceState);
 		
-		PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, false);
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		mPrefsClassifier = Storage.getClassifierPreferences(getActivity());
 		readSettings();

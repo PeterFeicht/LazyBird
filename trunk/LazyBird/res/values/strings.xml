@@ -4,7 +4,7 @@
     <string name="app_name">Lazy Bird</string>
     <string name="title_tab_record">Record</string>
     <string name="title_tab_train">Train</string>
-    <string name="title_tab_classify">Classify</string>
+    <string name="title_tab_report">Report</string>
     <string name="title_activity_settings">Settings</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_report_on">Reporting is ON</string>
@@ -31,7 +31,7 @@
     <string name="set_numFolds_long">The number of folds to be used when cross-validating the trained classifier.</string>
     
     <!-- Record -->
-    <string name="helpRecorder">In this tab, you can record accelerometer data to ARFF files to train a classifier with.\nYou have to record data and train a classifier, before you can report your activity to the server.</string>
+    <string name="helpRecorder">Here you can record accelerometer data to ARFF files to train a classifier with.\nYou have to record data and train a classifier, before you can report your activity to the server.</string>
     <string name="txtStatus">Recorder status:</string>
     <string name="btnMakeFilename">Make Filename</string>
     <string name="btnArff">+ .arff</string>
@@ -47,7 +47,7 @@
     <string name="btnDelete">Delete file</string>
     
     <!-- Train -->
-    <string name="helpTrain">In this Tab, you can train a classifier to classify your activity, using data you recorded.\nYou have to record data and train a classifier, before you can report your activity to the server.</string>
+    <string name="helpTrain">Here you can train a classifier to classify your activity, using data you recorded.\nYou have to record data and train a classifier, before you can report your activity to the server.</string>
     <string name="btnSelectFile">Select data file(s)&#8230;</string>
     <string name="btnSelectFeatures">Select features&#8230;</string>
     <string name="btnSaveFeatures">Save Features&#8230;</string>
@@ -71,7 +71,13 @@
     <string name="validationCancelled">Validation cancelled</string>
     
     <!-- Report -->
-    
+    <string name="helpReport">Here you can classify your acitvity and report it to the server or output it a few other ways.\nYou have to record data and train a classifier, before you can report your activity to the server.</string>
+    <string name="lblNoClassifier">You have to train a classifier first.</string>
+    <string name="swClassify">Classification:</string>
+    <string name="lblOutputOptions">Output options:</string>
+    <string name="chkTts">Text-to-speech</string>
+    <string name="chkReport">Report to server</string>
+    <string name="lblLog">Log:</string>
     
     <!-- Errors and stuff -->
     <string name="error">Error</string>
