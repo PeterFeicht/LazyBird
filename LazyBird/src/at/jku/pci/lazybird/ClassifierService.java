@@ -93,7 +93,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	private String mServer;
 	private String mUsername;
 	private CoordinatorClient mClient = null;
-
+	
 	private int mLastActivity;
 	private Classifier mClassifier;
 	private Instances mHeader;
@@ -179,7 +179,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 				mServer = intent.getStringExtra(ReportFragment.EXTRA_REPORT_SERVER);
 				mUsername = intent.getStringExtra(ReportFragment.EXTRA_REPORT_USER);
 				// Report is enabled
-				if(intent.getBooleanExtra(ReportFragment.EXTRA_REPORT_ENABLE, false));
+				if(intent.getBooleanExtra(ReportFragment.EXTRA_REPORT_ENABLE, false))
 					setReportToServer(true);
 			}
 			
@@ -188,7 +188,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 		
 		return START_STICKY;
 	}
-
+	
 	@Override
 	public void onDestroy()
 	{
@@ -305,7 +305,8 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	}
 	
 	/**
-	 * Sets whether Text-to-speech output is enabled.
+	 * Sets whether Text-to-speech output is enabled. This has no effect if TTS was not enabled
+	 * in the start {@code Intent}.
 	 * 
 	 * @param enabled {@code true} if Text-to-speech output should be enabled.
 	 */
@@ -330,8 +331,8 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	}
 	
 	/**
-	 * Sets whether the log should be written to a file. This has no effect if no filename was
-	 * specified when starting the service.
+	 * Sets whether the log should be written to a file. This has no effect if logging to a file
+	 * was not enabled in the start {@code Intent}.
 	 * <p>
 	 * Note that every time this is set from {@code false} to {@code true}, the output file is
 	 * overwritten.
@@ -423,7 +424,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	
 	/**
 	 * Sets whether the current activity should be reported to the sever. This has no effect if
-	 * no server was specified when starting the service.
+	 * reporting was not enabled in the start {@code Intent}.
 	 * 
 	 * @param report {@code true} to report the current activity.
 	 * @see #getReportToServer()
