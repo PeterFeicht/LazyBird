@@ -36,6 +36,14 @@
                 <action android:name="at.jku.pci.lazybird.ARFF_SERVICE" />
             </intent-filter>
         </service>
+        <service
+            android:name="ClassifierService"
+            android:enabled="true"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="at.jku.pci.lazybird.CLASSIFIER_SERVICE" />
+            </intent-filter>
+        </service>
 
         <activity
             android:name="at.jku.pci.lazybird.SettingsActivity"
