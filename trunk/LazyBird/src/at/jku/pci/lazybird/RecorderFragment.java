@@ -55,7 +55,7 @@ public class RecorderFragment extends Fragment
 	/**
 	 * Format string used for the last values displayed
 	 */
-	public static final String TRIPLET_FORMAT = "%.2f, %.2f, %.2f";
+	public static final String TRIPLET_FORMAT = "%.1f, %.1f, %.1f";
 	/**
 	 * Format string used to construct a filename.
 	 */
@@ -165,7 +165,7 @@ public class RecorderFragment extends Fragment
 				// Select appropriate class, if possible
 				SpinnerAdapter a = mSpinClass.getAdapter();
 				for(int j = 0, count = a.getCount(); j < count; j++)
-					if(mService.getAClass().equals(a.getItem(j)))
+					if(a.getItem(j).equals(mService.getAClass()))
 					{
 						mSpinClass.setSelection(j);
 						break;
