@@ -49,7 +49,6 @@
     <PreferenceCategory
         android:orderingFromXml="true"
         android:title="@string/title_tab_train" >
-        
         <at.jku.pci.lazybird.NumberPreference
             android:defaultValue="4"
             android:dialogLayout="@layout/number_preference"
@@ -59,7 +58,33 @@
             android:title="@string/set_numFolds"
             custom:maxValue="10"
             custom:minValue="2" />
-        
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/title_tab_report" >
+        <EditTextPreference
+            android:dialogMessage="@string/set_reportServer_long"
+            android:dialogTitle="@string/set_reportServer"
+            android:key="reportServer"
+            android:title="@string/set_reportServer" />
+        <EditTextPreference
+            android:dialogMessage="@string/set_reportUser_long"
+            android:dialogTitle="@string/set_reportUser"
+            android:key="reportUser"
+            android:title="@string/set_reportUser" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="writeLog"
+            android:summaryOff="@string/set_writeLog_diasble"
+            android:summaryOn="@string/set_writeLog_enable"
+            android:title="@string/set_writeLog" />
+
+        <EditTextPreference
+            android:defaultValue="activity.log"
+            android:dependency="set_writeLog"
+            android:dialogMessage="@string/set_logFilename_long"
+            android:dialogTitle="@string/set_logFilename"
+            android:key="logFilename"
+            android:title="@string/set_logFilename" />
     </PreferenceCategory>
 
 </PreferenceScreen>

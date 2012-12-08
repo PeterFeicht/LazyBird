@@ -28,15 +28,26 @@
     <string name="conn_fail_long">Verbindung zum Server verloren</string>
     
     <string name="set_valueUpdateSpeed">Anzeigegeschwindigkeit</string>
-    <string name="set_ValueUpdateSpeed_long">Geschwindigkeit der Anzeige der letzten Werte</string>
+    <string name="set_ValueUpdateSpeed_long">Geschwindigkeit der Anzeige der letzten Werte.</string>
     <string name="set_outputDir">Ausgabeverzeichnis</string>
-    <string name="set_outputDir_long">Verzeichnis in das die Ausgabedateien gespeichert werden</string>
+    <string name="set_outputDir_long">Verzeichnis in das die Ausgabedateien gespeichert werden.</string>
     <string name="set_maxNumValues">Datenpunkt Limit</string>
-    <string name="set_maxNumValues_long">Anzahl der Datenpunkte nach der die Aufnahme beendet wird</string>
+    <string name="set_maxNumValues_long">Anzahl der Datenpunkte nach der die Aufnahme beendet wird.</string>
     <string name="set_startDelay">Startverzögerung</string>
-    <string name="set_startDelay_long">Wartezeit (Sekunden) bevor die Aufnahme gestartet wird</string>
+    <string name="set_startDelay_long">Wartezeit (Sekunden) bevor die Aufnahme gestartet wird.</string>
     <string name="set_numFolds">Anzahl Folds</string>
     <string name="set_numFolds_long">Die Anzahl von Teilmengen bei der Kreuzvalidierung des trainierten Classifiers.</string>
+    <string name="set_reportServer">Server-Adresse</string>
+    <string name="set_reportServer_long">Server-Adresse oder Hostname und Port für das Senden der Aktivität. Geben Sie nichts ein, um die Standardeinstellungen zu verwenden.</string>
+    <string name="set_reportUser">Benutzername</string>
+    <string name="set_reportUser_long">Die Benutzer ID für die Verbindung zum Server, muss aus 7 Ziffern bestehen.</string>
+    <string name="set_writeLog">Logdatei schreiben</string>
+    <string name="set_writeLog_enable">Aktivitäts-Log wird gespeichert</string>
+    <string name="set_writeLog_diasble">Kein Log wird gespeichert</string>
+    <string name="set_logFilename">Dateiname</string>
+    <string name="set_logFilename_long">Name für die Logdatei.</string>
+    <string name="set_ttsLanguage">TTS Sprache</string>
+    <string name="set_ttsLanguage_long">Die Sprache für Text-to-speech Ausgabe.</string>
     
     <!-- Record -->
     <string name="helpRecorder">Hier können Sie Beschleunigungsdaten in ARFF Dateien aufnehmen um Classifier zu trainieren.\nSie müssen Daten aufnehmen und einen Classifier trainieren, bevor Sie ihre Aktivität an den Server melden können.</string>
