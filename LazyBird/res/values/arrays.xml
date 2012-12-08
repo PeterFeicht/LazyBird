@@ -40,7 +40,7 @@
     <!-- Record -->
     
     <string-array name="classes">
-        <item>none</item>
+        <item>None</item>
         <item>sitting</item>
         <item>walking</item>
         <item>standing</item>
