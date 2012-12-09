@@ -647,7 +647,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 		mSensorManager.registerListener(this, s, SensorManager.SENSOR_DELAY_FASTEST);
 		
 		startForeground(NOTIFICATION_REPORTING, makeOngoingNotification());
-		mBrodcastManager.sendBroadcast(new Intent(RecorderFragment.BCAST_SERVICE_STARTED));
+		mBrodcastManager.sendBroadcast(new Intent(ReportFragment.BCAST_SERVICE_STARTED));
 	}
 	
 	/**
