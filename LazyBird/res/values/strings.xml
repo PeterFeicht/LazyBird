@@ -64,6 +64,9 @@
     <string name="dialogInfo">Info:</string>
     <string name="valsPerSecond">Values/Second:</string>
     <string name="btnDelete">Delete file</string>
+    <string name="fileNotFound">File not found</string>
+    <string name="fileDeleted">File deleted</string>
+    <string name="fileNotDeleted">File &lt;i&gt;not&lt;/i&gt; deleted</string>
     
     <!-- Train -->
     <string name="helpTrain">Here you can train a classifier to classify your activity, using data you recorded.\nYou have to record data and train a classifier, before you can report your activity to the server.</string>

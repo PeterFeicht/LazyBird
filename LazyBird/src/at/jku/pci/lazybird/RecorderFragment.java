@@ -28,6 +28,7 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.Switch;
@@ -97,6 +98,7 @@ public class RecorderFragment extends Fragment
 	private TextView mLabelNumValues;
 	private TextView mLabelLastValues;
 	private TextView mLabelValsPerSecond;
+	private ImageButton mBtnDelete;
 	
 	private int mTextColor;
 	private int mDisabledColor = Color.GRAY;
@@ -209,6 +211,8 @@ public class RecorderFragment extends Fragment
 		mBtnMakeFilename.setOnClickListener(onBtnMakeFilenameClick);
 		mBtnArff = (Button)v.findViewById(R.id.btnArff);
 		mBtnArff.setOnClickListener(onBtnArffClick);
+		mBtnDelete = (ImageButton)v.findViewById(R.id.btnDelete);
+		mBtnDelete.setOnClickListener(onBtnDeleteClick);
 		
 		mTxtStartTime = (TextView)v.findViewById(R.id.txtStartTime);
 		mTxtLastValues = (TextView)v.findViewById(R.id.txtLastValues);
@@ -384,6 +388,26 @@ public class RecorderFragment extends Fragment
 		}
 	}
 	
+	private OnClickListener onBtnDeleteClick = new OnClickListener() {
+		@Override
+		public void onClick(View v)
+		{
+			final String filename = mTxtFilename.getText().toString();
+			
+			if(filename.isEmpty())
+				return;
+			
+			final File f = new File(new File(Environment.getExternalStorageDirectory(),
+				sOutputDir), filename);
+			int text;
+			if(f.isFile())
+				text = (f.delete() ? R.string.fileDeleted : R.string.fileNotDeleted);
+			else
+				text = R.string.fileNotFound;
+			Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
+		}
+	};
+	
 	private OnClickListener onBtnMakeFilenameClick = new OnClickListener() {
 		@Override
 		public void onClick(View v)
@@ -474,30 +498,6 @@ public class RecorderFragment extends Fragment
 		setViewStates(false);
 		mSwOnOff.setChecked(false);
 	}
-	
-	// TODO integrate delete button in layout, maybe action bar style next to the text input
-	// OnMenuItemClickListener onMenuDeleteFileClick = new OnMenuItemClickListener() {
-	// public boolean onMenuItemClick(MenuItem item)
-	// {
-	// String filename = mTxtFilename.getText().toString();
-	//
-	// if(filename.isEmpty())
-	// return true;
-	//
-	// File f = new File(Environment.getExternalStorageDirectory() +
-	// File.separator + sOutputDir, filename);
-	// int text;
-	// if(f.isFile())
-	// text = (f.delete() ? R.string.fileDeleted : R.string.fileNotDeleted);
-	// else
-	// text = R.string.fileNotFound;
-	//
-	// if(LOCAL_LOGV)
-	// Log.v(LOGTAG, "onMenuDeleteFileClick: " + getText(text) + ", " + f);
-	// Toast.makeText(ARFFRecorderActivity.this, text, Toast.LENGTH_SHORT).show();
-	// return true;
-	// }
-	// };
 	
 	/**
 	 * Builds an {@link AlertDialog} with the specified title, message and info and displays it

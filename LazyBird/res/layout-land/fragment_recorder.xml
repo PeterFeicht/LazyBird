@@ -6,18 +6,29 @@
     android:paddingBottom="10dp"
     android:paddingLeft="20dp"
     android:paddingRight="20dp"
-    android:paddingTop="3dp" >
+    android:paddingTop="6dp" >
 
     <EditText
         android:id="@+id/txtFilename"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/btnDelete"
         android:ems="10"
         android:hint="@string/filename"
         android:inputType="textNoSuggestions" />
+
+    <ImageButton
+        android:id="@+id/btnDelete"
+        style="@android:style/Widget.Holo.Light.ActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/txtFilename"
+        android:layout_alignParentRight="true"
+        android:contentDescription="@string/btnDelete"
+        android:minHeight="42dp"
+        android:src="@drawable/ic_action_delete" />
 
     <Button
         android:id="@+id/btnMakeFilename"
