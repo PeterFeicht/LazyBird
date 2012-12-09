@@ -40,7 +40,6 @@ public class ReportFragment extends Fragment
 	public static final String EXTRA_FEATURES = "at.jku.pci.lazybird.FEATURES";
 	public static final String EXTRA_TTS = "at.jku.pci.lazybird.TTS";
 	public static final String EXTRA_TTS_ENABLE = "at.jku.pci.lazybird.TTS_ENABLE";
-	public static final String EXTRA_LANGUAGE = "at.jku.pci.lazybird.LANGUAGE";
 	public static final String EXTRA_LOG = "at.jku.pci.lazybird.LOG";
 	public static final String EXTRA_LOG_ENABLE = "at.jku.pci.lazybird.LOG_ENABLE";
 	public static final String EXTRA_FILENAME = "at.jku.pci.lazybird.LOG_FILENAME";
@@ -88,7 +87,6 @@ public class ReportFragment extends Fragment
 	private static String sReportUser;
 	private static boolean sWriteLog;
 	private static String sLogFilename;
-	private static String sTtsLanguage;
 	
 	private SharedPreferences mPrefs;
 	private SharedPreferences mPrefsClassifier;
@@ -267,7 +265,6 @@ public class ReportFragment extends Fragment
 		sReportUser = mPrefs.getString(SettingsActivity.KEY_REPORT_USER, "");
 		sWriteLog = mPrefs.getBoolean(SettingsActivity.KEY_WRITE_LOG, false);
 		sLogFilename = mPrefs.getString(SettingsActivity.KEY_LOG_FILENAME, "");
-		sTtsLanguage = mPrefs.getString(SettingsActivity.KEY_TTS_LANGUAGE, "en");
 	}
 	
 	private void setClassifierPresent(boolean present)
@@ -389,7 +386,6 @@ public class ReportFragment extends Fragment
 		
 		i.putExtra(EXTRA_TTS, true);
 		i.putExtra(EXTRA_TTS_ENABLE, mChkTts.isChecked());
-		i.putExtra(EXTRA_LANGUAGE, sTtsLanguage);
 		
 		i.putExtra(EXTRA_LOG, true);
 		i.putExtra(EXTRA_LOG_ENABLE, sWriteLog);
