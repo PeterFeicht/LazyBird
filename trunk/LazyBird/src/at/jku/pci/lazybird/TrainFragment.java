@@ -54,6 +54,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class TrainFragment extends Fragment
@@ -304,12 +305,25 @@ public class TrainFragment extends Fragment
 		
 		if(savedInstanceState != null)
 		{
-			mFiles = (File[])savedInstanceState.getSerializable(STATE_FILES);
-			if(mFiles == null)
+			Object[] files = (Object[])savedInstanceState.getSerializable(STATE_FILES);
+			if(files != null)
+			{
+				try
+				{
+					mFiles = Arrays.copyOf(files, files.length, File[].class);
+				}
+				catch(ArrayStoreException ex)
+				{
+					mFiles = new File[0];
+					Log.w(LOGTAG, "Saved state for mFiles is of wrong class.", ex);
+				}
+			}  
+			else
 				mFiles = new File[0];
-			int tmp = savedInstanceState.getInt(STATE_FEATURES, 0);
-			if(tmp != 0)
-				mFeatures = Feature.getFeatures(tmp);
+			
+			int features = savedInstanceState.getInt(STATE_FEATURES, 0);
+			if(features != 0)
+				mFeatures = Feature.getFeatures(features);
 			updateTrainEnabled();
 			updateCheckButtons();
 		}
