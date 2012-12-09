@@ -5,8 +5,7 @@
         android:orderInCategory="50"
         android:showAsAction="always"
         android:title="@string/menu_report_off"
-        android:icon="@drawable/ic_action_report_off"
-        android:enabled="false" />
+        android:icon="@drawable/ic_action_report_off" />
     
     <item
         android:id="@+id/menu_help"

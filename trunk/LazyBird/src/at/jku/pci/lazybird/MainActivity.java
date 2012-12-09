@@ -3,14 +3,19 @@ package at.jku.pci.lazybird;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
@@ -24,8 +29,22 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	// The PagerAdapter supplies the fragments to be displayed in the ViewPager
 	private SectionsPagerAdapter mPagerAdapter;
 	private ViewPager mViewPager;
-	
 	private MenuItem mMenuReport;
+	
+	private LocalBroadcastManager mBroadcastManager;
+	private IntentFilter mServiceIntentFilter;
+	private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+		public void onReceive(Context context, Intent intent)
+		{
+			if(LOCAL_LOGV) Log.v(LOGTAG, "Received broadcast: " + intent);
+			
+			if(intent.getAction().equals(ReportFragment.BCAST_SERVICE_STOPPED) ||
+				intent.getAction().equals(ReportFragment.BCAST_SERVICE_STARTED))
+			{
+				updateMenuReportIcon();
+			}
+		}
+	};
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -33,6 +52,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+		
+		mBroadcastManager = LocalBroadcastManager.getInstance(this);
+		mServiceIntentFilter = new IntentFilter();
+		mServiceIntentFilter.addAction(ReportFragment.BCAST_SERVICE_STARTED);
+		mServiceIntentFilter.addAction(ReportFragment.BCAST_SERVICE_STOPPED);
 		
 		// Set up the action bar
 		final ActionBar actionBar = getActionBar();
@@ -61,13 +85,29 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	}
 	
 	@Override
+	protected void onPause()
+	{
+		super.onPause();
+		mBroadcastManager.unregisterReceiver(mBroadcastReceiver);
+	}
+	
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		updateMenuReportIcon();
+		mBroadcastManager.registerReceiver(mBroadcastReceiver, mServiceIntentFilter);
+	}
+	
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
+		super.onCreateOptionsMenu(menu);
 		getMenuInflater().inflate(R.menu.activity_main, menu);
 		
-		// TODO enable report button in layout
 		mMenuReport = menu.findItem(R.id.menu_report);
 		mMenuReport.setOnMenuItemClickListener(onMenuReportClick);
+		updateMenuReportIcon();
 		menu.findItem(R.id.menu_settings).setOnMenuItemClickListener(onMenuSettingsClick);
 		menu.findItem(R.id.menu_help).setOnMenuItemClickListener(onMenuHelpClick);
 		return true;
@@ -85,8 +125,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		@Override
 		public boolean onMenuItemClick(MenuItem item)
 		{
-			// TODO implement reporting
-			return false;
+			if(ClassifierService.isRunning())
+				mPagerAdapter.mReportFragment.stopService();
+			else
+				mPagerAdapter.mReportFragment.startService();
+			
+			return true;
 		}
 	};
 	
@@ -137,6 +181,16 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction)
 	{
 		// TODO add animation
+	}
+	
+	private void updateMenuReportIcon()
+	{
+		if(mMenuReport == null)
+			return;
+		if(ClassifierService.isRunning())
+			mMenuReport.setIcon(R.drawable.ic_action_report_on);
+		else
+			mMenuReport.setIcon(R.drawable.ic_action_report_off);
 	}
 	
 	private class SectionsPagerAdapter extends FragmentPagerAdapter
