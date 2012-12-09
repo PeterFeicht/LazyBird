@@ -418,7 +418,7 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 			.setContentIntent(mNotificationIntent)
 			.setSmallIcon(R.drawable.ic_stat_service)
 			.setOngoing(true)
-			.setLights(0xFFFFFF00, 500, 500)
+			.setLights(0xFFFFFF00, 1000, 1000)
 			.setAutoCancel(false).getNotification();
 		
 		n.flags |= Notification.FLAG_SHOW_LIGHTS;
@@ -468,6 +468,7 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 			.setContentText(text)
 			.setSmallIcon(R.drawable.ic_stat_service)
 			.setAutoCancel(true)
+			.setDefaults(Notification.DEFAULT_VIBRATE)
 			.setContentIntent(mNotificationIntent).getNotification();
 		
 		mNotificationManager.notify(NOTIFICATION_TOO_MAY_VALUES, n);

@@ -593,7 +593,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 			.setContentIntent(mNotificationIntent)
 			.setSmallIcon(R.drawable.ic_stat_rservice)
 			.setOngoing(true)
-			.setLights(0xFFFFFF00, 500, 500)
+			.setLights(0xFFFFFF00, 1000, 1000)
 			.setAutoCancel(false).getNotification();
 		
 		n.flags |= Notification.FLAG_SHOW_LIGHTS;
