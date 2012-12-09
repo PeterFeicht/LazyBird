@@ -12,6 +12,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -79,26 +80,36 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	 */
 	private static boolean sRunning = false;
 	
+	// Manage
 	private final IBinder mBinder = new LocalBinder();
 	private NotificationManager mNotificationManager;
 	private SensorManager mSensorManager;
 	private LocalBroadcastManager mBrodcastManager;
 	private PendingIntent mNotificationIntent;
 	private SimpleDateFormat mDateFormat;
-	
+	// TTS
 	private boolean mTextToSpeech;
 	private String mLanguage;
-	
+	// Log
 	private boolean mWriteToFile;
 	private String mFilename;
 	private String mDirname;
 	private BufferedWriter mOutfile = null;
-	
+	// Report
 	private boolean mReport;
 	private String mServer;
 	private String mUsername;
 	private CoordinatorClient mClient = null;
-	
+	private Handler mHandler = new Handler();
+	private Runnable mRunReportActivity = new Runnable() {
+		public void run()
+		{
+			// The server expects an update every few seconds to keep the client online
+			reportActivity(getLastActivity());
+			mHandler.postDelayed(this, 2000);
+		}
+	};
+	// State
 	private int mLastActivity;
 	private int mNewCount = 0;
 	private int mNewActivity = -1;
@@ -130,7 +141,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 		i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 		mNotificationIntent = PendingIntent.getActivity(this, 0, i, 0);
 	}
-	
+
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
@@ -204,6 +215,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 		stopForeground(true);
 		if(mSensorManager != null)
 			mSensorManager.unregisterListener(this);
+		mHandler.removeCallbacks(mRunReportActivity);
 		
 		try
 		{
@@ -496,9 +508,12 @@ public class ClassifierService extends Service implements SensorEventListener, W
 				notifyConnectionFail();
 				mClient = null;
 			}
+			else
+				mHandler.post(mRunReportActivity);
 		}
 		else if(mClient != null && !report)
 		{
+			mHandler.removeCallbacks(mRunReportActivity);
 			mClient.interrupt();
 			mClient = null;
 		}
@@ -657,6 +672,22 @@ public class ClassifierService extends Service implements SensorEventListener, W
 		}
 	}
 	
+	private void reportActivity(String activity)
+	{
+		if(mClient != null)
+		{
+			if(mClient.isAlive())
+			{
+				mClient.setCurrentActivity(ClassLabel.parse(activity));
+			}
+			else
+			{
+				notifyConnectionFail();
+				mClient = null;
+			}
+		}
+	}
+	
 	private void onActivityChanged(int newActivity)
 	{
 		mLastActivity = newActivity;
@@ -672,18 +703,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 			// TODO output with TTS
 		}
 		
-		if(mClient != null)
-		{
-			if(mClient.isAlive())
-			{
-				mClient.setCurrentActivity(ClassLabel.parse(activity));
-			}
-			else
-			{
-				notifyConnectionFail();
-				mClient = null;
-			}
-		}
+		reportActivity(activity);
 	}
 	
 	@Override
@@ -725,7 +745,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 			{
 				if(mNewActivity == clazz)
 				{
-					if(++mNewCount > 10)
+					if(++mNewCount > 30)
 						onActivityChanged(clazz);
 				}
 				else
