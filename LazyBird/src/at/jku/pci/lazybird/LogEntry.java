@@ -67,6 +67,8 @@ public class LogEntry implements Comparable<LogEntry>, Serializable
 	@Override
 	public boolean equals(Object o)
 	{
+		if(o == this)
+			return true;
 		if(o == null)
 			return false;
 		if(o instanceof LogEntry)
