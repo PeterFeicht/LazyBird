@@ -20,6 +20,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -93,11 +94,12 @@ public class ReportFragment extends Fragment
 	private SharedPreferences mPrefsClassifier;
 	
 	// Fields
-	TextView mLblNoClassifier;
-	Switch mSwClassifiy;
-	CheckBox mChkTts;
-	CheckBox mChkReport;
-	ListView mListLog;
+	private TextView mLblNoClassifier;
+	private Switch mSwClassifiy;
+	private ProgressBar mPrograssSerialize;
+	private CheckBox mChkTts;
+	private CheckBox mChkReport;
+	private ListView mListLog;
 	
 	private Classifier mClassifier = null;
 	private LogListAdapter mLogAdapter;
@@ -142,6 +144,7 @@ public class ReportFragment extends Fragment
 		mServiceIntentFilter.addAction(BCAST_SERVICE_STARTED);
 		mServiceIntentFilter.addAction(BCAST_SERVICE_STOPPED);
 		mServiceIntentFilter.addAction(BCAST_NEW_ACTIVITY);
+		mServiceIntentFilter.addAction(BCAST_NEW_CLASSIFIER);
 		
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		mPrefsClassifier = Storage.getClassifierPreferences(getActivity());
@@ -205,6 +208,7 @@ public class ReportFragment extends Fragment
 		mSwClassifiy = (Switch)v.findViewById(R.id.swClassify);
 		mSwClassifiy.setOnCheckedChangeListener(onSwClassifyCheckedChange);
 		mSwClassifiy.setEnabled(false);
+		mPrograssSerialize = (ProgressBar)v.findViewById(R.id.progressSerialize);
 		
 		mChkTts = (CheckBox)v.findViewById(R.id.chkTts);
 		mChkTts.setOnCheckedChangeListener(onChkTtsCheckedChange);
@@ -450,10 +454,17 @@ public class ReportFragment extends Fragment
 		}
 		
 		@Override
+		protected void onPreExecute()
+		{
+			mPrograssSerialize.setVisibility(View.VISIBLE);
+		}
+		
+		@Override
 		protected void onPostExecute(Classifier result)
 		{
 			setClassifierPresent(result != null);
 			mClassifier = result;
+			mPrograssSerialize.setVisibility(View.GONE);
 			if(LOCAL_LOGV) Log.v(LOGTAG, "CheckForClassifierTask finished");
 		}
 	}

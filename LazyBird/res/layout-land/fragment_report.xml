@@ -27,6 +27,19 @@
         android:layout_below="@+id/lblNoClassifier"
         android:orientation="vertical" >
 
+        <ProgressBar
+            android:id="@+id/progressSerialize"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="9dp"
+            android:layout_marginTop="3dp"
+            android:indeterminate="true"
+            android:minHeight="24dp"
+            android:minWidth="24dp"
+            android:visibility="gone" />
+
         <Switch
             android:id="@+id/swClassify"
             android:layout_width="wrap_content"
