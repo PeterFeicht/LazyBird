@@ -86,6 +86,7 @@ public class ReportFragment extends Fragment
 	private static String sReportUser;
 	private static boolean sWriteLog;
 	private static String sLogFilename;
+	private static String sTtsLanguage;
 	
 	private SharedPreferences mPrefs;
 	private SharedPreferences mPrefsClassifier;
@@ -244,6 +245,7 @@ public class ReportFragment extends Fragment
 		sReportUser = mPrefs.getString(SettingsActivity.KEY_REPORT_USER, "");
 		sWriteLog = mPrefs.getBoolean(SettingsActivity.KEY_WRITE_LOG, false);
 		sLogFilename = mPrefs.getString(SettingsActivity.KEY_LOG_FILENAME, "");
+		sTtsLanguage = mPrefs.getString(SettingsActivity.KEY_TTS_LANGUAGE, "en");
 	}
 	
 	private void setClassifierPresent(boolean present)
@@ -361,9 +363,9 @@ public class ReportFragment extends Fragment
 		i.putExtra(EXTRA_JUMP, sJumpSize);
 		i.putExtra(EXTRA_FEATURES, sTrainedFeatures);
 		
-		i.putExtra(EXTRA_TTS, false);
+		i.putExtra(EXTRA_TTS, true);
 		i.putExtra(EXTRA_TTS_ENABLE, mChkTts.isChecked());
-		// Language
+		i.putExtra(EXTRA_LANGUAGE, sTtsLanguage);
 		
 		i.putExtra(EXTRA_LOG, true);
 		i.putExtra(EXTRA_LOG_ENABLE, sWriteLog);
