@@ -18,11 +18,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import weka.classifiers.Classifier;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -212,9 +212,8 @@ public class ReportFragment extends Fragment
 		// check for running service every time the fragment is resumed, since broadcast can't
 		// be received while paused or stopped
 		mSwClassifiy.setChecked(ClassifierService.isRunning());
-		if(ClassifierService.isRunning())
-			mBroadcastManager.registerReceiver(mBroadcastReceiver, mServiceIntentFilter);
-		else
+		mBroadcastManager.registerReceiver(mBroadcastReceiver, mServiceIntentFilter);
+		if(!ClassifierService.isRunning())
 			mService = null;
 	}
 	
@@ -305,8 +304,7 @@ public class ReportFragment extends Fragment
 	
 	private void onNewActivity(Intent intent)
 	{
-		// TODO Auto-generated method stub
-		
+		// TODO log
 	}
 	
 	private void onServiceStarted()
@@ -318,14 +316,42 @@ public class ReportFragment extends Fragment
 	
 	private void onServiceStopped()
 	{
-		mBroadcastManager.unregisterReceiver(mBroadcastReceiver);
 		mSwClassifiy.setChecked(false);
 		// TODO log
 	}
 	
+	/**
+	 * Determines whether the report service can be started.
+	 * 
+	 * @return {@code true} if the service can be started and is not running, {@code false}
+	 *         otherwise.
+	 */
+	public boolean canStart()
+	{
+		return !ClassifierService.isRunning() && mClassifier != null;
+	}
+	
+	public void setReport(boolean report)
+	{
+		if(mService != null)
+			mService.setReportToServer(report);
+		mChkReport.setChecked(report);
+	}
+	
+	public boolean getReport()
+	{
+		if(mService != null)
+			return mService.getReportToServer();
+		else
+			return mChkReport.isChecked();
+	}
+	
+	/**
+	 * Starts the service. If {@link #canStart()} returns {@code false}, does nothing.
+	 */
 	public void startService()
 	{
-		if(ClassifierService.isRunning())
+		if(!canStart())
 			return;
 		
 		readSettings();
@@ -350,9 +376,11 @@ public class ReportFragment extends Fragment
 		i.putExtra(EXTRA_REPORT_USER, sReportUser);
 		
 		getActivity().startService(i);
-		mBroadcastManager.registerReceiver(mBroadcastReceiver, mServiceIntentFilter);
 	}
 	
+	/**
+	 * Stops the running service.
+	 */
 	public void stopService()
 	{
 		getActivity().stopService(new Intent(ClassifierService.CLASSIFIER_SERVICE));
