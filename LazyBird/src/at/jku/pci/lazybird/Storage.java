@@ -21,42 +21,42 @@ public final class Storage
 	public static final String PREFS_CLASSIFIER = "at.jku.pci.lazybird.PREFS_CLASSIFIER";
 	
 	/**
-	 * Shared preference key: {@value}
+	 * Shared preference key: {@code int} {@value}
 	 * <p>
 	 * The flags for all features the current classifier was trained with.
 	 */
 	public static final String KEY_FEATURES = "classifierFeatures";
 	
 	/**
-	 * Shared preference key: {@value}
+	 * Shared preference key: {@code String} {@value}
 	 * <p>
 	 * The file name for the serialized current classifier object.
 	 */
 	public static final String KEY_CLASSIFIER_FILE = "classifierFile";
 	
 	/**
-	 * Shared preference key: {@value}
+	 * Shared preference key: {@code String} {@value}
 	 * <p>
 	 * The file name for the data the current classifier was trained with.
 	 */
 	public static final String KEY_TRAINING_FILE = "classifierTrainingFile";
 	
 	/**
-	 * Shared preference key: {@value}
+	 * Shared preference key: {@code String} {@value}
 	 * <p>
 	 * The file name for the log file from validating the current classifier.
 	 */
 	public static final String KEY_VALIDATION_LOG_FILE = "classifierValidationLogFile";
 	
 	/**
-	 * Shared preference key: {@value}
+	 * Shared preference key: {@code String} {@value}
 	 * <p>
 	 * The type of the current classifier.
 	 */
 	public static final String KEY_CLASSIFIER_TYPE = "classifierType";
 	
 	/**
-	 * Shared preference key: {@value}
+	 * Shared preference key: {@code int} {@value}
 	 * <p>
 	 * The window size for the sliding window used to train the current classifier.
 	 */
@@ -71,6 +71,36 @@ public final class Storage
 	public static SharedPreferences getClassifierPreferences(Context c)
 	{
 		return c.getSharedPreferences(PREFS_CLASSIFIER, Activity.MODE_PRIVATE);
+	}
+	
+	/**
+	 * Name for the UI preferences: {@value}
+	 */
+	public static final String PREFS_UI = "at.jku.pci.lazybird.PREFS_UI";
+	
+	/**
+	 * Shared preference key: {@code boolean} {@value}
+	 * <p>
+	 * Whether chkTts in ReportFragment was checked.
+	 */
+	public static final String KEY_CHK_TTS_CHECKED = "chkTts_checked";
+	
+	/**
+	 * Shared preference key: {@code boolean} {@value}
+	 * <p>
+	 * Whether chkReport in ReportFragment was checked.
+	 */
+	public static final String KEY_CHK_REPORT_CHECKED  = "chkReport_checked";
+	
+	/**
+	 * Gets the {@link SharedPreferences} for the UI preferences.<br>
+	 * The key is {@link #PREFS_UI}.
+	 * @param c the {@link Context} to get preferences from.
+	 * @return the {@code SharedPreferences} for UI related settings.
+	 */
+	public static SharedPreferences getUiPreferences(Context c)
+	{
+		return c.getSharedPreferences(PREFS_UI, Activity.MODE_PRIVATE);
 	}
 	
 	private Storage()

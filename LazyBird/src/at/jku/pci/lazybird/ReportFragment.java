@@ -183,7 +183,12 @@ public class ReportFragment extends Fragment
 			}
 		}
 		else
+		{
+			SharedPreferences uiPrefs = Storage.getUiPreferences(getActivity());
+			mChkReport.setChecked(uiPrefs.getBoolean(Storage.KEY_CHK_REPORT_CHECKED, false));
+			mChkTts.setChecked(uiPrefs.getBoolean(Storage.KEY_CHK_TTS_CHECKED, false));
 			checkForClassifier();
+		}
 	}
 	
 	@Override
@@ -236,6 +241,16 @@ public class ReportFragment extends Fragment
 		mBroadcastManager.registerReceiver(mBroadcastReceiver, mServiceIntentFilter);
 		if(!ClassifierService.isRunning())
 			mService = null;
+	}
+	
+	@Override
+	public void onStop()
+	{
+		super.onStop();
+		Storage.getUiPreferences(getActivity()).edit()
+			.putBoolean(Storage.KEY_CHK_REPORT_CHECKED, mChkReport.isChecked())
+			.putBoolean(Storage.KEY_CHK_TTS_CHECKED, mChkTts.isChecked())
+			.apply();
 	}
 	
 	/**
