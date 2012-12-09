@@ -1,5 +1,6 @@
 package at.jku.pci.lazybird;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -7,9 +8,10 @@ import java.util.Date;
  * 
  * @author Peter
  */
-public class LogEntry implements Comparable<LogEntry>
-
+public class LogEntry implements Comparable<LogEntry>, Serializable
 {
+	private static final long serialVersionUID = -8913365085816311032L;
+	
 	/**
 	 * The time of this log entry.
 	 */

@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,8 +20,10 @@ import java.util.List;
  * 
  * @author Peter
  */
-public class LogListAdapter extends BaseAdapter
+public class LogListAdapter extends BaseAdapter implements Serializable
 {
+	private static final long serialVersionUID = -6786673932748896170L;
+	
 	/**
 	 * The default initial capacity when nothing is specified.
 	 */
