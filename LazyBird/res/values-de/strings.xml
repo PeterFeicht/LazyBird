@@ -14,7 +14,7 @@
     <string name="service_started">ARFF Recorder service gestartet</string>
     <string name="service_stopped">ARFF Recorder service gestoppt</string>
     <string name="service_label">ARFF Recorder Service</string>
-    <string name="too_many_values">Aufzeichnung gestoppt, zu viele Werte</string>
+    <string name="too_many_values">Aufzeichnung gestoppt</string>
     <string name="too_many_values_long">Aufzeichnung gestoppt nach %d Werten</string>
     <string name="service_waiting">Aufnahme startet in %s Sekunden</string>
     <string name="service_waiting_ticker">Recorder service wartet</string>

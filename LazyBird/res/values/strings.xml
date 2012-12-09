@@ -14,7 +14,7 @@
     <string name="service_started">ARFF Recorder service started</string>
     <string name="service_stopped">ARFF Recorder service stopped</string>
     <string name="service_label">ARFF Recorder Service</string>
-    <string name="too_many_values">Recording stopped, too many values</string>
+    <string name="too_many_values">Recording stopped</string>
     <string name="too_many_values_long">Recording stopped after %d values</string>
     <string name="service_waiting">Recording will start in %s seconds</string>
     <string name="service_waiting_ticker">Recorder service waiting</string>
