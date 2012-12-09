@@ -46,8 +46,6 @@
     <string name="set_writeLog_diasble">Kein Log wird gespeichert</string>
     <string name="set_logFilename">Dateiname</string>
     <string name="set_logFilename_long">Name für die Logdatei.</string>
-    <string name="set_ttsLanguage">TTS Sprache</string>
-    <string name="set_ttsLanguage_long">Die Sprache für Text-to-speech Ausgabe.</string>
     
     <!-- Record -->
     <string name="helpRecorder">Hier können Sie Beschleunigungsdaten in ARFF Dateien aufnehmen um Classifier zu trainieren.\nSie müssen Daten aufnehmen und einen Classifier trainieren, bevor Sie ihre Aktivität an den Server melden können.</string>

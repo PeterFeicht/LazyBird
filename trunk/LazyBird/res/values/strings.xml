@@ -46,8 +46,6 @@
     <string name="set_writeLog_diasble">No log will be written</string>
     <string name="set_logFilename">Filename</string>
     <string name="set_logFilename_long">The name for the log file.</string>
-    <string name="set_ttsLanguage">TTS Language</string>
-    <string name="set_ttsLanguage_long">The Language used for Text-to-speech output.</string>
     
     <!-- Record -->
     <string name="helpRecorder">Here you can record accelerometer data to ARFF files to train a classifier with.\nYou have to record data and train a classifier, before you can report your activity to the server.</string>
