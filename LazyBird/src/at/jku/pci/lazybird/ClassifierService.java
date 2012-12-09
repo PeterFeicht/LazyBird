@@ -46,7 +46,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	 * Format string to use for log entries, formatted by {@link SimpleDateFormat} and
 	 * {@link String#format(String, Object...)} with one string argument.
 	 */
-	public static final String LOG_FORMAT = "yyyy-MM-dd HH:mm:ss.SSSZ' - %s'";
+	public static final String LOG_FORMAT = "yyyy-MM-dd HH:mm:ss' - %s'";
 	
 	/**
 	 * Format string to use for short log entries, formatted by {@link SimpleDateFormat} and
@@ -100,6 +100,8 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	private CoordinatorClient mClient = null;
 	
 	private int mLastActivity;
+	private int mNewCount = 0;
+	private int mNewActivity = -1;
 	private Classifier mClassifier;
 	private Instances mHeader;
 	private int mFeatures;
@@ -704,22 +706,38 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	public void onWindowChanged(Iterable<Instance> window)
 	{
 		Instance i = FeatureExtractor.extractFeatures(window, mFeatures);
+		Instance add = new Instance(mHeader.numAttributes());
+		for(int j = 1; j < i.numValues(); j++)
+			add.setValue(j - 1, i.value(j));
 		mHeader.delete();
-		mHeader.add(i);
+		mHeader.add(add);
+		add.setDataset(mHeader);
 		
 		try
 		{
-			// TODO maybe apply some averaging
-			double tmp = mClassifier.classifyInstance(i);
+			double tmp = mClassifier.classifyInstance(add);
 			if(tmp == Instance.missingValue())
-				return;
-			if(mLastActivity != (int)tmp)
-				onActivityChanged((int)tmp);
+				throw new Exception("not classified.");
+			
+			// Require a few equal classifications to change activity
+			int clazz = (int)tmp;
+			if(mLastActivity != clazz)
+			{
+				if(mNewActivity == clazz)
+				{
+					if(++mNewCount > 10)
+						onActivityChanged(clazz);
+				}
+				else
+				{
+					mNewActivity = clazz;
+					mNewCount = 0;
+				}
+			}
 		}
 		catch(Exception ex)
 		{
-			mLastActivity = -1;
+			Log.i(LOGTAG, "Classification failed: " + ex.getMessage());
 		}
 	}
-	
 }

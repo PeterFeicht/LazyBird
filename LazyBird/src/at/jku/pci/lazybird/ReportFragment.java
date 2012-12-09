@@ -325,6 +325,9 @@ public class ReportFragment extends Fragment
 	
 	public void startService()
 	{
+		if(ClassifierService.isRunning())
+			return;
+		
 		readSettings();
 		Intent i = new Intent(ClassifierService.CLASSIFIER_SERVICE);
 		i.putExtra(EXTRA_CLASSIFIER, mClassifier);
