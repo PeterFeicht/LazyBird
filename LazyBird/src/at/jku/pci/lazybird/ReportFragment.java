@@ -208,6 +208,7 @@ public class ReportFragment extends Fragment
 		
 		mChkTts = (CheckBox)v.findViewById(R.id.chkTts);
 		mChkTts.setOnCheckedChangeListener(onChkTtsCheckedChange);
+		mChkTts.setEnabled(false);
 		mChkReport = (CheckBox)v.findViewById(R.id.chkReport);
 		mChkReport.setOnCheckedChangeListener(onChkReportCheckedChange);
 		
