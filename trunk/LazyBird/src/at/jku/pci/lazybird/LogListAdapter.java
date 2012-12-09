@@ -17,6 +17,9 @@ import java.util.List;
 /**
  * A {@link ListAdapter} with a queue that produces log-like element views and supports unbounded
  * addition of elements.
+ * <p>
+ * Note that the {@code Context} of this Adapter is not preserved when serializing it, you have
+ * to call {@link #setContext(Context)} after deserialization to use it again.
  * 
  * @author Peter
  */
@@ -31,7 +34,7 @@ public class LogListAdapter extends BaseAdapter implements Serializable
 	
 	private final int mInitialCapacity;
 	private List<LogEntry> mElements;
-	private Context mContext;
+	private transient Context mContext = null;
 	private DateFormat mDateFormat;
 	
 	/**
@@ -62,6 +65,21 @@ public class LogListAdapter extends BaseAdapter implements Serializable
 		
 		mInitialCapacity = capacity;
 		mElements = new ArrayList<LogEntry>(capacity);
+		mContext = c;
+		mDateFormat = android.text.format.DateFormat.getTimeFormat(mContext);
+	}
+	
+	/**
+	 * Sets the context to use when creating views. This has to be called after deserialization
+	 * so the adapter can be used again.
+	 * 
+	 * @param c the new {@link Context}.
+	 * @exception NullPointerException if {@code c} is {@code null}.
+	 */
+	public void setContext(Context c)
+	{
+		if(c == null)
+			throw new NullPointerException();
 		mContext = c;
 		mDateFormat = android.text.format.DateFormat.getTimeFormat(mContext);
 	}
@@ -106,6 +124,8 @@ public class LogListAdapter extends BaseAdapter implements Serializable
 	
 	private View createView(int position, ViewGroup parent)
 	{
+		if(mContext == null)
+			return null;
 		LayoutInflater inflater =
 			(LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View v = inflater.inflate(R.layout.log_entry, parent, false);
