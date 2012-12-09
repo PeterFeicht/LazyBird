@@ -175,6 +175,8 @@ public class ReportFragment extends Fragment
 			LogListAdapter log = (LogListAdapter)savedInstanceState.getSerializable(STATE_LOG);
 			if(log != null)
 			{
+				// The context can't be serialized so we need to set it to the new one
+				log.setContext(getActivity());
 				mLogAdapter = log;
 				mListLog.setAdapter(log);
 			}
@@ -208,7 +210,7 @@ public class ReportFragment extends Fragment
 		mChkTts.setOnCheckedChangeListener(onChkTtsCheckedChange);
 		mChkReport = (CheckBox)v.findViewById(R.id.chkReport);
 		mChkReport.setOnCheckedChangeListener(onChkReportCheckedChange);
-
+		
 		mLogAdapter = new LogListAdapter(getActivity());
 		mListLog = (ListView)v.findViewById(R.id.listLog);
 		mListLog.setAdapter(mLogAdapter);
