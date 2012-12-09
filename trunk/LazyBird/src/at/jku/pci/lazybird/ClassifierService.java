@@ -110,9 +110,9 @@ public class ClassifierService extends Service implements SensorEventListener, W
 		}
 	};
 	// State
-	private int mLastActivity;
+	private int mLastActivity = -1;
 	private int mNewCount = 0;
-	private int mNewActivity = -1;
+	private int mNewActivity = -2;
 	private Classifier mClassifier;
 	private Instances mHeader;
 	private int mFeatures;
@@ -141,7 +141,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 		i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 		mNotificationIntent = PendingIntent.getActivity(this, 0, i, 0);
 	}
-
+	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
@@ -303,14 +303,17 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	}
 	
 	/**
-	 * Gets the last activity as classified by the classifier.
+	 * Gets the last activity as classified by the classifier, or {@code null} if there is none.
 	 * 
-	 * @return the name of the last activity.
+	 * @return the name of the last activity, or {@code null}.
 	 * @see #getClassifier()
 	 */
 	public String getLastActivity()
 	{
-		return mHeader.classAttribute().value(mLastActivity);
+		if(mLastActivity < 0)
+			return null;
+		else
+			return mHeader.classAttribute().value(mLastActivity);
 	}
 	
 	/**
@@ -320,7 +323,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	 */
 	public boolean getTextToSpeech()
 	{
-		return mTextToSpeech;
+		return false;
 	}
 	
 	/**
@@ -678,7 +681,10 @@ public class ClassifierService extends Service implements SensorEventListener, W
 		{
 			if(mClient.isAlive())
 			{
-				mClient.setCurrentActivity(ClassLabel.parse(activity));
+				if(activity == null || activity.isEmpty())
+					mClient.setCurrentActivity(null);
+				else
+					mClient.setCurrentActivity(ClassLabel.parse(activity));
 			}
 			else
 			{
