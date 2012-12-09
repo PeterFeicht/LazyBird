@@ -80,6 +80,13 @@ public class SettingsActivity extends Activity
 	 */
 	public static final String KEY_LOG_FILENAME = "logFilename";
 	
+	/**
+	 * Shared preferences key: {@value}
+	 * <p>
+	 * Language for speech output.
+	 */
+	public static final String KEY_TTS_LANGUAGE = "ttsLanguage";
+	
 	public static final String LOGTAG = "SettingsActivity";
 	public static final boolean LOCAL_LOGV = true;
 	
@@ -94,6 +101,7 @@ public class SettingsActivity extends Activity
 		private EditTextPreference mReportServer;
 		private EditTextPreference mReportUser;
 		private EditTextPreference mLogFilename;
+		private ListPreference mTtsLanguage;
 		
 		@Override
 		public void onCreate(Bundle savedInstanceState)
@@ -111,6 +119,7 @@ public class SettingsActivity extends Activity
 			mReportServer = (EditTextPreference)findPreference(KEY_REPORT_SERVER);
 			mReportUser = (EditTextPreference)findPreference(KEY_REPORT_USER);
 			mLogFilename = (EditTextPreference)findPreference(KEY_LOG_FILENAME);
+			mTtsLanguage = (ListPreference)findPreference(KEY_TTS_LANGUAGE);
 			
 			// What layout do non-custom preferences use?
 			final int layout = mValueUpdateSpeed.getLayoutResource();
@@ -166,6 +175,8 @@ public class SettingsActivity extends Activity
 				mReportUser.setSummary(p.getString(KEY_REPORT_USER, ""));
 			else if(key.equals(KEY_LOG_FILENAME))
 				mLogFilename.setSummary(p.getString(KEY_LOG_FILENAME, ""));
+			else if(key.equals(KEY_TTS_LANGUAGE))
+				mTtsLanguage.setSummary(mTtsLanguage.getEntry());
 		}
 		
 		private void setReportServerSummary(SharedPreferences p)
