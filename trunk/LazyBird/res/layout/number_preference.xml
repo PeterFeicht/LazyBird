@@ -6,15 +6,18 @@
     android:padding="3dp"
     android:paddingLeft="8dp"
     android:paddingRight="8dp" >
-    
-    <TextView android:id="@android:id/message"
-        android:layout_width="fill_parent"
+
+    <TextView
+        android:id="@android:id/message"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_marginBottom="10dp"
         android:padding="5dp"
-        android:layout_marginBottom="10dp" />
-    
-    <NumberPicker android:id="@+id/number_preference_picker"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="?android:attr/textColorSecondary" />
+
+    <NumberPicker
+        android:id="@+id/number_preference_picker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal" />
