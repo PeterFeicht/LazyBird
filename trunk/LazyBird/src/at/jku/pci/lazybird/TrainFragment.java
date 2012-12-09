@@ -228,7 +228,7 @@ public class TrainFragment extends Fragment
 			mSpinWindowSize.setSelection(1);
 		mSpinClassifier = (Spinner)v.findViewById(R.id.spinClassifier);
 		
-		ArrayAdapter<ClassifierEntry> adapter = new ArrayAdapter<TrainFragment.ClassifierEntry>(
+		ArrayAdapter<ClassifierEntry> adapter = new ArrayAdapter<ClassifierEntry>(
 			getActivity(), android.R.layout.simple_spinner_item, mClassifiers);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		mSpinClassifier.setAdapter(adapter);
@@ -257,7 +257,7 @@ public class TrainFragment extends Fragment
 	
 	private void initClassifiers()
 	{
-		mClassifiers = new ArrayList<TrainFragment.ClassifierEntry>(4);
+		mClassifiers = new ArrayList<ClassifierEntry>(4);
 		mClassifiers.add(new ClassifierEntry(IBk.class));
 		mClassifiers.add(new ClassifierEntry(NaiveBayes.class));
 		mClassifiers.add(new ClassifierEntry(J48.class));
@@ -317,7 +317,7 @@ public class TrainFragment extends Fragment
 					mFiles = new File[0];
 					Log.w(LOGTAG, "Saved state for mFiles is of wrong class.", ex);
 				}
-			}  
+			}
 			else
 				mFiles = new File[0];
 			
@@ -657,12 +657,24 @@ public class TrainFragment extends Fragment
 		@Override
 		public void onClick(View v)
 		{
-			int windowSize = Integer.parseInt((String)mSpinWindowSize.getSelectedItem());
-			FeatureExtractor fe = new FeatureExtractor(mFiles, mFeatures, windowSize, JUMP_SIZE);
-			
-			TrainClassifierTask t = new TrainClassifierTask();
-			mTask = t;
-			t.execute(fe);
+			final AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+			b.setTitle(R.string.btnTrain);
+			b.setMessage(R.string.trainNote);
+			b.setNegativeButton(R.string.no, null);
+			b.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					int windowSize = Integer.parseInt((String)mSpinWindowSize.getSelectedItem());
+					FeatureExtractor fe =
+						new FeatureExtractor(mFiles, mFeatures, windowSize, JUMP_SIZE);
+					
+					TrainClassifierTask t = new TrainClassifierTask();
+					mTask = t;
+					t.execute(fe);
+				}
+			});
+			b.show();
 		}
 	};
 	
@@ -932,6 +944,9 @@ public class TrainFragment extends Fragment
 				
 				out.buildClassifier(fe.getOutput());
 				
+				if(isCancelled())
+					return null;
+				
 				final String oldClassifierFile = sClassifierFile;
 				final String oldTrainingFile = sTrainingFile;
 				sClassifierFile = String.format("classifier-%X%s", out.hashCode(), ".bin");
@@ -1019,6 +1034,7 @@ public class TrainFragment extends Fragment
 				@Override
 				public void onClick(View v)
 				{
+					mTxtTrainStatus.setText(R.string.statusCancel);
 					TrainClassifierTask.this.cancel(true);
 				}
 			});
