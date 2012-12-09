@@ -14,6 +14,7 @@ import android.os.Binder;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -34,6 +35,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 public class ClassifierService extends Service implements SensorEventListener, WindowListener
@@ -89,7 +91,10 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	private SimpleDateFormat mDateFormat;
 	// TTS
 	private boolean mTextToSpeech;
-	private String mLanguage;
+	private TextToSpeech mTtsEngine = null;
+	private boolean mTtsInit = false;
+	private boolean mTtsRunning = false;
+	private HashMap<String, String> mTtsParams;
 	// Log
 	private boolean mWriteToFile;
 	private String mFilename;
@@ -174,7 +179,6 @@ public class ClassifierService extends Service implements SensorEventListener, W
 			// TTS is possible
 			if(mTextToSpeech)
 			{
-				mLanguage = intent.getStringExtra(ReportFragment.EXTRA_LANGUAGE);
 				// TTS is enabled
 				if(intent.getBooleanExtra(ReportFragment.EXTRA_TTS_ENABLE, false))
 					setTextToSpeech(true);
@@ -238,9 +242,15 @@ public class ClassifierService extends Service implements SensorEventListener, W
 		if(mClient != null)
 		{
 			mClient.interrupt();
+			mClient = null;
 		}
 		
-		// TODO stop text-to-speech
+		if(mTtsEngine != null)
+		{
+			mTtsEngine.stop();
+			mTtsEngine.shutdown();
+			mTtsEngine = null;
+		}
 		
 		Toast.makeText(this, R.string.rservice_stopped, Toast.LENGTH_SHORT).show();
 		sRunning = false;
@@ -279,6 +289,21 @@ public class ClassifierService extends Service implements SensorEventListener, W
 		out.setClassIndex(out.numAttributes() - 1);
 		
 		return out;
+	}
+	
+	private void initTts()
+	{
+		int lang = mTtsEngine.setLanguage(Locale.ENGLISH);
+		if(lang == TextToSpeech.LANG_MISSING_DATA || lang == TextToSpeech.LANG_NOT_SUPPORTED)
+		{
+			mTtsEngine.shutdown();
+			mTtsEngine = null;
+			return;
+		}
+		
+		mTtsParams = new HashMap<String, String>();
+		mTtsParams.put(TextToSpeech.Engine.KEY_PARAM_STREAM, "STREAM_MUSIC");
+		mTtsInit = true;
 	}
 	
 	/**
@@ -323,22 +348,51 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	 */
 	public boolean getTextToSpeech()
 	{
-		return false;
+		return mTtsEngine != null && mTtsInit && mTtsRunning;
 	}
 	
 	/**
 	 * Sets whether Text-to-speech output is enabled. This has no effect if TTS was not enabled
 	 * in the start {@code Intent}.
 	 * 
-	 * @param enabled {@code true} if Text-to-speech output should be enabled.
+	 * @param enable {@code true} if Text-to-speech output should be enabled.
 	 */
-	public void setTextToSpeech(boolean enabled)
+	public void setTextToSpeech(boolean enable)
 	{
 		// TTS not enabled
 		if(!mTextToSpeech)
 			return;
 		
-		// TODO set text to speech
+		if(mTtsEngine == null)
+		{
+			if(enable)
+			{
+				// Initialize and start TTS engine when enabled the first time
+				mTtsEngine = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+					@Override
+					public void onInit(int status)
+					{
+						if(status == TextToSpeech.SUCCESS)
+							initTts();
+					}
+				});
+				mTtsRunning = true;
+			}
+		}
+		else
+		{
+			if(enable && !mTtsRunning)
+			{
+				// Start TTS engine when disabled
+				mTtsRunning = true;
+			}
+			else if(!enable && mTtsRunning)
+			{
+				// Stop TTS engine when enabled
+				mTtsEngine.stop();
+				mTtsRunning = false;
+			}
+		}
 	}
 	
 	/**
@@ -694,6 +748,12 @@ public class ClassifierService extends Service implements SensorEventListener, W
 		}
 	}
 	
+	private void speak(String activity)
+	{
+		if(mTtsEngine != null && mTtsInit && mTtsRunning && activity != null)
+			mTtsEngine.speak(activity, TextToSpeech.QUEUE_ADD, mTtsParams);
+	}
+	
 	private void onActivityChanged(int newActivity)
 	{
 		mLastActivity = newActivity;
@@ -704,10 +764,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 		
 		log(getString(R.string.log_new_activity, activity));
 		
-		if(mTextToSpeech)
-		{
-			// TODO output with TTS
-		}
+		speak(activity);
 		
 		reportActivity(activity);
 	}
