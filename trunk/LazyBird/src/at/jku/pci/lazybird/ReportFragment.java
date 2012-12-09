@@ -57,6 +57,7 @@ public class ReportFragment extends Fragment
 	public static final String LOGTAG = "ReportFragment";
 	public static final boolean LOCAL_LOGV = true;
 	public static final String STATE_CLASSIFIER = "at.jku.pci.lazybird.STATE_CLASSIFIER";
+	public static final String STATE_LOG = "at.jku.pci.lazybird.STATE_LOG";
 	/**
 	 * Standard extension for log files.
 	 * <p> {@value}
@@ -99,6 +100,7 @@ public class ReportFragment extends Fragment
 	ListView mListLog;
 	
 	private Classifier mClassifier = null;
+	private LogListAdapter mLogAdapter;
 	// Handlers
 	private ClassifierService mService = null;
 	private LocalBroadcastManager mBroadcastManager;
@@ -158,6 +160,8 @@ public class ReportFragment extends Fragment
 			{
 				mClassifier = mService.getClassifier();
 				setClassifierPresent(true);
+				mChkReport.setChecked(mService.getReportToServer());
+				mChkTts.setChecked(mService.getTextToSpeech());
 			}
 		}
 		else if(savedInstanceState != null)
@@ -165,6 +169,15 @@ public class ReportFragment extends Fragment
 			mClassifier = (Classifier)savedInstanceState.getSerializable(STATE_CLASSIFIER);
 			if(mClassifier == null)
 				checkForClassifier();
+			else
+				setClassifierPresent(true);
+			
+			LogListAdapter log = (LogListAdapter)savedInstanceState.getSerializable(STATE_LOG);
+			if(log != null)
+			{
+				mLogAdapter = log;
+				mListLog.setAdapter(log);
+			}
 		}
 		else
 			checkForClassifier();
@@ -175,6 +188,7 @@ public class ReportFragment extends Fragment
 	{
 		super.onSaveInstanceState(outState);
 		outState.putSerializable(STATE_CLASSIFIER, mClassifier);
+		outState.putSerializable(STATE_LOG, mLogAdapter);
 	}
 	
 	/**
@@ -194,8 +208,10 @@ public class ReportFragment extends Fragment
 		mChkTts.setOnCheckedChangeListener(onChkTtsCheckedChange);
 		mChkReport = (CheckBox)v.findViewById(R.id.chkReport);
 		mChkReport.setOnCheckedChangeListener(onChkReportCheckedChange);
-		
+
+		mLogAdapter = new LogListAdapter(getActivity());
 		mListLog = (ListView)v.findViewById(R.id.listLog);
+		mListLog.setAdapter(mLogAdapter);
 	}
 	
 	@Override
@@ -306,20 +322,22 @@ public class ReportFragment extends Fragment
 	
 	private void onNewActivity(Intent intent)
 	{
-		// TODO log
+		String activity = intent.getStringExtra(ClassifierService.EXTRA_ACTIVITY_NAME);
+		if(activity != null)
+			mLogAdapter.add(getString(R.string.log_new_activity, activity));
 	}
 	
 	private void onServiceStarted()
 	{
 		mService = ClassifierService.getInstance();
 		mSwClassifiy.setChecked(true);
-		// TODO log
+		mLogAdapter.add(getString(R.string.rservice_started));
 	}
 	
 	private void onServiceStopped()
 	{
 		mSwClassifiy.setChecked(false);
-		// TODO log
+		mLogAdapter.add(getString(R.string.rservice_stopped));
 	}
 	
 	/**
