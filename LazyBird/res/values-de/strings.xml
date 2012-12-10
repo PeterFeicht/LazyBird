@@ -90,6 +90,7 @@
     <string name="statusCancel">Abbrechen&#8230;</string>
     <string name="trainingFinished">Training fertig</string>
     <string name="trainingFinished_long">Der Classifier wurde erfolgreich trainiert und als Standard eingestellt.\nSie können nun eine Kreuzvalidierung durchführen.</string>
+    <string name="validationQuestion">Kaffee holen?</string>
     <string name="validateNote">Es wird eine Kreuzvalidierung des generierten Classifiers durchgeführt, um zu bestimmen wie gut dieser Datenpunkte klassifiziert.\nDas kann einige Zeit dauern, wollen Sie fortfahren?</string>
     <string name="validationCancelled">Validierung abgebrochen</string>
     <string name="validationResults">Validierungsergebnisse</string>

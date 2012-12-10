@@ -90,6 +90,7 @@
     <string name="statusCancel">Cancelling&#8230;</string>
     <string name="trainingFinished">Training finished</string>
     <string name="trainingFinished_long">The classifier was trained successfully and set as the default classifier.\nYou can now perform a cross-validation.</string>
+    <string name="validationQuestion">Get coffee?</string>
     <string name="validateNote">This will perform a cross-validation of the generated classifier, to determine how well it classifies instances.\nThis can take some time, do you want to continue?</string>
     <string name="validationCancelled">Validation cancelled</string>
     <string name="validationResults">Validation results</string>
