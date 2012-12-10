@@ -78,6 +78,7 @@
     <string name="selectFileNote">Note that only files in the output directory are listed.</string>
     <string name="selectFeaturesNote">Select the features used to train the classifier.</string>
     <string name="noFiles">No ARFF files in output directory.\nPut files you want to use in the output directory.</string>
+    <string name="trainQuestion">Replace current classifier?</string>
     <string name="trainNote">If you train a new classifier, the current one will be replaced.\nDo you want to continue?</string>
     <string name="extractionCancelled">Feature extraction cancelled</string>
     <string name="saveFeaturesNote">Enter a filename to save the calculated features to. If it exists it will be overwritten.</string>
@@ -91,6 +92,7 @@
     <string name="trainingFinished_long">The classifier was trained successfully and set as the default classifier.\nYou can now perform a cross-validation.</string>
     <string name="validateNote">This will perform a cross-validation of the generated classifier, to determine how well it classifies instances.\nThis can take some time, do you want to continue?</string>
     <string name="validationCancelled">Validation cancelled</string>
+    <string name="validationResults">Validation results</string>
     
     <!-- Report -->
     <string name="helpReport">Here you can classify your acitvity and report it to the server or output it a few other ways.\nYou have to record data and train a classifier, before you can report your activity to the server.</string>
