@@ -490,6 +490,7 @@ public class TrainFragment extends Fragment
 				}
 			}
 			
+			// Show selection or no-files dialog
 			final AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
 			b.setTitle(R.string.btnSelectFile);
 			
@@ -521,8 +522,7 @@ public class TrainFragment extends Fragment
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
-					if(which != AlertDialog.BUTTON_POSITIVE)
-						return;
+					// Kill everything when new files are selected
 					setValidateVisible(false);
 					
 					// User clicked OK, count the number of selected files
@@ -562,6 +562,7 @@ public class TrainFragment extends Fragment
 			if(featureNames == null)
 				init();
 			
+			// Populate the selected features array with the saved features
 			for(int j = 0; j < selected.length; j++)
 			{
 				selected[j] = false;
@@ -575,6 +576,8 @@ public class TrainFragment extends Fragment
 				}
 			}
 			
+			// This listener removes feature selections when RAW is selected and removes the RAW
+			// selection when any other feature is selected
 			final OnMultiChoiceClickListener checkListener = new OnMultiChoiceClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which, boolean isChecked)
@@ -621,10 +624,9 @@ public class TrainFragment extends Fragment
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
-					if(which != AlertDialog.BUTTON_POSITIVE)
-						return;
 					setValidateVisible(false);
 					
+					// Special case when raw is selected
 					if(selected[rawIdx])
 					{
 						mFeatures = new Feature[] { Feature.RAW };
@@ -660,6 +662,7 @@ public class TrainFragment extends Fragment
 		
 		private void init()
 		{
+			// Get feature names an save index of RAW feature (should always be 0 anyway)
 			featureNames = new String[allFeatures.length];
 			selected = new boolean[allFeatures.length];
 			
@@ -676,6 +679,7 @@ public class TrainFragment extends Fragment
 		@Override
 		public void onClick(View v)
 		{
+			// If features have already been calculated just save them, otherwise calculate them
 			if(mCalculatedFeatures == null)
 			{
 				int windowSize = Integer.parseInt((String)mSpinWindowSize.getSelectedItem());
@@ -695,14 +699,16 @@ public class TrainFragment extends Fragment
 		@Override
 		public void onClick(View v)
 		{
+			// Warn the user that training a new classifier will replace the current one
 			final AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
-			b.setTitle(R.string.btnTrain);
+			b.setTitle(R.string.trainQuestion);
 			b.setMessage(R.string.trainNote);
 			b.setNegativeButton(R.string.no, null);
 			b.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which)
 				{
+					// User wants to train, so train
 					int windowSize = Integer.parseInt((String)mSpinWindowSize.getSelectedItem());
 					FeatureExtractor fe =
 						new FeatureExtractor(mFiles, mFeatures, windowSize, JUMP_SIZE);
@@ -720,6 +726,7 @@ public class TrainFragment extends Fragment
 		@Override
 		public void onClick(View v)
 		{
+			// If the classifier has been evaluated show results, otherwise evaluate
 			if(mEvaluation == null)
 			{
 				readSettings();
@@ -728,6 +735,7 @@ public class TrainFragment extends Fragment
 				bu.putSerializable(ValidateClassifierTask.KEY_INSTANCES, mCalculatedFeatures);
 				bu.putSerializable(ValidateClassifierTask.KEY_CLASSIFIER, mClassifier);
 				
+				// Warn the user that this may take some time
 				final AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
 				b.setTitle(R.string.btnValidate);
 				b.setMessage(R.string.validateNote);
@@ -736,6 +744,7 @@ public class TrainFragment extends Fragment
 					@Override
 					public void onClick(DialogInterface dialog, int which)
 					{
+						// User wants to validate, obey minion!
 						ValidateClassifierTask t = new ValidateClassifierTask();
 						mTask = t;
 						t.execute(bu);
@@ -748,11 +757,19 @@ public class TrainFragment extends Fragment
 		}
 	};
 	
-	private void setLeftDrawable(Button btn, Drawable d)
+	/**
+	 * Sets the left compound drawable of the specified button.
+	 */
+	private void setLeftDrawable(Button btn, Drawable drawable)
 	{
-		btn.setCompoundDrawables(d, null, null, null);
+		btn.setCompoundDrawables(drawable, null, null, null);
 	}
 	
+	/**
+	 * Shows a dialog informing the user that an error occurred while performing a task.
+	 * 
+	 * @param ex the type of the {@link Exception} determines the message shown.
+	 */
 	private void showExceptionDialog(Exception ex)
 	{
 		AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
@@ -775,18 +792,22 @@ public class TrainFragment extends Fragment
 		b.show();
 	}
 	
+	/**
+	 * Diplays a dialog asking for a filename and writes the calculated features to this file.
+	 */
 	private void saveFeatures()
 	{
-		final EditText e = new EditText(getActivity());
+		final EditText txt = new EditText(getActivity());
 		final AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
 		b.setTitle(R.string.btnSaveFeatures);
 		b.setMessage(R.string.saveFeaturesNote);
-		b.setView(e);
+		b.setView(txt);
 		b.setNegativeButton(android.R.string.cancel, null);
 		b.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which)
 			{
+				// Check for writable external storage
 				if(!Environment.getExternalStorageState().equals(
 					Environment.MEDIA_MOUNTED))
 				{
@@ -796,10 +817,11 @@ public class TrainFragment extends Fragment
 				}
 				
 				readSettings();
-				String name = e.getText().toString();
+				String name = txt.getText().toString();
 				if(!name.endsWith(ArffLoader.FILE_EXTENSION))
 					name += ArffLoader.FILE_EXTENSION;
 				
+				// Save file
 				File out = new File(new File(Environment.getExternalStorageDirectory(),
 					sOutputDir), name);
 				if(out.exists())
@@ -823,6 +845,9 @@ public class TrainFragment extends Fragment
 		b.show();
 	}
 	
+	/**
+	 * Extracts data from the evaluation of the classifier and shows it in a dialog.
+	 */
 	private void showEvaluation()
 	{
 		final Evaluation e = mEvaluation;
@@ -868,11 +893,12 @@ public class TrainFragment extends Fragment
 			sb = new StringBuilder("Error showing the evaluation.");
 		}
 		
+		// Create a TextView with small monospace font
 		final TextView txt = new TextView(getActivity());
 		txt.setText(sb.toString());
 		txt.setTypeface(Typeface.MONOSPACE);
 		txt.setTextSize(12f);
-		
+		// Set 12dp of padding left and right
 		final int pixels = (int)(Resources.getSystem().getDisplayMetrics().density * 12);
 		txt.setPadding(pixels, 0, pixels, 0);
 		
@@ -884,6 +910,12 @@ public class TrainFragment extends Fragment
 		b.show();
 	}
 	
+	/**
+	 * {@link AsyncTask} that extracts the selected features from the selected files, merges and
+	 * saves them.
+	 * 
+	 * @author Peter
+	 */
 	private class SaveFeaturesTask extends AsyncTask<FeatureExtractor, Void, FeatureExtractor>
 	{
 		private Exception mException = null;
@@ -899,6 +931,7 @@ public class TrainFragment extends Fragment
 			}
 			catch(Exception ex)
 			{
+				// Save exception to report it to the user
 				ex.printStackTrace();
 				mException = ex;
 				return null;
@@ -982,6 +1015,10 @@ public class TrainFragment extends Fragment
 		@Override
 		protected Classifier doInBackground(FeatureExtractor... params)
 		{
+			// Save filenames of old serialized classifier and training data
+			final String oldClassifierFile = sClassifierFile;
+			final String oldTrainingFile = sTrainingFile;
+			
 			try
 			{
 				FeatureExtractor fe = params[0];
@@ -1000,12 +1037,12 @@ public class TrainFragment extends Fragment
 				if(isCancelled())
 					return null;
 				
-				final String oldClassifierFile = sClassifierFile;
-				final String oldTrainingFile = sTrainingFile;
+				// Make new filenames
 				sClassifierFile = String.format("classifier-%X%s", out.hashCode(), ".bin");
 				sTrainingFile = String.format("trainfile-%X%s",
 					out.hashCode(), Instances.SERIALIZED_OBJ_FILE_EXTENSION);
 				
+				// Serialize the classifier to internal storage
 				OutputStream os =
 					getActivity().openFileOutput(sClassifierFile, Context.MODE_PRIVATE);
 				final ObjectOutputStream oos = new ObjectOutputStream(os);
@@ -1015,6 +1052,7 @@ public class TrainFragment extends Fragment
 				if(isCancelled())
 					return null;
 				
+				// Serialize training data to internal storage
 				os = getActivity().openFileOutput(sTrainingFile, Context.MODE_PRIVATE);
 				final SerializedInstancesSaver saver = new SerializedInstancesSaver();
 				saver.setDestination(os);
@@ -1022,6 +1060,7 @@ public class TrainFragment extends Fragment
 				saver.writeBatch();
 				// writeBatch() closes the stream
 				
+				// Delete old files
 				if(!oldClassifierFile.equals(sClassifierFile))
 					getActivity().deleteFile(oldClassifierFile);
 				if(!oldTrainingFile.equals(sTrainingFile))
@@ -1031,6 +1070,16 @@ public class TrainFragment extends Fragment
 			}
 			catch(Exception ex)
 			{
+				if(getActivity() != null)
+				{
+					// In case of an exception after one of the new files was saved, remove it
+					if(!sClassifierFile.equals(oldClassifierFile))
+						getActivity().deleteFile(sClassifierFile);
+					if(!sTrainingFile.equals(oldTrainingFile))
+						getActivity().deleteFile(sTrainingFile);
+				}
+				
+				// Save exception to report it to the user
 				ex.printStackTrace();
 				mException = ex;
 				return null;
@@ -1040,6 +1089,7 @@ public class TrainFragment extends Fragment
 		@Override
 		protected void onProgressUpdate(Instances... values)
 		{
+			// Save calculated features and update status text
 			mCalculatedFeatures = values[0];
 			sTrainedFeatures = mOutputFeatures;
 			mTxtTrainStatus.setText(R.string.statusTrain);
@@ -1056,6 +1106,7 @@ public class TrainFragment extends Fragment
 			
 			if(result == null)
 			{
+				// Restore old classifier and training data filenames in case of an error
 				readSettings();
 				
 				if(mException != null)
@@ -1063,6 +1114,7 @@ public class TrainFragment extends Fragment
 			}
 			else
 			{
+				// Activate the validate button and inform the user
 				setValidateVisible(true);
 				
 				final AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
@@ -1083,6 +1135,7 @@ public class TrainFragment extends Fragment
 			if(ClassifierService.isRunning())
 				cancel(true);
 			
+			// Disable inputs and change button to cancel
 			setViewStates(true);
 			setValidateVisible(false);
 			mBtnSaveFeatures.setEnabled(false);
@@ -1097,6 +1150,7 @@ public class TrainFragment extends Fragment
 			});
 			mBtnTrain.setText(android.R.string.cancel);
 			
+			// Set status text and show progress bar
 			mTxtTrainStatus.setText(R.string.statusExtract);
 			mTxtTrainStatus.setVisibility(View.VISIBLE);
 			mType = (ClassifierEntry)mSpinClassifier.getSelectedItem();
@@ -1146,14 +1200,17 @@ public class TrainFragment extends Fragment
 		{
 			try
 			{
+				// Extract classifier, feature data and number of folds from the bundle
 				final Bundle b = params[0];
 				final Classifier classifier = (Classifier)b.getSerializable(KEY_CLASSIFIER);
 				final Instances instances = (Instances)b.getSerializable(KEY_INSTANCES);
 				final int numFolds = b.getInt(KEY_NUM_FOLDS);
 				
+				// Prepare data for cross-validation
 				instances.stratify(numFolds);
 				Evaluation eval = new Evaluation(instances);
 				
+				// Validate
 				for(int fold = 0; fold < numFolds; fold++)
 				{
 					if(isCancelled())
@@ -1186,10 +1243,10 @@ public class TrainFragment extends Fragment
 			mBtnSaveFeatures.setEnabled(false);
 			mBtnTrain.setEnabled(false);
 			
+			// Show progress bar and change button to cancel
 			mTxtTrainStatus.setText(R.string.statusValidate);
 			mTxtTrainStatus.setVisibility(View.VISIBLE);
 			mProgressTraining.setVisibility(View.VISIBLE);
-			
 			mBtnValidate.setText(android.R.string.cancel);
 			mBtnValidate.setOnClickListener(new OnClickListener() {
 				@Override
@@ -1214,6 +1271,7 @@ public class TrainFragment extends Fragment
 			
 			mEvaluation = result;
 			
+			// If something went wrong inform the user, otherwise show results
 			if(result == null)
 			{
 				if(mException != null)
