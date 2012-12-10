@@ -85,6 +85,11 @@ public class SettingsActivity extends Activity
 	public static final String LOGTAG = "SettingsActivity";
 	public static final boolean LOCAL_LOGV = true;
 	
+	/**
+	 * This is the fragment containing all settings.
+	 * 
+	 * @author Peter
+	 */
 	public static class SettingsFragment extends PreferenceFragment implements
 			OnSharedPreferenceChangeListener
 	{
@@ -105,6 +110,7 @@ public class SettingsActivity extends Activity
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.preferences);
 			
+			// Get all preferences
 			mValueUpdateSpeed = (ListPreference)findPreference(KEY_VALUE_UPDATE_SPEED);
 			mOutputDir = (EditTextPreference)findPreference(KEY_OUTPUT_DIR);
 			mMaxNumValues = (ListPreference)findPreference(KEY_MAX_NUM_VALUES);
@@ -119,7 +125,7 @@ public class SettingsActivity extends Activity
 			mStartDelay.setLayoutResource(layout);
 			mNumFolds.setLayoutResource(layout);
 			
-			// Set summaries to preference values
+			// Set summaries to preference values where necessary
 			final SharedPreferences p = getPreferenceScreen().getSharedPreferences();
 			mOutputDir.setSummary(p.getString(KEY_OUTPUT_DIR, ""));
 			setReportServerSummary(p);
@@ -151,7 +157,7 @@ public class SettingsActivity extends Activity
 		{
 			if(LOCAL_LOGV) Log.v(LOGTAG, "SharedPreference changed: " + key);
 			
-			// Update summary only for changed preference
+			// Update summary for changed preference
 			if(key.equals(KEY_VALUE_UPDATE_SPEED))
 				mValueUpdateSpeed.setSummary(mValueUpdateSpeed.getEntry());
 			else if(key.equals(KEY_OUTPUT_DIR))
@@ -172,6 +178,8 @@ public class SettingsActivity extends Activity
 		
 		private void setReportServerSummary(SharedPreferences p)
 		{
+			// When nothing is entered, the ClassifieService uses the default server, so reflect
+			// this behavior in the displayed value
 			if(p.getString(KEY_REPORT_SERVER, "").isEmpty())
 				mReportServer.setSummary(ClassifierService.DEFAULT_HOST);
 			else
@@ -200,6 +208,7 @@ public class SettingsActivity extends Activity
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
+		// Return when back is pressed on the action bar
 		if(item.getItemId() == android.R.id.home)
 			super.onBackPressed();
 		return super.onOptionsItemSelected(item);

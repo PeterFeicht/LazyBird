@@ -76,6 +76,8 @@ public final class Storage
 		return c.getSharedPreferences(PREFS_CLASSIFIER, Activity.MODE_PRIVATE);
 	}
 	
+	/* ======================================================================================= */
+	
 	/**
 	 * Name for the UI preferences: {@value}
 	 */
