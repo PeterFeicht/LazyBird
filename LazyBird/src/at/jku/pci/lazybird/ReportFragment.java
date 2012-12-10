@@ -71,27 +71,48 @@ public class ReportFragment extends Fragment
 	public static final CharSequence TITLE = "Report";
 	// Settings
 	/**
-	 * Output directory for log files, the base directory is always
-	 * {@link Environment#getExternalStorageDirectory()}.
-	 * <p>
 	 * Setting: {@link SettingsActivity#KEY_OUTPUT_DIR}
 	 * 
 	 * @see ARFFRecorderService#getDirname()
 	 */
 	private static String sOutputDir;
+	/**
+	 * Setting: {@link Storage#KEY_CLASSIFIER_FILE}
+	 */
 	private static String sClassifierFile;
+	/**
+	 * Setting: {@link Storage#KEY_FEATURES}
+	 */
 	private static int sTrainedFeatures;
+	/**
+	 * Setting {@link Storage#KEY_WINDOW_SIZE}
+	 */
 	private static int sWindowSize;
+	/**
+	 * Setting that's not actually a setting, see {@link TrainFragment#JUMP_SIZE}
+	 */
 	private static int sJumpSize;
+	/**
+	 * Setting: {@link SettingsActivity#KEY_REPORT_SERVER}
+	 */
 	private static String sReportServer;
+	/**
+	 * Setting: {@link SettingsActivity#KEY_REPORT_USER}
+	 */
 	private static String sReportUser;
+	/**
+	 * Setting: {@link SettingsActivity#KEY_WRITE_LOG}
+	 */
 	private static boolean sWriteLog;
+	/**
+	 * Setting: {@link SettingsActivity#KEY_LOG_FILENAME}
+	 */
 	private static String sLogFilename;
 	
 	private SharedPreferences mPrefs;
 	private SharedPreferences mPrefsClassifier;
 	
-	// Fields
+	// Views
 	private TextView mLblNoClassifier;
 	private Switch mSwClassifiy;
 	private ProgressBar mPrograssSerialize;
@@ -99,6 +120,7 @@ public class ReportFragment extends Fragment
 	private CheckBox mChkReport;
 	private ListView mListLog;
 	
+	// Fields
 	private Classifier mClassifier = null;
 	private LogListAdapter mLogAdapter;
 	// Handlers
@@ -152,7 +174,6 @@ public class ReportFragment extends Fragment
 		
 		// If the service is running and we just got created, get working classifier.
 		// Setting of input enabled and such things are done in onResume.
-		// It seems savedInstanceState is null when the fragment is recreated while paging.
 		if(ClassifierService.isRunning())
 		{
 			mService = ClassifierService.getInstance();
@@ -164,26 +185,32 @@ public class ReportFragment extends Fragment
 				mChkReport.setChecked(mService.getReportToServer());
 				mChkTts.setChecked(mService.getTextToSpeech());
 			}
+			// Restore the log if the service is running
+			if(savedInstanceState != null)
+			{
+				LogListAdapter log =
+					(LogListAdapter)savedInstanceState.getSerializable(STATE_LOG);
+				if(log != null)
+				{
+					// The context can't be serialized so we need to set it to the new one
+					log.setContext(getActivity());
+					mLogAdapter = log;
+					mListLog.setAdapter(log);
+				}
+			}
 		}
 		else if(savedInstanceState != null)
 		{
+			// Restore the classifier if the service isn't running
 			mClassifier = (Classifier)savedInstanceState.getSerializable(STATE_CLASSIFIER);
 			if(mClassifier == null)
 				checkForClassifier();
 			else
 				setClassifierPresent(true);
-			
-			LogListAdapter log = (LogListAdapter)savedInstanceState.getSerializable(STATE_LOG);
-			if(log != null)
-			{
-				// The context can't be serialized so we need to set it to the new one
-				log.setContext(getActivity());
-				mLogAdapter = log;
-				mListLog.setAdapter(log);
-			}
 		}
 		else
 		{
+			// When freshly starting the app, restore previous selection of output methods
 			SharedPreferences uiPrefs = Storage.getUiPreferences(getActivity());
 			mChkReport.setChecked(uiPrefs.getBoolean(Storage.KEY_CHK_REPORT_CHECKED, false));
 			mChkTts.setChecked(uiPrefs.getBoolean(Storage.KEY_CHK_TTS_CHECKED, false));
@@ -195,7 +222,10 @@ public class ReportFragment extends Fragment
 	public void onSaveInstanceState(Bundle outState)
 	{
 		super.onSaveInstanceState(outState);
+		// Save the classifier to avoid deserializing it when the screen rotates, doesn't seem to
+		// do any good though
 		outState.putSerializable(STATE_CLASSIFIER, mClassifier);
+		// Save the log, will be restored in case the service is running
 		outState.putSerializable(STATE_LOG, mLogAdapter);
 	}
 	
@@ -247,6 +277,7 @@ public class ReportFragment extends Fragment
 	public void onStop()
 	{
 		super.onStop();
+		// Save selected output methods
 		Storage.getUiPreferences(getActivity()).edit()
 			.putBoolean(Storage.KEY_CHK_REPORT_CHECKED, mChkReport.isChecked())
 			.putBoolean(Storage.KEY_CHK_TTS_CHECKED, mChkTts.isChecked())
@@ -275,7 +306,7 @@ public class ReportFragment extends Fragment
 		sClassifierFile = mPrefsClassifier.getString(Storage.KEY_CLASSIFIER_FILE, "");
 		sTrainedFeatures = mPrefsClassifier.getInt(Storage.KEY_FEATURES, 0);
 		sWindowSize = mPrefsClassifier.getInt(Storage.KEY_WINDOW_SIZE, 1000);
-		sJumpSize = 100;
+		sJumpSize = TrainFragment.JUMP_SIZE;
 		sReportServer = mPrefs.getString(SettingsActivity.KEY_REPORT_SERVER, "");
 		sReportUser = mPrefs.getString(SettingsActivity.KEY_REPORT_USER, "");
 		sWriteLog = mPrefs.getBoolean(SettingsActivity.KEY_WRITE_LOG, false);
@@ -340,6 +371,7 @@ public class ReportFragment extends Fragment
 	
 	private void onNewActivity(Intent intent)
 	{
+		// Log the new activity
 		String activity = intent.getStringExtra(ClassifierService.EXTRA_ACTIVITY_NAME);
 		if(activity != null)
 			mLogAdapter.add(getString(R.string.log_new_activity, activity));
@@ -347,6 +379,7 @@ public class ReportFragment extends Fragment
 	
 	private void onServiceStarted()
 	{
+		// Get service instance and log event
 		mService = ClassifierService.getInstance();
 		mSwClassifiy.setChecked(true);
 		mLogAdapter.add(getString(R.string.rservice_started));
@@ -356,6 +389,7 @@ public class ReportFragment extends Fragment
 	{
 		mSwClassifiy.setChecked(false);
 		mLogAdapter.add(getString(R.string.rservice_stopped));
+		mService = null;
 	}
 	
 	/**
@@ -367,21 +401,6 @@ public class ReportFragment extends Fragment
 	public boolean canStart()
 	{
 		return !ClassifierService.isRunning() && mClassifier != null;
-	}
-	
-	public void setReport(boolean report)
-	{
-		if(mService != null)
-			mService.setReportToServer(report);
-		mChkReport.setChecked(report);
-	}
-	
-	public boolean getReport()
-	{
-		if(mService != null)
-			return mService.getReportToServer();
-		else
-			return mChkReport.isChecked();
 	}
 	
 	/**
@@ -399,6 +418,8 @@ public class ReportFragment extends Fragment
 		i.putExtra(EXTRA_JUMP, sJumpSize);
 		i.putExtra(EXTRA_FEATURES, sTrainedFeatures);
 		
+		// This is a little complicated, the first value determines whether the feature should be
+		// enabled at all, the second one specifies whether it's actually activated
 		i.putExtra(EXTRA_TTS, true);
 		i.putExtra(EXTRA_TTS_ENABLE, mChkTts.isChecked());
 		
@@ -423,6 +444,12 @@ public class ReportFragment extends Fragment
 		getActivity().stopService(new Intent(ClassifierService.CLASSIFIER_SERVICE));
 	}
 	
+	/**
+	 * Attempts to deserialize the classifier from the file in the settings, see
+	 * {@link Storage#KEY_CLASSIFIER_FILE}.
+	 * 
+	 * @author Peter
+	 */
 	private class CheckForClassifierTask extends AsyncTask<Void, Void, Classifier>
 	{
 		@Override
