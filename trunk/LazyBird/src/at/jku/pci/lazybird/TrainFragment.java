@@ -737,7 +737,7 @@ public class TrainFragment extends Fragment
 				
 				// Warn the user that this may take some time
 				final AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
-				b.setTitle(R.string.btnValidate);
+				b.setTitle(R.string.validationQuestion);
 				b.setMessage(R.string.validateNote);
 				b.setNegativeButton(R.string.no, null);
 				b.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
@@ -903,7 +903,7 @@ public class TrainFragment extends Fragment
 		txt.setPadding(pixels, 0, pixels, 0);
 		
 		AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
-		b.setTitle(R.string.btnValidate);
+		b.setTitle(R.string.validationResults);
 		b.setNeutralButton(android.R.string.ok, null);
 		b.setMessage(mClassifier.getClass().getSimpleName());
 		b.setView(txt);
