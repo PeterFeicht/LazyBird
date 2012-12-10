@@ -1,0 +1,8 @@
+<b>Lazy Bird</b><br>
+<br>
+Version 1.0<br>
+made by Peter Feichtinger<br>
+<i>shippo@gmx.at</i><br>
+<br>
+Johannes Kepler University of Linz<br>
+Institute for Pervasive Computing

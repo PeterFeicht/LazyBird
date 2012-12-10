@@ -7,8 +7,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.res.Resources.NotFoundException;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -16,16 +20,36 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
+import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
+import android.widget.Toast;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener
 {
 	// Constants
 	public static final String LOGTAG = "MainActivity";
 	public static final boolean LOCAL_LOGV = true;
+	// Settings
+	/**
+	 * Setting: {@link SettingsActivity#KEY_OUTPUT_DIR}
+	 * 
+	 * @see ARFFRecorderService#getDirname()
+	 */
+	private static String sOutputDir;
+	/**
+	 * Setting: {@link SettingsActivity#KEY_LOG_FILENAME}
+	 */
+	private static String sLogFilename;
+	
+	private SharedPreferences mPrefs;
 	
 	// The PagerAdapter supplies the fragments to be displayed in the ViewPager
 	private SectionsPagerAdapter mPagerAdapter;
@@ -54,6 +78,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+		mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+		updateSettings();
 		
 		mBroadcastManager = LocalBroadcastManager.getInstance(this);
 		mServiceIntentFilter = new IntentFilter();
@@ -88,6 +114,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 	}
 	
+	private void updateSettings()
+	{
+		sOutputDir = mPrefs.getString(SettingsActivity.KEY_OUTPUT_DIR, "");
+		sLogFilename = mPrefs.getString(SettingsActivity.KEY_LOG_FILENAME, "");
+	}
+	
 	@Override
 	protected void onPause()
 	{
@@ -114,10 +146,58 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		updateMenuReportIcon();
 		menu.findItem(R.id.menu_settings).setOnMenuItemClickListener(onMenuSettingsClick);
 		menu.findItem(R.id.menu_help).setOnMenuItemClickListener(onMenuHelpClick);
+		menu.findItem(R.id.menu_showlog).setOnMenuItemClickListener(onMenuShowlogClick);
+		menu.findItem(R.id.menu_about).setOnMenuItemClickListener(onMenuAboutClick);
 		return true;
 	}
 	
+	private OnMenuItemClickListener onMenuAboutClick = new OnMenuItemClickListener() {
+		@Override
+		public boolean onMenuItemClick(MenuItem item)
+		{
+			AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
+			b.setTitle(R.string.menu_about);
+			b.setIcon(R.drawable.ic_launcher);
+			
+			CharSequence text = readRawTextFile(R.raw.about);
+			if(text == null)
+				text = "Oops!";
+			text = Html.fromHtml((String)text);
+			
+			b.setMessage(text);
+			b.setPositiveButton(android.R.string.ok, null);
+			b.show();
+			return true;
+		}
+	};
+	
+	private OnMenuItemClickListener onMenuShowlogClick = new OnMenuItemClickListener() {
+		@Override
+		public boolean onMenuItemClick(MenuItem item)
+		{
+			updateSettings();
+			
+			if(sLogFilename.isEmpty())
+				return true;
+			final File logfile = new File(new File(Environment.getExternalStorageDirectory(),
+				sOutputDir), sLogFilename);
+			if(logfile.isFile())
+			{
+				Intent i = new Intent(Intent.ACTION_VIEW);
+				i.setDataAndType(Uri.fromFile(logfile), "text/plain");
+				startActivity(i);
+			}
+			else
+			{
+				Toast.makeText(MainActivity.this, R.string.fileNotFound, Toast.LENGTH_SHORT)
+					.show();
+			}
+			return true;
+		}
+	};
+	
 	private OnMenuItemClickListener onMenuSettingsClick = new OnMenuItemClickListener() {
+		@Override
 		public boolean onMenuItemClick(MenuItem item)
 		{
 			startActivity(new Intent(MainActivity.this, SettingsActivity.class));
@@ -144,8 +224,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		{
 			// Display an appropriate help message for the current tab
 			final AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
-			b.setIcon(android.R.drawable.ic_dialog_info);
-			b.setTitle(R.string.menu_help);
 			b.setNeutralButton(android.R.string.ok, null);
 			
 			switch(getActionBar().getSelectedNavigationIndex())
@@ -199,6 +277,38 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			mMenuReport.setIcon(R.drawable.ic_action_report_on);
 		else
 			mMenuReport.setIcon(R.drawable.ic_action_report_off);
+	}
+	
+	/**
+	 * Reads text from the raw resource file with the specified ID.
+	 * 
+	 * @param id the ID of the file to read.
+	 * @return the contents of the file as {@code String}, or {@code null} in case of an IO
+	 *         error.
+	 * @exception NotFoundException if the resource ID is not found.
+	 */
+	public String readRawTextFile(int id)
+	{
+		InputStream is = getResources().openRawResource(id);
+		BufferedReader r = new BufferedReader(new InputStreamReader(is));
+		
+		StringBuilder sb = new StringBuilder();
+		try
+		{
+			String line = r.readLine();
+			while(line != null)
+			{
+				sb.append(line);
+				sb.append("\n");
+				line = r.readLine();
+			}
+		}
+		catch(IOException ex)
+		{
+			return null;
+		}
+		
+		return sb.toString();
 	}
 	
 	private class SectionsPagerAdapter extends FragmentPagerAdapter

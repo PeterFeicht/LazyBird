@@ -10,6 +10,8 @@
     <string name="menu_report_on">Senden ist EIN</string>
     <string name="menu_report_off">Senden ist AUS</string>
     <string name="menu_help">Hilfe</string>
+    <string name="menu_showlog">Logdatei anzeigen</string>
+    <string name="menu_about">Über</string>
     
     <string name="service_started">ARFF Recorder service gestartet</string>
     <string name="service_stopped">ARFF Recorder service gestoppt</string>
@@ -81,7 +83,8 @@
     <string name="trainQuestion">Aktuellen Classifier ersetzen?</string>
     <string name="trainNote">Wenn Sie einen neuen Classifier trainieren, wird der aktuelle ersetzt.\nWollen Sie fortfahren?</string>
     <string name="extractionCancelled">Feature Extraction abgebrochen</string>
-    <string name="saveFeaturesNote">Geben Sie einen Dateinamen ein um die berechneten Features zu speichern. Wenn die Datei existiert wird sie überschrieben.</string>
+    <string name="saveFeaturesQuestion">Geben Sie einen Dateinamen ein</string>
+    <string name="saveFeaturesNote">Wenn die Datei existiert wird sie überschrieben..</string>
     <string name="fileSaved">Datei gespeichert</string>
     <string name="trainingCancelled">Training abgebrochen</string>
     <string name="statusExtract">Extrahierung&#8230;</string>

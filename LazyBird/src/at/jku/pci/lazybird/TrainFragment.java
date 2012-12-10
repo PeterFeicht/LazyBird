@@ -799,7 +799,7 @@ public class TrainFragment extends Fragment
 	{
 		final EditText txt = new EditText(getActivity());
 		final AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
-		b.setTitle(R.string.btnSaveFeatures);
+		b.setTitle(R.string.saveFeaturesQuestion);
 		b.setMessage(R.string.saveFeaturesNote);
 		b.setView(txt);
 		b.setNegativeButton(android.R.string.cancel, null);
