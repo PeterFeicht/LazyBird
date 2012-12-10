@@ -208,6 +208,7 @@ public class FeatureExtractor
 			return;
 		}
 		
+		// WindowListener to add extracted features to the output Instances
 		final WindowListener windowListener = new WindowListener() {
 			@Override
 			public void onWindowChanged(Iterable<Instance> window)
@@ -265,6 +266,7 @@ public class FeatureExtractor
 		
 		for(File f : mFiles)
 		{
+			// Read the next input file
 			final BufferedReader reader = new BufferedReader(new FileReader(f));
 			final ArffReader arff = new ArffReader(reader);
 			final Instances input = arff.getData();
@@ -272,6 +274,7 @@ public class FeatureExtractor
 			
 			if(mOutput == null)
 			{
+				// Initialize output and fill our HashSet with the feature names
 				mOutput = initOutput(input);
 				for(Feature f2 : Feature.getFeatures(mOutputFeatures))
 					inFeatures.add(f2.getAttribute());
@@ -288,6 +291,7 @@ public class FeatureExtractor
 					throw new UnsupportedAttributeTypeException(f.toString());
 			}
 			
+			// Simply add all instances to the output
 			@SuppressWarnings("unchecked")
 			Enumeration<Instance> instances = input.enumerateInstances();
 			while(instances.hasMoreElements())
@@ -310,18 +314,18 @@ public class FeatureExtractor
 	private Instances initOutput(Instances input) throws UnsupportedAttributeTypeException
 	{
 		final FastVector attributes = new FastVector(mFeatures.length + 1);
-		// Make an educated guess for the needed capacity of the output set
 		double cap = mFiles.length;
 		
-		// Features have been specified, no extraction from input file necessary
 		if(mOutputFeatures != 0)
 		{
+			// Features have been specified, no extraction from input file necessary
 			for(Feature f : Feature.getFeatures(mOutputFeatures))
 				attributes.addElement(new Attribute(f.getAttribute()));
 			
 			attributes.addElement(
 				new Attribute("class", getValueVector(input.classAttribute())));
 			
+			// Make an educated guess for the needed capacity of the output set
 			cap *= (input.lastInstance().value(0) - input.firstInstance().value(0)) / mJumpSize;
 		}
 		else
@@ -336,28 +340,14 @@ public class FeatureExtractor
 				final Attribute a = inAttributes.nextElement();
 				if(a.isNumeric())
 				{
-					// If name matches celebrate, otherwise try to find a matching name
+					// If name matches celebrate, otherwise go berserk
 					if(map.containsKey(a.name()))
 					{
 						attributes.addElement(a);
 						mOutputFeatures |= map.get(a.name()).getBit();
 					}
 					else
-					{
-						boolean added = false;
-						for(Feature f : map.values())
-						{
-							if(a.name().contains(f.getAttribute()))
-							{
-								attributes.addElement(a.copy(f.getAttribute()));
-								added = true;
-								break;
-							}
-						}
-						
-						if(!added)
-							throw new UnsupportedAttributeTypeException();
-					}
+						throw new UnsupportedAttributeTypeException();
 				}
 				else if(a.isNominal())
 				{
@@ -371,6 +361,7 @@ public class FeatureExtractor
 					throw new UnsupportedAttributeTypeException();
 			}
 			
+			// Make an educated guess for the needed capacity of the output set
 			cap *= input.numInstances();
 		}
 		
@@ -381,6 +372,12 @@ public class FeatureExtractor
 		return out;
 	}
 	
+	/**
+	 * Gets a {@link FastVector} with all possible values of the specified nominal attribute.
+	 * 
+	 * @param a the {@link Attribute} to get values from
+	 * @return a {@link FastVector} with all possible {@link String} values of {@code a}.
+	 */
 	private FastVector getValueVector(Attribute a)
 	{
 		@SuppressWarnings("unchecked")
@@ -391,6 +388,9 @@ public class FeatureExtractor
 		return values;
 	}
 	
+	/**
+	 * Call {@link #extractFeatures(Iterable, int)} with our output features.
+	 */
 	private Instance extractFeatures(Iterable<Instance> instances)
 	{
 		return extractFeatures(instances, mOutputFeatures);
@@ -414,15 +414,18 @@ public class FeatureExtractor
 		if(flags == 0)
 			throw new IllegalArgumentException("flags cannot be 0.");
 		
-		final Feature[] features = Feature.getFeatures(flags);
-		final boolean hasMean = (flags & 0x07) != 0;
+		// The output features need to be in the right order, which depends on the definition of
+		// the Feature class. To be independent, put all features in a map and get them in the
+		// right order
 		final EnumMap<Feature, Double> values = new EnumMap<Feature, Double>(Feature.class);
 		
+		// Check for empty input set
 		final Iterator<Instance> it = instances.iterator();
 		if(!it.hasNext())
 			throw new IllegalArgumentException("instances cannot be empty.");
 		
-		if(hasMean)
+		// All means are extracted at once, so if any one is needed, do it
+		if((flags & 0x07) != 0)
 		{
 			final Instance mean = mean(instances);
 			if(Feature.X.isSet(flags))
@@ -433,6 +436,7 @@ public class FeatureExtractor
 				values.put(Feature.Z, mean.value(3));
 		}
 		
+		// Magnitude and Variance of the Magnitude both need the magnitude
 		if(Feature.MAGNITUDE.isSet(flags) || Feature.VARIANCE_OF_MAGNITUDE.isSet(flags))
 		{
 			final Iterable<Instance> mag = magnitude(instances);
@@ -453,6 +457,7 @@ public class FeatureExtractor
 				values.put(Feature.VARIANCE_OF_MAGNITUDE, variance(mag, 1).value(1));
 		}
 		
+		// Extract variance features
 		if(Feature.VARIANCE_X.isSet(flags))
 			values.put(Feature.VARIANCE_X, variance(instances, 1).value(1));
 		if(Feature.VARIANCE_Y.isSet(flags))
@@ -465,7 +470,9 @@ public class FeatureExtractor
 		while(it.hasNext())
 			last = it.next();
 		
+		// Put all features in an Instance and return it
 		final boolean hasClass = (last.numValues() == 5);
+		final Feature[] features = Feature.getFeatures(flags);
 		final Instance out = new Instance(features.length + (hasClass ? 2 : 1));
 		out.setValue(0, last.value(0));
 		
@@ -498,6 +505,14 @@ public class FeatureExtractor
 		return extractFeatures(instances, Feature.getMask(features));
 	}
 	
+	/**
+	 * Calculates the variance of the attribute with the specified index.
+	 * 
+	 * @param instances the set of instances to calculate the variance for.
+	 * @param idx the index of the needed attribute.
+	 * @return an {@link Instance} with the timestamp of the last input instance and the variance
+	 *         of the specified index. The class is retained, if present.
+	 */
 	private static Instance variance(Iterable<Instance> instances, int idx)
 	{
 		Iterator<Instance> it = instances.iterator();
@@ -523,6 +538,10 @@ public class FeatureExtractor
 			var += (last.value(idx) - mean) * (last.value(idx) - mean);
 		}
 		
+		// Input instances can have a number of attributes:
+		// * 3: timestamp, coordinate and class
+		// * 4: timestamp and three coordinates
+		// * 5: timestamp, three coordinates and a class
 		final boolean hasClass = (last.numValues() == 5) || (last.numValues() == 3);
 		final Instance out = new Instance(hasClass ? 3 : 2);
 		out.setValue(0, last.value(0));
@@ -534,6 +553,13 @@ public class FeatureExtractor
 		return out;
 	}
 	
+	/**
+	 * Calculates the magnitude of the specified instances.
+	 * 
+	 * @param instances the set of instances to calculate the magnitude for.
+	 * @return an {@link Instance} with the timestamp of the last input instance and the
+	 *         magnitude. The class is retained, if present.
+	 */
 	private static Iterable<Instance> magnitude(Iterable<Instance> instances)
 	{
 		final LinkedList<Instance> out = new LinkedList<Instance>();
