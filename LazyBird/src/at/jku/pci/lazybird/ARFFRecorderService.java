@@ -1,11 +1,5 @@
 package at.jku.pci.lazybird;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Date;
-import java.util.Locale;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -16,7 +10,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Binder;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
@@ -24,6 +17,12 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.widget.Toast;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Date;
+import java.util.Locale;
 
 public class ARFFRecorderService extends Service implements SensorEventListener
 {
@@ -87,7 +86,6 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 	private static int sStartDelay = 0;
 	
 	private final long mTimeOffset = System.currentTimeMillis() - System.nanoTime() / 1000000;
-	private final IBinder mBinder = new LocalBinder();
 	private NotificationManager mNotificationManager;
 	private SensorManager mSensorManager;
 	private PendingIntent mNotificationIntent;
@@ -138,7 +136,7 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 			sRunning = true;
 			mStartTime = new Date();
 			
-			// get information from the intent
+			// Get information from the intent
 			mFilename = intent.getStringExtra(RecorderFragment.EXTRA_FILENAME);
 			mDirname = intent.getStringExtra(RecorderFragment.EXTRA_DIRNAME);
 			final int clazz = intent.getIntExtra(RecorderFragment.EXTRA_CLASS, 0);
@@ -154,14 +152,14 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 			if(!directory.exists())
 				directory.mkdir();
 			
-			// create ARFF-file and write header and data
+			// Create ARFF-file and write header and data
 			final File file = new File(directory, mFilename);
 			
 			try
 			{
 				mOutfile = new BufferedWriter(new FileWriter(file, false));
 				
-				// write the file header
+				// Write the file header
 				mOutfile.write("% Group: Feichtinger, Hager\n% Date: ");
 				mOutfile.write(DateFormat.format(DATE_FORMAT, new Date()).toString());
 				mOutfile.write(String.format(
@@ -204,6 +202,7 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 			mSensorManager.unregisterListener(this);
 		if(mWaitingTimer != null)
 			mWaitingTimer.stop();
+		
 		// We don't want to cancel the notification telling the user why we stopped, only those
 		// that aren't needed any more.
 		mNotificationManager.cancel(NOTIFICATION_WAITING);
@@ -235,15 +234,7 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 	@Override
 	public IBinder onBind(Intent intent)
 	{
-		return mBinder;
-	}
-	
-	public class LocalBinder extends Binder
-	{
-		ARFFRecorderService getService()
-		{
-			return ARFFRecorderService.this;
-		}
+		return null;
 	}
 	
 	/**
@@ -474,6 +465,10 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 		mNotificationManager.notify(NOTIFICATION_TOO_MAY_VALUES, n);
 	}
 	
+	/**
+	 * Registers the sensor listener, starts this service as foreground service and sends a
+	 * broadcast informing of the start.
+	 */
 	private void startRecording()
 	{
 		Sensor s = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -486,6 +481,7 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 			new Intent(RecorderFragment.BCAST_SERVICE_STARTED));
 	}
 	
+	@Override
 	public void onSensorChanged(SensorEvent event)
 	{
 		final Long timestamp = event.timestamp / 1000000 + mTimeOffset;
@@ -495,6 +491,7 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 		if(mOutfile == null)
 		{
 			mSensorManager.unregisterListener(this);
+			stopSelf();
 		}
 		else
 		{
@@ -523,10 +520,16 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 		}
 	}
 	
+	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy)
 	{
 	}
 	
+	/**
+	 * A timer that waits for an amount of seconds before starting the recording.
+	 * 
+	 * @author Peter
+	 */
 	private class WaitingTimer implements Runnable
 	{
 		private int mSeconds;

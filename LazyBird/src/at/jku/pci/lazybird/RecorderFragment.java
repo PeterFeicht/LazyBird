@@ -73,9 +73,6 @@ public class RecorderFragment extends Fragment
 	 */
 	private static long sValueUpdateDelay;
 	/**
-	 * Output directory for recorded files, the base directory is always
-	 * {@link Environment#getExternalStorageDirectory()}.
-	 * <p>
 	 * Setting: {@link SettingsActivity#KEY_OUTPUT_DIR}
 	 * 
 	 * @see ARFFRecorderService#getDirname()
@@ -84,7 +81,7 @@ public class RecorderFragment extends Fragment
 	
 	private SharedPreferences mPrefs;
 	
-	// Fields
+	// Views
 	private Switch mSwOnOff;
 	private EditText mTxtFilename;
 	private Spinner mSpinClass;
@@ -99,7 +96,8 @@ public class RecorderFragment extends Fragment
 	private TextView mLabelLastValues;
 	private TextView mLabelValsPerSecond;
 	private ImageButton mBtnDelete;
-	
+
+	// Fields
 	private int mTextColor;
 	private int mDisabledColor = Color.GRAY;
 	
@@ -154,7 +152,7 @@ public class RecorderFragment extends Fragment
 		
 		getWidgets(getView());
 		
-		// if the service is running and we just got created, fill inputs with running data.
+		// If the service is running and we just got created, fill inputs with running data.
 		// setting of input enabled and such things are done in onResume.
 		if(ARFFRecorderService.isRunning())
 		{
@@ -263,7 +261,8 @@ public class RecorderFragment extends Fragment
 	/**
 	 * Gets the title associated with this fragment for use in an {@link ActionBar} tab.
 	 * 
-	 * @return the title of this fragment.
+	 * @return the localized title of this fragment in case it is already attached to an
+	 *         activity, a default title otherwise.
 	 */
 	public CharSequence getTitle()
 	{
@@ -420,6 +419,7 @@ public class RecorderFragment extends Fragment
 		@Override
 		public void onClick(View v)
 		{
+			// Add .arff extension to filename
 			String f = mTxtFilename.getText().toString();
 			
 			if(!f.endsWith(EXTENSION) && !f.isEmpty())
@@ -439,6 +439,7 @@ public class RecorderFragment extends Fragment
 	{
 		if(mSwOnOff.isChecked())
 		{
+			// Check for writable external storage
 			if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
 			{
 				Toast.makeText(getActivity(), R.string.error_extstorage,
@@ -449,7 +450,7 @@ public class RecorderFragment extends Fragment
 			
 			String filename = mTxtFilename.getText().toString();
 			
-			if(filename.isEmpty() || filename.contains(String.valueOf(File.separatorChar)))
+			if(filename.isEmpty() || filename.contains(File.separator))
 			{
 				Toast.makeText(getActivity(), R.string.error_filename,
 					Toast.LENGTH_SHORT).show();
@@ -497,6 +498,7 @@ public class RecorderFragment extends Fragment
 		mBroadcastManager.unregisterReceiver(mBroadcastReceiver);
 		setViewStates(false);
 		mSwOnOff.setChecked(false);
+		mService = null;
 	}
 	
 	/**

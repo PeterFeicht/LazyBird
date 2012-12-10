@@ -142,6 +142,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		@Override
 		public boolean onMenuItemClick(MenuItem item)
 		{
+			// Display an appropriate help message for the current tab
 			final AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
 			b.setIcon(android.R.drawable.ic_dialog_info);
 			b.setTitle(R.string.menu_help);
@@ -186,6 +187,10 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	{
 	}
 	
+	/**
+	 * Sets the icon of the report menu item according to the current {@link ClassifierService}
+	 * status.
+	 */
 	private void updateMenuReportIcon()
 	{
 		if(mMenuReport == null)
