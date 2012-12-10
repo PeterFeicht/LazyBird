@@ -7,6 +7,11 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.NumberPicker;
 
+/**
+ * A preference that displays a dialog with a {@link NumberPicker}.
+ * 
+ * @author Peter
+ */
 public class NumberPreference extends DialogPreference
 {
 	public static final String LOGTAG = "NumberPreference";
@@ -32,6 +37,7 @@ public class NumberPreference extends DialogPreference
 		setPositiveButtonText(android.R.string.ok);
 		setNegativeButtonText(android.R.string.cancel);
 		
+		// Get min and max value from XML
 		final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.NumberPreference);
 		for(int j = 0; j < a.getIndexCount(); j++)
 		{
@@ -82,7 +88,6 @@ public class NumberPreference extends DialogPreference
 			if(callChangeListener(mValue))
 			{
 				persistInt(mValue);
-				// mTimeDisplay.setText(toString());
 				setSummary(Integer.toString(mValue));
 			}
 		}

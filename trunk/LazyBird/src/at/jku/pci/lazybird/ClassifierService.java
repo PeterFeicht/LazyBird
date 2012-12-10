@@ -10,7 +10,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Binder;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
@@ -83,7 +82,6 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	private static boolean sRunning = false;
 	
 	// Manage
-	private final IBinder mBinder = new LocalBinder();
 	private NotificationManager mNotificationManager;
 	private SensorManager mSensorManager;
 	private LocalBroadcastManager mBrodcastManager;
@@ -261,17 +259,17 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	@Override
 	public IBinder onBind(Intent intent)
 	{
-		return mBinder;
+		return null;
 	}
 	
-	public class LocalBinder extends Binder
-	{
-		ClassifierService getService()
-		{
-			return ClassifierService.this;
-		}
-	}
-	
+	/**
+	 * Builds an {@link Instances} object with the specified feature attributes and a class
+	 * 
+	 * @param flags a mask of selected features, see {@link Feature#getMask(Feature[])}.
+	 * @return an {@link Instances} object with attributes for the specified features, a class
+	 *         attribute with possible values taken from the {@code classes} array resource, and
+	 *         a capacity of {@code 2}.
+	 */
 	private Instances buildHeader(int flags)
 	{
 		final Feature[] features = Feature.getFeatures(flags);
@@ -291,6 +289,11 @@ public class ClassifierService extends Service implements SensorEventListener, W
 		return out;
 	}
 	
+	/**
+	 * Attempts to set the language of the Text-to-speech engine and kills it on failure.
+	 * <p>
+	 * TODO maybe add a check for TTS data to the main activity to inform the user.
+	 */
 	private void initTts()
 	{
 		int lang = mTtsEngine.setLanguage(Locale.ENGLISH);
@@ -301,6 +304,8 @@ public class ClassifierService extends Service implements SensorEventListener, W
 			return;
 		}
 		
+		// Set output stream to music, this is the stream the main activity requests for volume
+		// control
 		mTtsParams = new HashMap<String, String>();
 		mTtsParams.put(TextToSpeech.Engine.KEY_PARAM_STREAM, "STREAM_MUSIC");
 		mTtsInit = true;
@@ -423,6 +428,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 		
 		if(mOutfile == null && write)
 		{
+			// Create ouput file to enable logging
 			if(mFilename == null || mFilename.isEmpty() || mDirname == null)
 				return;
 			
@@ -447,6 +453,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 		}
 		else if(mOutfile != null && !write)
 		{
+			// Close output file to disable logging
 			try
 			{
 				mOutfile.flush();
@@ -527,11 +534,13 @@ public class ClassifierService extends Service implements SensorEventListener, W
 			
 			if(mServer == null || mServer.isEmpty())
 			{
+				// Use default server and port in case something is missing
 				host = CoordinatorClient.DEFAULT_SERVER_HOST;
 				port = CoordinatorClient.DEFAULT_SERVER_PORT;
 			}
 			else if(mServer.contains(":"))
 			{
+				// Use specified server and port
 				final int idx = mServer.indexOf(":");
 				host = mServer.substring(0, idx);
 				try
@@ -545,12 +554,13 @@ public class ClassifierService extends Service implements SensorEventListener, W
 			}
 			else
 			{
+				// Port is missing, use default
 				host = mServer;
 				port = CoordinatorClient.DEFAULT_SERVER_PORT;
 			}
 			
+			// Start reporting
 			mClient = new CoordinatorClient(host, port, mUsername);
-			
 			try
 			{
 				Thread.sleep(1000);
@@ -560,6 +570,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 				// Why would I be interrupted?
 			}
 			
+			// In case the connection fails, the thread of the client stops, check
 			if(!mClient.isAlive())
 			{
 				notifyConnectionFail();
@@ -570,6 +581,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 		}
 		else if(mClient != null && !report)
 		{
+			// Stop reporting
 			mHandler.removeCallbacks(mRunReportActivity);
 			mClient.interrupt();
 			mClient = null;
@@ -655,7 +667,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	}
 	
 	/**
-	 * Builds and shows a notification, notifying the user of an error when writing the output
+	 * Builds and shows a notification, to inform the user of an error when writing the output
 	 * log file.
 	 */
 	private void notifyWriteFail()
@@ -677,7 +689,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	}
 	
 	/**
-	 * Builds and shows a notification, notifying the user of a failed connection to the
+	 * Builds and shows a notification, to inform the user of a failed connection to the
 	 * reporting server.
 	 */
 	private void notifyConnectionFail()
@@ -698,6 +710,10 @@ public class ClassifierService extends Service implements SensorEventListener, W
 		mNotificationManager.notify(NOTIFICATION_CONNECTION_FAIL, n);
 	}
 	
+	/**
+	 * Registers the sensor listener, starts this service as foreground service and sends a
+	 * broadcast informing of the start.
+	 */
 	private void startReporting()
 	{
 		Sensor s = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -729,6 +745,12 @@ public class ClassifierService extends Service implements SensorEventListener, W
 		}
 	}
 	
+	/**
+	 * Reports the specified activity to the server, if enabled.
+	 * 
+	 * @param activity the activity to report, has to correspond to a value in the
+	 *        {@link ClassLabel} enumeration.
+	 */
 	private void reportActivity(String activity)
 	{
 		if(mClient != null)
@@ -748,12 +770,23 @@ public class ClassifierService extends Service implements SensorEventListener, W
 		}
 	}
 	
+	/**
+	 * Speaks the specified string, if enabled.
+	 * 
+	 * @param activity the text to speak.
+	 */
 	private void speak(String activity)
 	{
 		if(mTtsEngine != null && mTtsInit && mTtsRunning && activity != null)
 			mTtsEngine.speak(activity, TextToSpeech.QUEUE_ADD, mTtsParams);
 	}
 	
+	/**
+	 * Outputs the specified activity on all enabled channels.
+	 * 
+	 * @param newActivity the index of the new activity in the {@code class} attribute of
+	 *        {@link #mHeader}, see {@link #buildHeader(int)}.
+	 */
 	private void onActivityChanged(int newActivity)
 	{
 		mLastActivity = newActivity;
@@ -772,6 +805,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	@Override
 	public void onSensorChanged(SensorEvent event)
 	{
+		// Add the new data to the sliding window
 		Instance i = new Instance(4);
 		i.setValue(0, System.currentTimeMillis());
 		for(int j = 0; j < 3; j++)
@@ -788,6 +822,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	@Override
 	public void onWindowChanged(Iterable<Instance> window)
 	{
+		// Extract features and save to a new instance with the right attributes
 		Instance i = FeatureExtractor.extractFeatures(window, mFeatures);
 		Instance add = new Instance(mHeader.numAttributes());
 		for(int j = 1; j < i.numValues(); j++)
@@ -798,6 +833,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 		
 		try
 		{
+			// Attempt to classify the instance, do nothing if classification fails
 			double tmp = mClassifier.classifyInstance(add);
 			if(tmp == Instance.missingValue())
 				throw new Exception("not classified.");
