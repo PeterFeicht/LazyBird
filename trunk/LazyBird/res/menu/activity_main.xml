@@ -1,24 +1,38 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    
+
     <item
         android:id="@+id/menu_report"
+        android:icon="@drawable/ic_action_report_off"
         android:orderInCategory="50"
         android:showAsAction="always"
-        android:title="@string/menu_report_off"
-        android:icon="@drawable/ic_action_report_off" />
+        android:title="@string/menu_report_off"/>
     
     <item
         android:id="@+id/menu_help"
+        android:icon="@drawable/ic_action_help"
         android:orderInCategory="60"
         android:showAsAction="ifRoom"
-        android:title="@string/menu_help"
-        android:icon="@drawable/ic_action_help"/>
+        android:title="@string/menu_help"/>
     
     <item
         android:id="@+id/menu_settings"
-        android:title="@string/menu_settings"
+        android:icon="@drawable/ic_action_settings"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
-        android:icon="@drawable/ic_action_settings" />
+        android:title="@string/menu_settings"/>
+    
+    <item
+        android:id="@+id/menu_showlog"
+        android:icon="@drawable/ic_action_showlog"
+        android:orderInCategory="90"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_showlog"/>
+    
+    <item
+        android:id="@+id/menu_about"
+        android:icon="@drawable/ic_action_about"
+        android:orderInCategory="110"
+        android:showAsAction="never"
+        android:title="@string/menu_about" />
 
 </menu>
