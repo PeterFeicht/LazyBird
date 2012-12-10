@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceFragment;
@@ -27,7 +28,8 @@ public class SettingsActivity extends Activity
 	/**
 	 * Shared preferences key: {@value}
 	 * <p>
-	 * The directory to write the recorded files to.
+	 * Output directory for recorded files, the base directory is always
+	 * {@link Environment#getExternalStorageDirectory()}.
 	 */
 	public static final String KEY_OUTPUT_DIR = "outputDir";
 	
@@ -48,7 +50,7 @@ public class SettingsActivity extends Activity
 	/**
 	 * Shared preferences key: {@value}
 	 * <p>
-	 * The number of folds to perform cross validation with.
+	 * The number of folds for cross-validation.
 	 */
 	public static final String KEY_NUM_FOLDS = "numFolds";
 	

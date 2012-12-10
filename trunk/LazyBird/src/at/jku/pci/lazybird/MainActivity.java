@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -38,6 +39,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		{
 			if(LOCAL_LOGV) Log.v(LOGTAG, "Received broadcast: " + intent);
 			
+			// Update the icon of the report button on the action bar when the service starts
 			if(intent.getAction().equals(ReportFragment.BCAST_SERVICE_STOPPED) ||
 				intent.getAction().equals(ReportFragment.BCAST_SERVICE_STARTED))
 			{
@@ -82,6 +84,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			actionBar.addTab(
 				actionBar.newTab().setText(mPagerAdapter.getPageTitle(i)).setTabListener(this));
 		}
+		
+		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 	}
 	
 	@Override
@@ -180,7 +184,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	@Override
 	public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction)
 	{
-		// TODO add animation
 	}
 	
 	private void updateMenuReportIcon()

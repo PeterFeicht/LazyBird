@@ -5,9 +5,9 @@ import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
@@ -59,6 +59,11 @@ import java.util.List;
 
 public class TrainFragment extends Fragment
 {
+	/**
+	 * Represents an entry in the list of selectable classifiers.
+	 * 
+	 * @author Peter
+	 */
 	private static class ClassifierEntry
 	{
 		public final Class<? extends Classifier> type;
@@ -88,31 +93,43 @@ public class TrainFragment extends Fragment
 	public static final String STATE_FEATURES = "at.jku.pci.lazybird.FEATURES";
 	
 	/**
-	 * Gets the default title associated with this fragment for use in an {@link ActionBar} tab.
+	 * The default title associated with this fragment for use in an {@link ActionBar} tab.
 	 * 
 	 * @see #getTitle()
 	 */
 	public static final CharSequence TITLE = "Train";
+	/**
+	 * Jump size for the sliding window, maybe make this a setting someday.
+	 */
 	public static final int JUMP_SIZE = 100;
 	// Settings
 	/**
-	 * Output directory for recorded files, the base directory is always
-	 * {@link Environment#getExternalStorageDirectory()}.
-	 * <p>
 	 * Setting: {@link SettingsActivity#KEY_OUTPUT_DIR}
 	 * 
-	 * @see ARFFRecorderService#getDirname()
+	 * @see ClassifierService#getDirname()
 	 */
 	private static String sOutputDir;
+	/**
+	 * Setting {@link SettingsActivity#KEY_NUM_FOLDS}
+	 */
 	private static int sNumFolds;
+	/**
+	 * Setting: {@link Storage#KEY_CLASSIFIER_FILE}
+	 */
 	private static String sClassifierFile;
+	/**
+	 * Setting {@link Storage#KEY_TRAINING_FILE}
+	 */
 	private static String sTrainingFile;
+	/**
+	 * Setting: {@link Storage#KEY_FEATURES}
+	 */
 	private static int sTrainedFeatures;
 	
 	private SharedPreferences mPrefs;
 	private SharedPreferences mPrefsClassifier;
 	
-	// Fields
+	// Views
 	private Button mBtnSelectFile;
 	private Button mBtnSelectFeatures;
 	private Button mBtnSaveFeatures;
@@ -124,6 +141,7 @@ public class TrainFragment extends Fragment
 	private ProgressBar mProgressExtract;
 	private TextView mTxtTrainStatus;
 	
+	// Fields
 	private Drawable mCompoundCheck;
 	private Drawable mCompoundUncheck;
 	private Drawable mCompoundAlert;
@@ -146,6 +164,7 @@ public class TrainFragment extends Fragment
 		{
 			if(LOCAL_LOGV) Log.v(LOGTAG, "Received broadcast: " + intent);
 			
+			// Disable or enable train button when report service is started or stopped
 			if(intent.getAction().equals(ReportFragment.BCAST_SERVICE_STARTED) ||
 				intent.getAction().equals(ReportFragment.BCAST_SERVICE_STOPPED))
 			{
@@ -176,8 +195,6 @@ public class TrainFragment extends Fragment
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		mPrefsClassifier = Storage.getClassifierPreferences(getActivity());
 		readSettings();
-		
-		initClassifiers();
 		
 		getWidgets(getView());
 		
@@ -227,12 +244,7 @@ public class TrainFragment extends Fragment
 		if(mSpinWindowSize.getCount() > 1)
 			mSpinWindowSize.setSelection(1);
 		mSpinClassifier = (Spinner)v.findViewById(R.id.spinClassifier);
-		
-		ArrayAdapter<ClassifierEntry> adapter = new ArrayAdapter<ClassifierEntry>(
-			getActivity(), android.R.layout.simple_spinner_item, mClassifiers);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		mSpinClassifier.setAdapter(adapter);
-		mSpinClassifier.setSelection(0);
+		initClassifiers();
 		
 		OnItemSelectedListener hideValidateListener = new OnItemSelectedListener() {
 			@Override
@@ -255,12 +267,21 @@ public class TrainFragment extends Fragment
 		mProgressExtract = (ProgressBar)v.findViewById(R.id.progressExtract);
 	}
 	
+	/**
+	 * Populates the classifier type spinner.
+	 */
 	private void initClassifiers()
 	{
 		mClassifiers = new ArrayList<ClassifierEntry>(4);
 		mClassifiers.add(new ClassifierEntry(IBk.class));
 		mClassifiers.add(new ClassifierEntry(NaiveBayes.class));
 		mClassifiers.add(new ClassifierEntry(J48.class));
+		
+		ArrayAdapter<ClassifierEntry> adapter = new ArrayAdapter<ClassifierEntry>(
+			getActivity(), android.R.layout.simple_spinner_item, mClassifiers);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		mSpinClassifier.setAdapter(adapter);
+		mSpinClassifier.setSelection(0);
 	}
 	
 	@Override
@@ -275,6 +296,7 @@ public class TrainFragment extends Fragment
 	{
 		super.onStop();
 		
+		// Stop any running task when activity stops
 		if(mTask != null)
 			mTask.cancel(true);
 		mTask = null;
@@ -294,6 +316,7 @@ public class TrainFragment extends Fragment
 	{
 		super.onSaveInstanceState(outState);
 		
+		// Save selected files and features, we wouldn't expect to lose that
 		outState.putSerializable(STATE_FILES, mFiles);
 		outState.putInt(STATE_FEATURES, Feature.getMask(mFeatures));
 	}
@@ -305,6 +328,7 @@ public class TrainFragment extends Fragment
 		
 		if(savedInstanceState != null)
 		{
+			// Restore selected files and features, if possible
 			Object[] files = (Object[])savedInstanceState.getSerializable(STATE_FILES);
 			if(files != null)
 			{
@@ -332,7 +356,8 @@ public class TrainFragment extends Fragment
 	/**
 	 * Gets the title associated with this fragment for use in an {@link ActionBar} tab.
 	 * 
-	 * @return the title of this fragment.
+	 * @return the localized title of this fragment in case it is already attached to an
+	 *         activity, a default title otherwise.
 	 */
 	public CharSequence getTitle()
 	{
@@ -343,7 +368,7 @@ public class TrainFragment extends Fragment
 	}
 	
 	/**
-	 * Sets all appropriate private fields from the shared preferences.
+	 * Sets all appropriate private (static) fields from the shared preferences.
 	 */
 	private void readSettings()
 	{
@@ -380,6 +405,10 @@ public class TrainFragment extends Fragment
 		mSpinWindowSize.setEnabled(!extracting);
 	}
 	
+	/**
+	 * Enables or disables the train and extract features buttons according to the selected
+	 * files, features, spinner items and report service state.
+	 */
 	private void updateTrainEnabled()
 	{
 		boolean enabled = mFiles.length > 0 && mFeatures.length > 0;
@@ -390,6 +419,10 @@ public class TrainFragment extends Fragment
 		mBtnSaveFeatures.setEnabled(enabled);
 	}
 	
+	/**
+	 * Sets the compound drawables of the buttons depending on whether files or features are
+	 * selected.
+	 */
 	private void updateCheckButtons()
 	{
 		setLeftDrawable(mBtnSelectFile, (mFiles.length > 0) ? mCompoundCheck : mCompoundUncheck);
@@ -397,6 +430,12 @@ public class TrainFragment extends Fragment
 			(mFeatures.length > 0) ? mCompoundCheck : mCompoundUncheck);
 	}
 	
+	/**
+	 * Shows or hides the validate button.
+	 * 
+	 * @param visible if {@code true} the button will be shown, otherwise it will be hidden and
+	 *        the calculated features and evaluation reset.
+	 */
 	private void setValidateVisible(boolean visible)
 	{
 		if(!visible)
@@ -414,6 +453,7 @@ public class TrainFragment extends Fragment
 		@Override
 		public void onClick(View v)
 		{
+			// Check for readable external storage
 			final String state = Environment.getExternalStorageState();
 			if(!state.equals(Environment.MEDIA_MOUNTED) &&
 				!state.equals(Environment.MEDIA_MOUNTED_READ_ONLY))
@@ -426,23 +466,15 @@ public class TrainFragment extends Fragment
 			
 			readSettings();
 			final File dir = new File(Environment.getExternalStorageDirectory(), sOutputDir);
-			
 			if(!dir.exists() || !dir.isDirectory())
 			{
 				Toast.makeText(getActivity(), R.string.error_nodir, Toast.LENGTH_LONG).show();
 				setLeftDrawable(mBtnSelectFile, mCompoundAlert);
 				return;
 			}
-			
 			allFiles = dir.listFiles(mArffFilter);
-			final OnMultiChoiceClickListener checkListener = new OnMultiChoiceClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which, boolean isChecked)
-				{
-					selected[which] = isChecked;
-				}
-			};
 			
+			// Populate list of names and look for selected files
 			String[] filenames = new String[allFiles.length];
 			selected = new boolean[allFiles.length];
 			for(int j = 0; j < allFiles.length; j++)
@@ -465,7 +497,13 @@ public class TrainFragment extends Fragment
 			{
 				b.setPositiveButton(android.R.string.ok, filesSelectedListener);
 				b.setNegativeButton(android.R.string.cancel, null);
-				b.setMultiChoiceItems(filenames, selected, checkListener);
+				b.setMultiChoiceItems(filenames, selected, new OnMultiChoiceClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which, boolean isChecked)
+					{
+						selected[which] = isChecked;
+					}
+				});
 			}
 			else
 			{
@@ -849,6 +887,7 @@ public class TrainFragment extends Fragment
 	private class SaveFeaturesTask extends AsyncTask<FeatureExtractor, Void, FeatureExtractor>
 	{
 		private Exception mException = null;
+		private int mOrientation;
 		
 		@Override
 		protected FeatureExtractor doInBackground(FeatureExtractor... params)
@@ -869,7 +908,9 @@ public class TrainFragment extends Fragment
 		@Override
 		protected void onPostExecute(FeatureExtractor result)
 		{
-			resetViews();
+			// Fragment was detached before the task completed, do nothing
+			if(getActivity() == null)
+				return;
 			
 			if(result == null)
 			{
@@ -883,6 +924,7 @@ public class TrainFragment extends Fragment
 				
 				saveFeatures();
 			}
+			resetViews();
 		}
 		
 		@Override
@@ -899,14 +941,22 @@ public class TrainFragment extends Fragment
 				}
 			});
 			mBtnSaveFeatures.setText(android.R.string.cancel);
+			
+			// Don't let the screen rotate while a task is running
+			mOrientation = getActivity().getRequestedOrientation();
+			int currentOrientation = getResources().getConfiguration().orientation;
+			getActivity().setRequestedOrientation(currentOrientation);
 		}
 		
 		@Override
 		protected void onCancelled(FeatureExtractor result)
 		{
-			Toast.makeText(getActivity(), R.string.extractionCancelled, Toast.LENGTH_LONG)
-				.show();
-			resetViews();
+			if(getActivity() != null)
+			{
+				Toast.makeText(getActivity(), R.string.extractionCancelled, Toast.LENGTH_LONG)
+					.show();
+				resetViews();
+			}
 		}
 		
 		private void resetViews()
@@ -917,6 +967,8 @@ public class TrainFragment extends Fragment
 			mBtnSaveFeatures.setOnClickListener(onBtnSaveFeaturesClick);
 			mBtnSaveFeatures.setText(R.string.btnSaveFeatures);
 			mTask = null;
+			// Reset the requested orientation to the one before the task start
+			getActivity().setRequestedOrientation(mOrientation);
 		}
 	}
 	
@@ -925,6 +977,7 @@ public class TrainFragment extends Fragment
 		private Exception mException = null;
 		private int mOutputFeatures = 0;
 		private ClassifierEntry mType = null;
+		private int mOrientation;
 		
 		@Override
 		protected Classifier doInBackground(FeatureExtractor... params)
@@ -995,7 +1048,10 @@ public class TrainFragment extends Fragment
 		@Override
 		protected void onPostExecute(Classifier result)
 		{
-			resetViews();
+			// Fragment was detached before the task completed, do nothing
+			if(getActivity() == null)
+				return;
+			
 			mClassifier = result;
 			
 			if(result == null)
@@ -1018,6 +1074,7 @@ public class TrainFragment extends Fragment
 				writeSettings();
 				mBroadcastManager.sendBroadcast(new Intent(ReportFragment.BCAST_NEW_CLASSIFIER));
 			}
+			resetViews();
 		}
 		
 		@Override
@@ -1042,16 +1099,23 @@ public class TrainFragment extends Fragment
 			
 			mTxtTrainStatus.setText(R.string.statusExtract);
 			mTxtTrainStatus.setVisibility(View.VISIBLE);
-			
 			mType = (ClassifierEntry)mSpinClassifier.getSelectedItem();
+			
+			// Don't let the screen rotate while a task is running
+			mOrientation = getActivity().getRequestedOrientation();
+			int currentOrientation = getResources().getConfiguration().orientation;
+			getActivity().setRequestedOrientation(currentOrientation);
 		}
 		
 		@Override
 		protected void onCancelled(Classifier result)
 		{
-			Toast.makeText(getActivity(), R.string.trainingCancelled, Toast.LENGTH_LONG)
-				.show();
-			resetViews();
+			if(getActivity() != null)
+			{
+				Toast.makeText(getActivity(), R.string.trainingCancelled, Toast.LENGTH_LONG)
+					.show();
+				resetViews();
+			}
 		}
 		
 		private void resetViews()
@@ -1063,6 +1127,8 @@ public class TrainFragment extends Fragment
 			mBtnTrain.setOnClickListener(onBtnTrainClick);
 			mBtnTrain.setText(R.string.btnTrain);
 			mTask = null;
+			// Reset the requested orientation to the one before the task start
+			getActivity().setRequestedOrientation(mOrientation);
 		}
 	}
 	
@@ -1073,6 +1139,7 @@ public class TrainFragment extends Fragment
 		public static final String KEY_CLASSIFIER = "classifier";
 		
 		private Exception mException = null;
+		private int mOrientation;
 		
 		@Override
 		protected Evaluation doInBackground(Bundle... params)
@@ -1131,12 +1198,20 @@ public class TrainFragment extends Fragment
 					ValidateClassifierTask.this.cancel(true);
 				}
 			});
+			
+			// Don't let the screen rotate while a task is running
+			mOrientation = getActivity().getRequestedOrientation();
+			int currentOrientation = getResources().getConfiguration().orientation;
+			getActivity().setRequestedOrientation(currentOrientation);
 		}
 		
 		@Override
 		protected void onPostExecute(Evaluation result)
 		{
-			resetViews();
+			// Fragment was detached before the task completed, do nothing
+			if(getActivity() == null)
+				return;
+			
 			mEvaluation = result;
 			
 			if(result == null)
@@ -1146,14 +1221,18 @@ public class TrainFragment extends Fragment
 			}
 			else
 				showEvaluation();
+			resetViews();
 		}
 		
 		@Override
 		protected void onCancelled(Evaluation result)
 		{
-			Toast.makeText(getActivity(), R.string.validationCancelled, Toast.LENGTH_LONG)
-				.show();
-			resetViews();
+			if(getActivity() != null)
+			{
+				Toast.makeText(getActivity(), R.string.validationCancelled, Toast.LENGTH_LONG)
+					.show();
+				resetViews();
+			}
 		}
 		
 		private void resetViews()
@@ -1166,6 +1245,9 @@ public class TrainFragment extends Fragment
 			
 			mBtnValidate.setText(R.string.btnValidate);
 			mBtnValidate.setOnClickListener(onBtnValidateClick);
+			mTask = null;
+			// Reset the requested orientation to the one before the task start
+			getActivity().setRequestedOrientation(mOrientation);
 		}
 	}
 }

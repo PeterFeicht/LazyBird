@@ -3,6 +3,8 @@ package at.jku.pci.lazybird;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import weka.classifiers.Classifier;
+import weka.core.Instances;
 
 /**
  * Provides keys and default values for shared preferences that cannot be changed by the user.
@@ -30,14 +32,14 @@ public final class Storage
 	/**
 	 * Shared preference key: {@code String} {@value}
 	 * <p>
-	 * The file name for the serialized current classifier object.
+	 * Filename of the serialized {@link Classifier} in the internal storage.
 	 */
 	public static final String KEY_CLASSIFIER_FILE = "classifierFile";
 	
 	/**
 	 * Shared preference key: {@code String} {@value}
 	 * <p>
-	 * The file name for the data the current classifier was trained with.
+	 * The filename for the serialized {@link Instances} the current classifier was trained with.
 	 */
 	public static final String KEY_TRAINING_FILE = "classifierTrainingFile";
 	
@@ -65,6 +67,7 @@ public final class Storage
 	/**
 	 * Gets the {@link SharedPreferences} for the classifier preferences.<br>
 	 * The key is {@link #PREFS_CLASSIFIER}.
+	 * 
 	 * @param c the {@link Context} to get preferences from.
 	 * @return the {@code SharedPreferences} for classifier related settings.
 	 */
@@ -90,11 +93,12 @@ public final class Storage
 	 * <p>
 	 * Whether chkReport in ReportFragment was checked.
 	 */
-	public static final String KEY_CHK_REPORT_CHECKED  = "chkReport_checked";
+	public static final String KEY_CHK_REPORT_CHECKED = "chkReport_checked";
 	
 	/**
 	 * Gets the {@link SharedPreferences} for the UI preferences.<br>
 	 * The key is {@link #PREFS_UI}.
+	 * 
 	 * @param c the {@link Context} to get preferences from.
 	 * @return the {@code SharedPreferences} for UI related settings.
 	 */
