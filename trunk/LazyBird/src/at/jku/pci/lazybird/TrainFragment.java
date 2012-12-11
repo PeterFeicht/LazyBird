@@ -19,6 +19,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -898,6 +899,10 @@ public class TrainFragment extends Fragment
 		txt.setText(sb.toString());
 		txt.setTypeface(Typeface.MONOSPACE);
 		txt.setTextSize(12f);
+		// Let the TextView scroll horizontally and vertically. Doesn't look very nice,
+		// but it shouldn't bee needed much
+		txt.setHorizontallyScrolling(true);
+		txt.setMovementMethod(ScrollingMovementMethod.getInstance());
 		// Set 12dp of padding left and right
 		final int pixels = (int)(Resources.getSystem().getDisplayMetrics().density * 12);
 		txt.setPadding(pixels, 0, pixels, 0);
