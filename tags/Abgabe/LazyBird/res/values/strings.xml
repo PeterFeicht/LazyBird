@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Lazy Bird</string>
+    <string name="title_tab_record">Record</string>
+    <string name="title_tab_train">Train</string>
+    <string name="title_tab_report">Report</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_report_on">Reporting is ON</string>
+    <string name="menu_report_off">Reporting is OFF</string>
+    <string name="menu_help">Help</string>
+    
+    <string name="service_started">ARFF Recorder service started</string>
+    <string name="service_stopped">ARFF Recorder service stopped</string>
+    <string name="service_label">ARFF Recorder Service</string>
+    <string name="too_many_values">Recording stopped</string>
+    <string name="too_many_values_long">Recording stopped after %d values</string>
+    <string name="service_waiting">Recording will start in %s seconds</string>
+    <string name="service_waiting_ticker">Recorder service waiting</string>
+    
+    <string name="rservice_started">Reporter service started</string>
+    <string name="rservice_stopped">Reporter service stopped</string>
+    <string name="rservice_label">Reporter Service</string>
+    <string name="write_fail">Error writing file</string>
+    <string name="write_fail_long">Error writing the log file</string>
+    <string name="conn_fail">Connection lost</string>
+    <string name="conn_fail_long">Connection to the server lost</string>
+    
+    <string name="set_valueUpdateSpeed">Update speed (display)</string>
+    <string name="set_ValueUpdateSpeed_long">Update speed of the last values displayed.</string>
+    <string name="set_outputDir">Output directory</string>
+    <string name="set_outputDir_long">Where to put the recorded files.</string>
+    <string name="set_maxNumValues">Datapoint limit</string>
+    <string name="set_maxNumValues_long">Number of data points after which recording is stopped.</string>
+    <string name="set_startDelay">Start delay</string>
+    <string name="set_startDelay_long">Time to wait (in seconds) before starting to record.</string>
+    <string name="set_numFolds">Number of folds</string>
+    <string name="set_numFolds_long">The number of folds to be used when cross-validating the trained classifier.</string>
+    <string name="set_reportServer">Server address</string>
+    <string name="set_reportServer_long">The server address or hostname and port for activity reporting. If empty, the default server will be used.</string>
+    <string name="set_reportUser">Username</string>
+    <string name="set_reportUser_long">The user ID to use when connecting to the server, needs to be 7 decimal digits.</string>
+    <string name="set_writeLog">Write log file</string>
+    <string name="set_writeLog_enable">An activity log will be written</string>
+    <string name="set_writeLog_diasble">No log will be written</string>
+    <string name="set_logFilename">Filename</string>
+    <string name="set_logFilename_long">The name for the log file.</string>
+    
+    <!-- Record -->
+    <string name="helpRecorder">Here you can record accelerometer data to ARFF files to train a classifier with.\nYou have to record data and train a classifier, before you can report your activity to the server.</string>
+    <string name="txtStatus">Recorder status:</string>
+    <string name="btnMakeFilename">Make Filename</string>
+    <string name="btnArff">+ .arff</string>
+    <string name="labelInstructions">First enter a filename and select a class, then switch on the recorder.</string>
+    <string name="labelClass">ARFF class:</string>
+    <string name="filename">Filename</string>
+    <string name="startTime">Start time:</string>
+    <string name="lastValues">Last values:</string>
+    <string name="nothing">-</string>
+    <string name="numValues">Number of values:</string>
+    <string name="dialogInfo">Info:</string>
+    <string name="valsPerSecond">Values/Second:</string>
+    <string name="btnDelete">Delete file</string>
+    <string name="fileNotFound">File not found</string>
+    <string name="fileDeleted">File deleted</string>
+    <string name="fileNotDeleted">File &lt;i&gt;not&lt;/i&gt; deleted</string>
+    
+    <!-- Train -->
+    <string name="helpTrain">Here you can train a classifier to classify your activity, using data you recorded.\nYou have to record data and train a classifier, before you can report your activity to the server.</string>
+    <string name="btnSelectFile">Select data file(s)&#8230;</string>
+    <string name="btnSelectFeatures">Select features&#8230;</string>
+    <string name="btnSaveFeatures">Save Features&#8230;</string>
+    <string name="btnTrain">Train</string>
+    <string name="btnValidate">Validate</string>
+    <string name="labelSelectClassifier">Select a classifier:</string>
+    <string name="labelSelectWindowSize">Select sliding window size (ms):</string>
+    <string name="selectFileNote">Note that only files in the output directory are listed.</string>
+    <string name="selectFeaturesNote">Select the features used to train the classifier.</string>
+    <string name="noFiles">No ARFF files in output directory.\nPut files you want to use in the output directory.</string>
+    <string name="trainQuestion">Replace current classifier?</string>
+    <string name="trainNote">If you train a new classifier, the current one will be replaced.\nDo you want to continue?</string>
+    <string name="extractionCancelled">Feature extraction cancelled</string>
+    <string name="saveFeaturesNote">Enter a filename to save the calculated features to. If it exists it will be overwritten.</string>
+    <string name="fileSaved">File saved</string>
+    <string name="trainingCancelled">Training cancelled</string>
+    <string name="statusExtract">Extracting&#8230;</string>
+    <string name="statusTrain">Training&#8230;</string>
+    <string name="statusValidate">Validating&#8230;</string>
+    <string name="statusCancel">Cancelling&#8230;</string>
+    <string name="trainingFinished">Training finished</string>
+    <string name="trainingFinished_long">The classifier was trained successfully and set as the default classifier.\nYou can now perform a cross-validation.</string>
+    <string name="validationQuestion">Get coffee?</string>
+    <string name="validateNote">This will perform a cross-validation of the generated classifier, to determine how well it classifies instances.\nThis can take some time, do you want to continue?</string>
+    <string name="validationCancelled">Validation cancelled</string>
+    <string name="validationResults">Validation results</string>
+    
+    <!-- Report -->
+    <string name="helpReport">Here you can classify your acitvity and report it to the server or output it a few other ways.\nYou have to record data and train a classifier, before you can report your activity to the server.</string>
+    <string name="lblNoClassifier">You have to train a classifier first.</string>
+    <string name="swClassify">Classification:</string>
+    <string name="lblOutputOptions">Output options:</string>
+    <string name="chkTts">Text-to-speech</string>
+    <string name="chkReport">Report to server</string>
+    <string name="lblLog">Log:</string>
+    <string name="log_new_activity">Activity changed: %s</string>
+    
+    <!-- Errors and stuff -->
+    <string name="error">Error</string>
+    <string name="error_generic">An error occurred, please tell the developer.</string>
+    <string name="error_filename">Not a valid filename</string>
+    <string name="error_extstorage">External storage not writable</string>
+    <string name="error_extstorage_read">External storage not readable</string>
+    <string name="error_nodir">Output directory doesn\'t exist</string>
+    <string name="error_nofile">A file was not found</string>
+    <string name="error_io">An IO error occurred</string>
+    <string name="error_attributes">Input file %s is of the wrong format.</string>
+    
+    <!-- Words -->
+    <string name="save">Save</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+
+</resources>

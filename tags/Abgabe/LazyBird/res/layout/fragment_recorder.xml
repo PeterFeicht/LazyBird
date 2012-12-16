@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="top"
+    android:paddingBottom="10dp"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
+    android:paddingTop="10dp" >
+    
+    <EditText
+        android:id="@+id/txtFilename"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="false"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        android:layout_toLeftOf="@+id/btnDelete"
+        android:ems="10"
+        android:hint="@string/filename"
+        android:inputType="textNoSuggestions" />
+
+    <ImageButton
+        android:id="@+id/btnDelete"
+        style="@android:style/Widget.Holo.Light.ActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/txtFilename"
+        android:layout_alignParentRight="true"
+        android:contentDescription="@string/btnDelete"
+        android:minHeight="42dp"
+        android:src="@drawable/ic_action_delete" />
+
+    <Button
+        android:id="@+id/btnMakeFilename"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/txtFilename"
+        android:layout_below="@+id/txtFilename"
+        android:text="@string/btnMakeFilename" />
+
+    <Button
+        android:id="@+id/btnArff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/btnMakeFilename"
+        android:layout_toRightOf="@+id/btnMakeFilename"
+        android:text="@string/btnArff" />
+
+    <TextView
+        android:id="@+id/labelClass"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/spinClass"
+        android:layout_alignLeft="@+id/btnMakeFilename"
+        android:layout_marginLeft="5dp"
+        android:text="@string/labelClass"
+        android:textAppearance="?android:attr/textAppearance" />
+
+    <Spinner
+        android:id="@+id/spinClass"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnMakeFilename"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="15dp"
+        android:layout_toRightOf="@+id/labelClass"
+        android:entries="@+array/classes"
+        android:minWidth="120dp" />
+
+    <TextView
+        android:id="@+id/labelInstructions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/labelClass"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/spinClass"
+        android:layout_marginTop="12dp"
+        android:text="@string/labelInstructions" />
+
+    <Switch
+        android:id="@+id/swOnOff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/labelClass"
+        android:layout_below="@+id/labelInstructions"
+        android:layout_marginTop="12dp"
+        android:text="@string/txtStatus" />
+
+    <GridLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/swOnOff"
+        android:layout_marginTop="10dp"
+        android:alignmentMode="alignBounds"
+        android:columnCount="2"
+        android:paddingLeft="6dp" >
+
+        <TextView
+            android:id="@+id/labelStartTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical"
+            android:text="@string/startTime"
+            android:textAppearance="?android:attr/textAppearance" />
+
+        <TextView
+            android:id="@+id/txtStartTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="fill_horizontal|center_vertical"
+            android:layout_marginLeft="12dp"
+            android:text="@string/nothing"
+            android:textAppearance="?android:attr/textAppearance" />
+
+        <TextView
+            android:id="@+id/labelLastValues"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical"
+            android:layout_marginTop="6dp"
+            android:text="@string/lastValues"
+            android:textAppearance="?android:attr/textAppearance" />
+
+        <TextView
+            android:id="@+id/txtLastValues"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="fill_horizontal|center_vertical"
+            android:layout_marginLeft="12dp"
+            android:text="@string/nothing"
+            android:textAppearance="?android:attr/textAppearance" />
+
+        <TextView
+            android:id="@+id/labelNumValues"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical"
+            android:layout_marginTop="6dp"
+            android:text="@string/numValues"
+            android:textAppearance="?android:attr/textAppearance" />
+
+        <TextView
+            android:id="@+id/txtNumValues"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="fill_horizontal|center_vertical"
+            android:layout_marginLeft="12dp"
+            android:text="@string/nothing"
+            android:textAppearance="?android:attr/textAppearance" />
+
+        <TextView
+            android:id="@+id/labelValsPerSecond"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical"
+            android:layout_marginTop="6dp"
+            android:text="@string/valsPerSecond"
+            android:textAppearance="?android:attr/textAppearance" />
+
+        <TextView
+            android:id="@+id/txtValsPerSecond"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="fill_horizontal|center_vertical"
+            android:layout_marginLeft="12dp"
+            android:text="@string/nothing"
+            android:textAppearance="?android:attr/textAppearance" />
+
+    </GridLayout>
+
+</RelativeLayout>
