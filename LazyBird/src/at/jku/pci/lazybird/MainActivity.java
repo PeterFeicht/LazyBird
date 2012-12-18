@@ -210,9 +210,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		public boolean onMenuItemClick(MenuItem item)
 		{
 			if(ClassifierService.isRunning())
-				mPagerAdapter.mReportFragment.stopService();
+				mPagerAdapter.getReportFragment().stopService();
 			else
-				mPagerAdapter.mReportFragment.startService();
+				mPagerAdapter.getReportFragment().startService();
 			
 			return true;
 		}
@@ -313,34 +313,21 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	
 	private class SectionsPagerAdapter extends FragmentPagerAdapter
 	{
-		RecorderFragment mRecorderFragment;
-		TrainFragment mTrainFragment;
-		ReportFragment mReportFragment;
+		AbstractTabFragment[] mTabs;
 		
 		public SectionsPagerAdapter(FragmentManager fm)
 		{
 			super(fm);
-			mRecorderFragment = new RecorderFragment();
-			mTrainFragment = new TrainFragment();
-			mReportFragment = new ReportFragment();
+			mTabs = new AbstractTabFragment[3];
+			mTabs[2] = new RecorderFragment();
+			mTabs[1] = new TrainFragment();
+			mTabs[0] = new ReportFragment();
 		}
 		
 		@Override
 		public Fragment getItem(int position)
 		{
-			switch(position)
-			{
-				case 0:
-					return mReportFragment;
-				case 1:
-					return mTrainFragment;
-				case 2:
-					return mRecorderFragment;
-					
-				default:
-					return null;
-			}
-			
+			return mTabs[position];
 		}
 		
 		@Override
@@ -352,18 +339,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		@Override
 		public CharSequence getPageTitle(int position)
 		{
-			switch(position)
-			{
-				case 0:
-					return mReportFragment.getTitle();
-				case 1:
-					return mTrainFragment.getTitle();
-				case 2:
-					return mRecorderFragment.getTitle();
-					
-				default:
-					return null;
-			}
+			return mTabs[position].getTitle();
+		}
+		
+		public ReportFragment getReportFragment()
+		{
+			return (ReportFragment)mTabs[0];
 		}
 	}
 }

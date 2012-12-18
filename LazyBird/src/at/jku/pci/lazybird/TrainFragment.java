@@ -17,7 +17,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -58,7 +57,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class TrainFragment extends Fragment
+public class TrainFragment extends AbstractTabFragment
 {
 	/**
 	 * Represents an entry in the list of selectable classifiers.
@@ -354,12 +353,7 @@ public class TrainFragment extends Fragment
 		}
 	}
 	
-	/**
-	 * Gets the title associated with this fragment for use in an {@link ActionBar} tab.
-	 * 
-	 * @return the localized title of this fragment in case it is already attached to an
-	 *         activity, a default title otherwise.
-	 */
+	@Override
 	public CharSequence getTitle()
 	{
 		if(getActivity() != null)
