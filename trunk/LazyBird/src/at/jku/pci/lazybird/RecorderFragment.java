@@ -1,8 +1,5 @@
 package at.jku.pci.lazybird;
 
-import java.io.File;
-import java.util.Date;
-import java.util.Locale;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -15,7 +12,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -34,8 +30,11 @@ import android.widget.SpinnerAdapter;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.io.File;
+import java.util.Date;
+import java.util.Locale;
 
-public class RecorderFragment extends Fragment
+public class RecorderFragment extends AbstractTabFragment
 {
 	// Extras
 	public static final String EXTRA_FILENAME = "at.jku.pci.lazybird.FILENAME";
@@ -258,12 +257,7 @@ public class RecorderFragment extends Fragment
 			mService = null;
 	}
 	
-	/**
-	 * Gets the title associated with this fragment for use in an {@link ActionBar} tab.
-	 * 
-	 * @return the localized title of this fragment in case it is already attached to an
-	 *         activity, a default title otherwise.
-	 */
+	@Override
 	public CharSequence getTitle()
 	{
 		if(getActivity() != null)

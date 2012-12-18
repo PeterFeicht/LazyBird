@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,7 +29,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.StreamCorruptedException;
 
-public class ReportFragment extends Fragment
+public class ReportFragment extends AbstractTabFragment
 {
 	// Extras
 	public static final String EXTRA_CLASSIFIER = "at.jku.pci.lazybird.CLASSIFIER";
@@ -283,12 +282,7 @@ public class ReportFragment extends Fragment
 			.apply();
 	}
 	
-	/**
-	 * Gets the title associated with this fragment for use in an {@link ActionBar} tab.
-	 * 
-	 * @return the localized title of this fragment in case it is already attached to an
-	 *         activity, a default title otherwise.
-	 */
+	@Override
 	public CharSequence getTitle()
 	{
 		if(getActivity() != null)
