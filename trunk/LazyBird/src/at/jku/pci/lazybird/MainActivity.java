@@ -274,9 +274,15 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		if(mMenuReport == null)
 			return;
 		if(ClassifierService.isRunning())
+		{
 			mMenuReport.setIcon(R.drawable.ic_action_report_on);
+			mMenuReport.setTitle(R.string.menu_report_on);
+		}
 		else
+		{
 			mMenuReport.setIcon(R.drawable.ic_action_report_off);
+			mMenuReport.setTitle(R.string.menu_report_off);
+		}
 	}
 	
 	/**
