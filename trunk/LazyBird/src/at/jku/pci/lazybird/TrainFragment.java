@@ -1,6 +1,7 @@
 package at.jku.pci.lazybird;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -53,6 +54,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -125,6 +127,10 @@ public class TrainFragment extends AbstractTabFragment
 	 * Setting: {@link Storage#KEY_FEATURES}
 	 */
 	private static int sTrainedFeatures;
+	/**
+	 * Setting: {@link Storage#KEY_VALIDATION_LOG_FILE}
+	 */
+	private static String sValidationLogFile;
 	
 	private SharedPreferences mPrefs;
 	private SharedPreferences mPrefsClassifier;
@@ -151,8 +157,8 @@ public class TrainFragment extends AbstractTabFragment
 	private File[] mFiles = new File[0];
 	private Feature[] mFeatures = new Feature[0];
 	private Instances mCalculatedFeatures = null;
-	private Evaluation mEvaluation = null;
 	private Classifier mClassifier = null;
+	private String mEvaluation = null;
 	@SuppressWarnings("rawtypes")
 	private AsyncTask mTask = null;
 	
@@ -372,6 +378,7 @@ public class TrainFragment extends AbstractTabFragment
 		sClassifierFile = mPrefsClassifier.getString(Storage.KEY_CLASSIFIER_FILE, "");
 		sTrainingFile = mPrefsClassifier.getString(Storage.KEY_TRAINING_FILE, "");
 		sTrainedFeatures = mPrefsClassifier.getInt(Storage.KEY_FEATURES, 0);
+		sValidationLogFile = mPrefsClassifier.getString(Storage.KEY_VALIDATION_LOG_FILE, "");
 	}
 	
 	/**
@@ -384,6 +391,7 @@ public class TrainFragment extends AbstractTabFragment
 		e.putString(Storage.KEY_TRAINING_FILE, sTrainingFile);
 		e.putInt(Storage.KEY_FEATURES, sTrainedFeatures);
 		e.putString(Storage.KEY_CLASSIFIER_TYPE, mClassifier.getClass().getSimpleName());
+		e.putString(Storage.KEY_VALIDATION_LOG_FILE, sValidationLogFile);
 		e.apply();
 	}
 	
@@ -788,7 +796,7 @@ public class TrainFragment extends AbstractTabFragment
 	}
 	
 	/**
-	 * Diplays a dialog asking for a filename and writes the calculated features to this file.
+	 * Displays a dialog asking for a filename and writes the calculated features to this file.
 	 */
 	private void saveFeatures()
 	{
@@ -845,8 +853,36 @@ public class TrainFragment extends AbstractTabFragment
 	 */
 	private void showEvaluation()
 	{
-		final Evaluation e = mEvaluation;
-		StringBuilder sb = new StringBuilder();
+		// Create a TextView with small monospace font
+		final TextView txt = new TextView(getActivity());
+		txt.setText(mEvaluation);
+		txt.setTypeface(Typeface.MONOSPACE);
+		txt.setTextSize(12f);
+		// Let the TextView scroll horizontally and vertically. Doesn't look very nice,
+		// but it shouldn't bee needed much
+		txt.setHorizontallyScrolling(true);
+		txt.setMovementMethod(ScrollingMovementMethod.getInstance());
+		// Set 12dp of padding left and right
+		final int pixels = (int)(Resources.getSystem().getDisplayMetrics().density * 12);
+		txt.setPadding(pixels, 0, pixels, 0);
+		
+		AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+		b.setTitle(R.string.validationResults);
+		b.setNeutralButton(android.R.string.ok, null);
+		b.setMessage(mClassifier.getClass().getSimpleName());
+		b.setView(txt);
+		b.show();
+	}
+	
+	/**
+	 * Builds a summary string for the specified evaluation.
+	 * 
+	 * @param e the {@link Evaluation} to summarize.
+	 * @return a summary string, or {@code null} in case of an error.
+	 */
+	public String getEvaluationSummary(Evaluation e)
+	{
+		final StringBuilder sb = new StringBuilder();
 		
 		try
 		{
@@ -881,32 +917,14 @@ public class TrainFragment extends AbstractTabFragment
 			sb.append("Total Number of Instances\n");
 			sb.append(Utils.doubleToString(e.numInstances(), width, after));
 			
-			sb.append(mEvaluation.toMatrixString("\n\nConfusion Matrix"));
+			sb.append(e.toMatrixString("\n\nConfusion Matrix"));
 		}
 		catch(Exception ex)
 		{
-			sb = new StringBuilder("Error showing the evaluation.");
+			return null;
 		}
 		
-		// Create a TextView with small monospace font
-		final TextView txt = new TextView(getActivity());
-		txt.setText(sb.toString());
-		txt.setTypeface(Typeface.MONOSPACE);
-		txt.setTextSize(12f);
-		// Let the TextView scroll horizontally and vertically. Doesn't look very nice,
-		// but it shouldn't bee needed much
-		txt.setHorizontallyScrolling(true);
-		txt.setMovementMethod(ScrollingMovementMethod.getInstance());
-		// Set 12dp of padding left and right
-		final int pixels = (int)(Resources.getSystem().getDisplayMetrics().density * 12);
-		txt.setPadding(pixels, 0, pixels, 0);
-		
-		AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
-		b.setTitle(R.string.validationResults);
-		b.setNeutralButton(android.R.string.ok, null);
-		b.setMessage(mClassifier.getClass().getSimpleName());
-		b.setView(txt);
-		b.show();
+		return sb.toString();
 	}
 	
 	/**
@@ -1017,6 +1035,7 @@ public class TrainFragment extends AbstractTabFragment
 			// Save filenames of old serialized classifier and training data
 			final String oldClassifierFile = sClassifierFile;
 			final String oldTrainingFile = sTrainingFile;
+			final String oldValidationLogFile = sValidationLogFile;
 			
 			try
 			{
@@ -1040,6 +1059,7 @@ public class TrainFragment extends AbstractTabFragment
 				sClassifierFile = String.format("classifier-%X%s", out.hashCode(), ".bin");
 				sTrainingFile = String.format("trainfile-%X%s",
 					out.hashCode(), Instances.SERIALIZED_OBJ_FILE_EXTENSION);
+				sValidationLogFile = "";
 				
 				// Serialize the classifier to internal storage
 				OutputStream os =
@@ -1064,6 +1084,8 @@ public class TrainFragment extends AbstractTabFragment
 					getActivity().deleteFile(oldClassifierFile);
 				if(!oldTrainingFile.equals(sTrainingFile))
 					getActivity().deleteFile(oldTrainingFile);
+				if(!oldValidationLogFile.isEmpty())
+					getActivity().deleteFile(oldValidationLogFile);
 				
 				return out;
 			}
@@ -1185,7 +1207,7 @@ public class TrainFragment extends AbstractTabFragment
 		}
 	}
 	
-	private class ValidateClassifierTask extends AsyncTask<Bundle, Void, Evaluation>
+	private class ValidateClassifierTask extends AsyncTask<Bundle, Void, String>
 	{
 		public static final String KEY_NUM_FOLDS = "numFolds";
 		public static final String KEY_INSTANCES = "instances";
@@ -1195,7 +1217,7 @@ public class TrainFragment extends AbstractTabFragment
 		private int mOrientation;
 		
 		@Override
-		protected Evaluation doInBackground(Bundle... params)
+		protected String doInBackground(Bundle... params)
 		{
 			try
 			{
@@ -1225,7 +1247,18 @@ public class TrainFragment extends AbstractTabFragment
 						eval.evaluateModelOnceAndRecordPrediction(run, test.instance(j));
 				}
 				
-				return eval;
+				final String summary = getEvaluationSummary(eval);
+				
+				// There is no old validation log file since it is deleted when a classifier is
+				// trained
+				sValidationLogFile =
+					String.format("validation-%X%s", classifier.hashCode(), ".txt");
+				OutputStreamWriter out = new OutputStreamWriter(
+					getActivity().openFileOutput(sValidationLogFile, Activity.MODE_PRIVATE));
+				out.write(summary);
+				out.close();
+				
+				return summary;
 			}
 			catch(Exception ex)
 			{
@@ -1262,7 +1295,7 @@ public class TrainFragment extends AbstractTabFragment
 		}
 		
 		@Override
-		protected void onPostExecute(Evaluation result)
+		protected void onPostExecute(String result)
 		{
 			// Fragment was detached before the task completed, do nothing
 			if(getActivity() == null)
@@ -1282,7 +1315,7 @@ public class TrainFragment extends AbstractTabFragment
 		}
 		
 		@Override
-		protected void onCancelled(Evaluation result)
+		protected void onCancelled(String result)
 		{
 			if(getActivity() != null)
 			{
