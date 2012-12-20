@@ -901,7 +901,7 @@ public class TrainFragment extends AbstractTabFragment
 			final int after = 4;
 			
 			sb.append("=== Summary ===\n");
-			sb.append(sNumFolds).append(" fold cross validation.");
+			sb.append(sNumFolds).append(" fold cross validation.\n");
 			sb.append("Correctly Classified Instances\n");
 			sb.append(Utils.doubleToString(e.correct(), width, after) + "    " +
 				Utils.doubleToString(e.pctCorrect(), width, after) + " %\n");
@@ -1324,7 +1324,10 @@ public class TrainFragment extends AbstractTabFragment
 					showExceptionDialog(mException);
 			}
 			else
+			{
+				writeSettings();
 				showEvaluation();
+			}
 			resetViews();
 		}
 		
