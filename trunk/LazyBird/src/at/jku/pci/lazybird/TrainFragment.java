@@ -10,7 +10,6 @@ import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -131,6 +130,10 @@ public class TrainFragment extends AbstractTabFragment
 	 * Setting: {@link Storage#KEY_VALIDATION_LOG_FILE}
 	 */
 	private static String sValidationLogFile;
+	/**
+	 * Setting: {@link Storage#KEY_CLASSIFIER_TYPE}
+	 */
+	private static String sClassifierType;
 	
 	private SharedPreferences mPrefs;
 	private SharedPreferences mPrefsClassifier;
@@ -379,6 +382,7 @@ public class TrainFragment extends AbstractTabFragment
 		sTrainingFile = mPrefsClassifier.getString(Storage.KEY_TRAINING_FILE, "");
 		sTrainedFeatures = mPrefsClassifier.getInt(Storage.KEY_FEATURES, 0);
 		sValidationLogFile = mPrefsClassifier.getString(Storage.KEY_VALIDATION_LOG_FILE, "");
+		sClassifierType = mPrefsClassifier.getString(Storage.KEY_CLASSIFIER_TYPE, "");
 	}
 	
 	/**
@@ -386,13 +390,14 @@ public class TrainFragment extends AbstractTabFragment
 	 */
 	private void writeSettings()
 	{
-		Editor e = mPrefsClassifier.edit();
-		e.putString(Storage.KEY_CLASSIFIER_FILE, sClassifierFile);
-		e.putString(Storage.KEY_TRAINING_FILE, sTrainingFile);
-		e.putInt(Storage.KEY_FEATURES, sTrainedFeatures);
-		e.putString(Storage.KEY_CLASSIFIER_TYPE, mClassifier.getClass().getSimpleName());
-		e.putString(Storage.KEY_VALIDATION_LOG_FILE, sValidationLogFile);
-		e.apply();
+		mPrefsClassifier.edit()
+			.putString(Storage.KEY_CLASSIFIER_FILE, sClassifierFile)
+			.putString(Storage.KEY_TRAINING_FILE, sTrainingFile)
+			.putInt(Storage.KEY_FEATURES, sTrainedFeatures)
+			.putString(Storage.KEY_CLASSIFIER_TYPE, mClassifier.getClass().getSimpleName())
+			.putString(Storage.KEY_VALIDATION_LOG_FILE, sValidationLogFile)
+			.putString(Storage.KEY_CLASSIFIER_TYPE, sClassifierType)
+			.apply();
 	}
 	
 	/**
@@ -1061,6 +1066,7 @@ public class TrainFragment extends AbstractTabFragment
 				sTrainingFile = String.format("trainfile-%X%s",
 					out.hashCode(), Instances.SERIALIZED_OBJ_FILE_EXTENSION);
 				sValidationLogFile = "";
+				sClassifierType = mType.toString();
 				
 				// Serialize the classifier to internal storage
 				OutputStream os =
