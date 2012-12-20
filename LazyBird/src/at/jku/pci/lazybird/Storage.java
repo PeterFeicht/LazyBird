@@ -53,7 +53,8 @@ public final class Storage
 	/**
 	 * Shared preference key: {@code String} {@value}
 	 * <p>
-	 * The type of the current classifier.
+	 * The type of the current classifier, stored to avoid deserialization when the classifier is
+	 * not actually needed.
 	 */
 	public static final String KEY_CLASSIFIER_TYPE = "classifierType";
 	
