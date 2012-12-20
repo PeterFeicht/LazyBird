@@ -869,6 +869,7 @@ public class TrainFragment extends AbstractTabFragment
 		txt.setText(mEvaluation);
 		txt.setTypeface(Typeface.MONOSPACE);
 		txt.setTextSize(12f);
+		txt.setTextColor(getResources().getColorStateList(android.R.color.primary_text_light));
 		// Let the TextView scroll horizontally and vertically. Doesn't look very nice,
 		// but it shouldn't bee needed much
 		txt.setHorizontallyScrolling(true);
