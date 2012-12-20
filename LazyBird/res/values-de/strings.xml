@@ -6,12 +6,14 @@
     <string name="title_tab_train">Train</string>
     <string name="title_tab_report">Report</string>
     <string name="title_activity_settings">Einstellungen</string>
+    <string name="title_activity_classifier_info">Classifier Info</string>
     <string name="menu_settings">Einstellungen</string>
     <string name="menu_report_on">Senden ist EIN</string>
     <string name="menu_report_off">Senden ist AUS</string>
     <string name="menu_help">Hilfe</string>
     <string name="menu_showlog">Logdatei anzeigen</string>
     <string name="menu_about">Über</string>
+    <string name="menu_showClassifierInfo">Classifier Info anzeigen</string>
     
     <string name="service_started">ARFF Recorder service gestartet</string>
     <string name="service_stopped">ARFF Recorder service gestoppt</string>
@@ -107,6 +109,13 @@
     <string name="chkReport">An Server melden</string>
     <string name="lblLog">Log:</string>
     <string name="log_new_activity">Neue Aktivität: %s</string>
+    
+    <!-- Classifier Info -->
+    <string name="noValidation">Keine Validierung durchgeführt.</string>
+    <string name="noClassifier">Es ist noch kein Classifier trainiert..</string>
+    <string name="txtClassifierType">Classifier Typ: %s</string>
+    <string name="txtTrainDate">Trainiert am %1$s, mit %2$d Werten.</string>
+    <string name="txtTrainedFeatures">Trainierte Features: %s</string>
     
     <!-- Errors and stuff -->
     <string name="error">Fehler</string>

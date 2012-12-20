@@ -148,8 +148,19 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		menu.findItem(R.id.menu_help).setOnMenuItemClickListener(onMenuHelpClick);
 		menu.findItem(R.id.menu_showlog).setOnMenuItemClickListener(onMenuShowlogClick);
 		menu.findItem(R.id.menu_about).setOnMenuItemClickListener(onMenuAboutClick);
+		menu.findItem(R.id.menu_showClassifierInfo)
+			.setOnMenuItemClickListener(onMenuShowClassifierInfo);
 		return true;
 	}
+	
+	private OnMenuItemClickListener onMenuShowClassifierInfo = new OnMenuItemClickListener() {
+		@Override
+		public boolean onMenuItemClick(MenuItem item)
+		{
+			startActivity(new Intent(MainActivity.this, ClassifierInfoActivity.class));
+			return true;
+		}
+	};
 	
 	private OnMenuItemClickListener onMenuAboutClick = new OnMenuItemClickListener() {
 		@Override
