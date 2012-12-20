@@ -105,14 +105,27 @@ public class ClassifierInfoActivity extends Activity
 			return;
 		}
 		
-		File classifierFile = new File(getFilesDir(), sClassifierFile);
+		File file = new File(getFilesDir(), sClassifierFile);
 		
-		if(classifierFile.exists())
+		if(file.exists())
 		{
 			// Classifier file exists, populate views
-			mTxtClassifierType.setText(getString(R.string.txtClassifierType, sClassifierType));
+			long size = file.length();
+			String unit = "B";
+			if(size > 1024)
+			{
+				size /= 1024;
+				unit = "KB";
+			}
+			if(size > 1024)
+			{
+				size /= 1024;
+				unit = "MB";
+			}
+			mTxtClassifierType.setText(
+				getString(R.string.txtClassifierType, sClassifierType, size, unit));
 			
-			mTrainDate = new Date(classifierFile.lastModified());
+			mTrainDate = new Date(file.lastModified());
 			final String date = SimpleDateFormat.getDateTimeInstance().format(mTrainDate);
 			mTxtTrainDate.setText(getString(R.string.txtTrainDate, date, sTrainInstances));
 			

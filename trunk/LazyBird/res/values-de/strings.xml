@@ -113,7 +113,7 @@
     <!-- Classifier Info -->
     <string name="noValidation">Keine Validierung durchgeführt.</string>
     <string name="noClassifier">Es ist noch kein Classifier trainiert..</string>
-    <string name="txtClassifierType">Classifier Typ: %s</string>
+    <string name="txtClassifierType">Classifier Typ: %1$s&#8195;(%2$d $3$s)</string>
     <string name="txtTrainDate">Trainiert am %1$s, mit %2$d Werten.</string>
     <string name="txtTrainedFeatures">Trainierte Features: %s</string>
     
