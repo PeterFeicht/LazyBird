@@ -15,18 +15,25 @@
         android:title="@string/menu_help"/>
     
     <item
-        android:id="@+id/menu_settings"
-        android:icon="@drawable/ic_action_settings"
-        android:orderInCategory="100"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_settings"/>
-    
-    <item
         android:id="@+id/menu_showlog"
         android:icon="@drawable/ic_action_showlog"
         android:orderInCategory="90"
         android:showAsAction="ifRoom"
         android:title="@string/menu_showlog"/>
+    
+    <item
+        android:id="@+id/menu_showClassifierInfo"
+        android:icon="@drawable/ic_action_show_classifier_info"
+        android:orderInCategory="95"
+        android:showAsAction="never"
+        android:title="@string/menu_showClassifierInfo" />
+    
+    <item
+        android:id="@+id/menu_settings"
+        android:icon="@drawable/ic_action_settings"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_settings"/>
     
     <item
         android:id="@+id/menu_about"
