@@ -123,6 +123,10 @@ public class TrainFragment extends AbstractTabFragment
 	 */
 	private static String sTrainingFile;
 	/**
+	 * Setting: {@link Storage#KEY_TRAIN_INSTANCES}
+	 */
+	private static int sTrainInstances;
+	/**
 	 * Setting: {@link Storage#KEY_FEATURES}
 	 */
 	private static int sTrainedFeatures;
@@ -383,6 +387,7 @@ public class TrainFragment extends AbstractTabFragment
 		sTrainedFeatures = mPrefsClassifier.getInt(Storage.KEY_FEATURES, 0);
 		sValidationLogFile = mPrefsClassifier.getString(Storage.KEY_VALIDATION_LOG_FILE, "");
 		sClassifierType = mPrefsClassifier.getString(Storage.KEY_CLASSIFIER_TYPE, "");
+		sTrainInstances = mPrefsClassifier.getInt(Storage.KEY_TRAIN_INSTANCES, 0);
 	}
 	
 	/**
@@ -397,6 +402,7 @@ public class TrainFragment extends AbstractTabFragment
 			.putString(Storage.KEY_CLASSIFIER_TYPE, mClassifier.getClass().getSimpleName())
 			.putString(Storage.KEY_VALIDATION_LOG_FILE, sValidationLogFile)
 			.putString(Storage.KEY_CLASSIFIER_TYPE, sClassifierType)
+			.putInt(Storage.KEY_TRAIN_INSTANCES, sTrainInstances)
 			.apply();
 	}
 	
@@ -1061,12 +1067,13 @@ public class TrainFragment extends AbstractTabFragment
 				if(isCancelled())
 					return null;
 				
-				// Make new filenames
+				// Make new filenames and save info
 				sClassifierFile = String.format("classifier-%X%s", out.hashCode(), ".bin");
 				sTrainingFile = String.format("trainfile-%X%s",
 					out.hashCode(), Instances.SERIALIZED_OBJ_FILE_EXTENSION);
 				sValidationLogFile = "";
 				sClassifierType = mType.toString();
+				sTrainInstances = fe.getOutput().numInstances();
 				
 				// Serialize the classifier to internal storage
 				OutputStream os =

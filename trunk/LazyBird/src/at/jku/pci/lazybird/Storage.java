@@ -46,6 +46,14 @@ public final class Storage
 	/**
 	 * Shared preference key: {@code String} {@value}
 	 * <p>
+	 * The number of instances the current classifier was trained with, to avoid deserializing
+	 * the whole {@code Instances} just to get the count.
+	 */
+	public static final String KEY_TRAIN_INSTANCES = "numTrainInstances";
+	
+	/**
+	 * Shared preference key: {@code String} {@value}
+	 * <p>
 	 * The file name for the log file from validating the current classifier.
 	 */
 	public static final String KEY_VALIDATION_LOG_FILE = "classifierValidationLogFile";
