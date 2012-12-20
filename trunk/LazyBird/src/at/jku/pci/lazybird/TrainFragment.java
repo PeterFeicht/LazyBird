@@ -1073,7 +1073,7 @@ public class TrainFragment extends AbstractTabFragment
 					out.hashCode(), Instances.SERIALIZED_OBJ_FILE_EXTENSION);
 				sValidationLogFile = "";
 				sClassifierType = mType.toString();
-				sTrainInstances = fe.getOutput().numInstances();
+				sTrainInstances = fe.getNumInputInstances();
 				
 				// Serialize the classifier to internal storage
 				OutputStream os =
