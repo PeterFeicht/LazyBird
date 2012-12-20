@@ -72,6 +72,7 @@ public class FeatureExtractor
 	private final Feature[] mFeatures;
 	private final int mWindowSize;
 	private final int mJumpSize;
+	private int mInputInstances;
 	private int mOutputFeatures;
 	private Instances mOutput = null;
 	private boolean mCalculated = false;
@@ -135,6 +136,15 @@ public class FeatureExtractor
 			throw new IllegalStateException();
 		else
 			return mOutput;
+	}
+	
+	/**
+	 * When extracting features, gets the number of input instances used. When merging already
+	 * extracted features, gets the number of feature instances.
+	 */
+	public int getNumInputInstances()
+	{
+		return mInputInstances;
 	}
 	
 	/**
@@ -244,6 +254,7 @@ public class FeatureExtractor
 			try
 			{
 				SlidingWindow.slide(input, mWindowSize, mJumpSize, windowListener);
+				mInputInstances += input.numInstances();
 			}
 			catch(UnsupportedAttributeTypeException ex)
 			{
@@ -301,6 +312,7 @@ public class FeatureExtractor
 				mOutput.add(i);
 			}
 			
+			mInputInstances += input.numInstances();
 			reader.close();
 		}
 		
