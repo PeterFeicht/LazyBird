@@ -1,28 +1,28 @@
 package at.jku.pci.lazybird.features;
 
-import java.util.ConcurrentModificationException;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.LinkedList;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.UnsupportedAttributeTypeException;
+import java.util.ConcurrentModificationException;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 /**
- * Represents a sliding window over a set of {@link Instance} objects with a defined window and
- * jump size. A listener can be registered to be notified when the window jumps as data are
+ * Represents a sliding window over a set of {@link Timestamped} objects with a defined window
+ * and jump size. A listener can be registered to be notified when the window jumps as data are
  * added.
  * <p>
- * Static methods are provided to process a fixed set of data instead of incrementally adding
- * data.
+ * Static methods are provided to process a fixed set of data (in an {@link Instances} object)
+ * instead of incrementally adding data.
  * 
  * @see WindowListener
  * @see #slide(Instances, int, int, WindowListener)
  * @see FeatureExtractor
  * @author Peter
  */
-public class SlidingWindow implements Iterable<Instance>
+public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 {
 	/**
 	 * Defines the interface that can be registered to be notified of window changes as data are
@@ -30,14 +30,14 @@ public class SlidingWindow implements Iterable<Instance>
 	 * 
 	 * @author Peter
 	 */
-	public interface WindowListener
+	public interface WindowListener<U>
 	{
 		/**
 		 * Called, when the window changes.
 		 * 
 		 * @param window the data of the new window.
 		 */
-		public void onWindowChanged(Iterable<Instance> window);
+		public void onWindowChanged(Iterable<U> window);
 	}
 	
 	/**
@@ -46,11 +46,12 @@ public class SlidingWindow implements Iterable<Instance>
 	 * iterating regardless.
 	 * 
 	 * @author Peter
+	 * @see Iterator
 	 */
-	public class SlidingWindowIterator implements Iterator<Instance>
+	public class SlidingWindowIterator implements Iterator<T>
 	{
 		private final int mExpectedModCount;
-		private final Iterator<Instance> it;
+		private final Iterator<T> it;
 		
 		private SlidingWindowIterator()
 		{
@@ -80,7 +81,7 @@ public class SlidingWindow implements Iterable<Instance>
 		 *            been changed since this iterator was created.
 		 */
 		@Override
-		public Instance next()
+		public T next()
 		{
 			if(mExpectedModCount != mModCount)
 				throw new ConcurrentModificationException();
@@ -124,8 +125,8 @@ public class SlidingWindow implements Iterable<Instance>
 	private volatile int mModCount = 0;
 	private final int mWindowSize;
 	private final int mJumpSize;
-	private final LinkedList<Instance> mInstances = new LinkedList<Instance>();
-	private WindowListener mListener = null;
+	private final LinkedList<T> mInstances = new LinkedList<T>();
+	private WindowListener<T> mListener = null;
 	
 	/**
 	 * Initializes a new instance of the {@link SlidingWindow} class with default window size
@@ -170,7 +171,7 @@ public class SlidingWindow implements Iterable<Instance>
 	 *            {@code jumpSize} is less than {@code 1} or {@code windowSize} is less than
 	 *            {@code jumpSize}.
 	 */
-	public SlidingWindow(int windowSize, int jumpSize, WindowListener listener)
+	public SlidingWindow(int windowSize, int jumpSize, WindowListener<T> listener)
 	{
 		this(windowSize, jumpSize);
 		mListener = listener;
@@ -180,7 +181,7 @@ public class SlidingWindow implements Iterable<Instance>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Iterator<Instance> iterator()
+	public Iterator<T> iterator()
 	{
 		return new SlidingWindowIterator();
 	}
@@ -190,7 +191,7 @@ public class SlidingWindow implements Iterable<Instance>
 	 * 
 	 * @param listener the listener to set, or {@code null} to remove the listener.
 	 */
-	public void setWindowListener(WindowListener listener)
+	public void setWindowListener(WindowListener<T> listener)
 	{
 		mListener = listener;
 	}
@@ -198,7 +199,7 @@ public class SlidingWindow implements Iterable<Instance>
 	/**
 	 * Gets the listener that will be notified of changes to this {@code SlidingWindow}.
 	 */
-	public WindowListener getWindowListener()
+	public WindowListener<T> getWindowListener()
 	{
 		return mListener;
 	}
@@ -229,34 +230,28 @@ public class SlidingWindow implements Iterable<Instance>
 	}
 	
 	/**
-	 * Adds an instance of data to this sliding window. The instance needs to have exactly four
-	 * numeric values, a class cannot be specified. For more information on the instance format
-	 * or when a class is needed, see {@link #slide(Instances, int, int, WindowListener)}.
+	 * Adds an instance of data to this sliding window.
 	 * 
-	 * @param i the {@link Instance} to add.
+	 * @param i the {@link Timestamped} object to add.
 	 * @return {@code true} if the window changed after adding this instance, {@code false}
 	 *         otherwise.
 	 * @exception NullPointerException if {@code i} is {@code null}.
-	 * @exception IllegalArgumentException if {@code i} does not have exactly four values.
-	 * @see #hasValidAttributes(Instances)
 	 */
-	public boolean add(Instance i)
+	public boolean add(T i)
 	{
 		if(i == null)
 			throw new NullPointerException();
-		if(i.numValues() != 4)
-			throw new IllegalArgumentException();
 		
-		double nextJump = 0.0;
+		long nextJump = 0;
 		if(!mInstances.isEmpty())
-			nextJump = mInstances.getFirst().value(0) + mWindowSize;
-
+			nextJump = mInstances.getFirst().getTime() + mWindowSize;
+		
 		mModCount++;
 		mInstances.add(i);
-		if(i.value(0) > nextJump)
+		if(i.getTime() > nextJump)
 		{
-			final double cut = i.value(0) - mWindowSize;
-			while(mInstances.size() > 0 && mInstances.getFirst().value(0) < cut)
+			final double cut = i.getTime() - mWindowSize;
+			while(mInstances.size() > 0 && mInstances.getFirst().getTime() < cut)
 				mInstances.removeFirst();
 			if(mListener != null)
 				mListener.onWindowChanged(this);
@@ -302,7 +297,7 @@ public class SlidingWindow implements Iterable<Instance>
 	 *            requirements specified.
 	 */
 	public static void slide(Instances data, int windowSize, int jumpSize,
-		WindowListener listener) throws UnsupportedAttributeTypeException
+		WindowListener<Instance> listener) throws UnsupportedAttributeTypeException
 	{
 		if(data == null || listener == null)
 			throw new NullPointerException();

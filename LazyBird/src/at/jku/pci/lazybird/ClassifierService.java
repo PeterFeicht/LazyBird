@@ -21,6 +21,7 @@ import at.jku.pci.lazybird.features.Feature;
 import at.jku.pci.lazybird.features.FeatureExtractor;
 import at.jku.pci.lazybird.features.SlidingWindow;
 import at.jku.pci.lazybird.features.SlidingWindow.WindowListener;
+import at.jku.pci.lazybird.features.TimeInstance;
 import at.jku.pervasive.sd12.actclient.ClassLabel;
 import at.jku.pervasive.sd12.actclient.CoordinatorClient;
 import weka.classifiers.Classifier;
@@ -37,7 +38,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
-public class ClassifierService extends Service implements SensorEventListener, WindowListener
+public class ClassifierService extends Service implements SensorEventListener,
+		WindowListener<TimeInstance>
 {
 	private static ClassifierService sInstance = null;
 	
@@ -119,7 +121,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	private Classifier mClassifier;
 	private Instances mHeader;
 	private int mFeatures;
-	private SlidingWindow mSlidingWindow;
+	private SlidingWindow<TimeInstance> mSlidingWindow;
 	private Date mStartTime;
 	
 	@Override
@@ -169,7 +171,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 			mHeader = buildHeader(mFeatures);
 			int windowSize = intent.getIntExtra(ReportFragment.EXTRA_WINDOW, 1000);
 			int jumpSize = intent.getIntExtra(ReportFragment.EXTRA_JUMP, 100);
-			mSlidingWindow = new SlidingWindow(windowSize, jumpSize, this);
+			mSlidingWindow = new SlidingWindow<TimeInstance>(windowSize, jumpSize, this);
 			mTextToSpeech = intent.getBooleanExtra(ReportFragment.EXTRA_TTS, false);
 			mWriteToFile = intent.getBooleanExtra(ReportFragment.EXTRA_LOG, false);
 			mReport = intent.getBooleanExtra(ReportFragment.EXTRA_REPORT, false);
@@ -806,8 +808,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	public void onSensorChanged(SensorEvent event)
 	{
 		// Add the new data to the sliding window
-		Instance i = new Instance(4);
-		i.setValue(0, System.currentTimeMillis());
+		TimeInstance i = new TimeInstance(4, System.currentTimeMillis());
 		for(int j = 0; j < 3; j++)
 			i.setValue(j + 1, event.values[j]);
 		mSlidingWindow.add(i);
@@ -820,7 +821,7 @@ public class ClassifierService extends Service implements SensorEventListener, W
 	}
 	
 	@Override
-	public void onWindowChanged(Iterable<Instance> window)
+	public void onWindowChanged(Iterable<TimeInstance> window)
 	{
 		// Extract features and save to a new instance with the right attributes
 		Instance i = FeatureExtractor.extractFeatures(window, mFeatures);
