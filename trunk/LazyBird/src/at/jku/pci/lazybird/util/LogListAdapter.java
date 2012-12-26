@@ -1,4 +1,4 @@
-package at.jku.pci.lazybird;
+package at.jku.pci.lazybird.util;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
+import at.jku.pci.lazybird.R;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.ArrayList;

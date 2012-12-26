@@ -10,6 +10,8 @@ import android.preference.ListPreference;
 import android.preference.PreferenceFragment;
 import android.util.Log;
 import android.view.MenuItem;
+import at.jku.pci.lazybird.util.NumberPreference;
+import at.jku.pci.lazybird.util.Storage;
 
 /**
  * All settings the user can change, for other stored values see {@link Storage}.

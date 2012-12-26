@@ -36,6 +36,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import at.jku.pci.lazybird.features.Feature;
 import at.jku.pci.lazybird.features.FeatureExtractor;
+import at.jku.pci.lazybird.util.Storage;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;

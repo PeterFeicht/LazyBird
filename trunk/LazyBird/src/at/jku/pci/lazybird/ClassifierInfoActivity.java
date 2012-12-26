@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import at.jku.pci.lazybird.features.Feature;
+import at.jku.pci.lazybird.util.Storage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;

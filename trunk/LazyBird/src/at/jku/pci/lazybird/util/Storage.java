@@ -1,8 +1,9 @@
-package at.jku.pci.lazybird;
+package at.jku.pci.lazybird.util;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import at.jku.pci.lazybird.SettingsActivity;
 import weka.classifiers.Classifier;
 import weka.core.Instances;
 
