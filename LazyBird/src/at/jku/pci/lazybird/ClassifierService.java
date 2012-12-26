@@ -22,8 +22,11 @@ import at.jku.pci.lazybird.features.FeatureExtractor;
 import at.jku.pci.lazybird.features.SlidingWindow;
 import at.jku.pci.lazybird.features.SlidingWindow.WindowListener;
 import at.jku.pci.lazybird.features.TimeInstance;
+import at.jku.pci.lazybird.features.UserActivities;
 import at.jku.pervasive.sd12.actclient.ClassLabel;
 import at.jku.pervasive.sd12.actclient.CoordinatorClient;
+import at.jku.pervasive.sd12.actclient.CoordinatorClient.UserState;
+import at.jku.pervasive.sd12.actclient.GroupStateListener;
 import weka.classifiers.Classifier;
 import weka.core.Attribute;
 import weka.core.FastVector;
@@ -36,10 +39,11 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 
 public class ClassifierService extends Service implements SensorEventListener,
-		WindowListener<TimeInstance>
+		WindowListener<TimeInstance>, GroupStateListener
 {
 	private static ClassifierService sInstance = null;
 	
@@ -67,6 +71,14 @@ public class ClassifierService extends Service implements SensorEventListener,
 	 */
 	public static final String DEFAULT_HOST =
 		CoordinatorClient.DEFAULT_SERVER_HOST + ":" + CoordinatorClient.DEFAULT_SERVER_PORT;
+	/**
+	 * The window size of the {@link SlidingWindow} for the user activities.
+	 */
+	public static final int ACTIVITY_WINDOW_SIZE = 60000;
+	/**
+	 * The jump size of the {@link SlidingWindow} for the user activities.
+	 */
+	public static final int ACTIVITY_JUMP_SIZE = 5000;
 	// Extras
 	public static final String EXTRA_ACTIVITY_NAME = "at.jku.pci.lazybird.ACTIVITY_NAME";
 	public static final String EXTRA_LOG_ENTRY = "at.jku.pci.lazybird.LOG_ENTRY";
@@ -105,6 +117,7 @@ public class ClassifierService extends Service implements SensorEventListener,
 	private String mServer;
 	private String mUsername;
 	private CoordinatorClient mClient = null;
+	private boolean mReportEnabled = false;
 	private Handler mHandler = new Handler();
 	private Runnable mRunReportActivity = new Runnable() {
 		public void run()
@@ -122,6 +135,8 @@ public class ClassifierService extends Service implements SensorEventListener,
 	private Instances mHeader;
 	private int mFeatures;
 	private SlidingWindow<TimeInstance> mSlidingWindow;
+	private SlidingWindow<UserActivities> mUserSlidingWindow;
+	private HashSet<String> mUsersOnline;
 	private Date mStartTime;
 	
 	@Override
@@ -163,6 +178,15 @@ public class ClassifierService extends Service implements SensorEventListener,
 		{
 			sRunning = true;
 			mStartTime = new Date();
+			mUserSlidingWindow = new SlidingWindow<UserActivities>(ACTIVITY_WINDOW_SIZE,
+				ACTIVITY_JUMP_SIZE, new WindowListener<UserActivities>() {
+					@Override
+					public void onWindowChanged(Iterable<UserActivities> window)
+					{
+						onUserWindowChanged(window);
+					}
+				});
+			mUsersOnline = new HashSet<String>();
 			
 			// get information from the intent
 			mClassifier =
@@ -311,6 +335,77 @@ public class ClassifierService extends Service implements SensorEventListener,
 		mTtsParams = new HashMap<String, String>();
 		mTtsParams.put(TextToSpeech.Engine.KEY_PARAM_STREAM, "STREAM_MUSIC");
 		mTtsInit = true;
+	}
+	
+	/**
+	 * If the client is {@code null} or is not alive any more, initialize it.
+	 */
+	private void initCoordinationClient()
+	{
+		// If reporting is not enabled at all, skip user state listening as well
+		if(!mReport)
+			return;
+		
+		if(mClient != null && !mClient.isAlive())
+			mClient = null;
+		
+		if(mClient == null)
+		{
+			String host;
+			int port;
+			
+			if(mUsername == null || mUsername.isEmpty())
+				return;
+			
+			if(mServer == null || mServer.isEmpty())
+			{
+				// Use default server and port in case something is missing
+				host = CoordinatorClient.DEFAULT_SERVER_HOST;
+				port = CoordinatorClient.DEFAULT_SERVER_PORT;
+			}
+			else if(mServer.contains(":"))
+			{
+				// Use specified server and port
+				final int idx = mServer.indexOf(":");
+				host = mServer.substring(0, idx);
+				try
+				{
+					port = Integer.parseInt(mServer.substring(idx + 1, mServer.length()));
+				}
+				catch(NumberFormatException ex)
+				{
+					port = CoordinatorClient.DEFAULT_SERVER_PORT;
+				}
+			}
+			else
+			{
+				// Port is missing, use default
+				host = mServer;
+				port = CoordinatorClient.DEFAULT_SERVER_PORT;
+			}
+			
+			// Start reporting
+			mClient = new CoordinatorClient(host, port, mUsername);
+			try
+			{
+				Thread.sleep(1000);
+			}
+			catch(InterruptedException ex)
+			{
+				// Why would I be interrupted?
+			}
+			
+			// In case the connection fails, the thread of the client stops; check
+			if(mClient.isAlive())
+			{
+				mClient.addGroupStateListener(this);
+			}
+			else
+			{
+				notifyConnectionFail();
+				mClient = null;
+			}
+		}
 	}
 	
 	/**
@@ -504,7 +599,7 @@ public class ClassifierService extends Service implements SensorEventListener,
 	 */
 	public boolean getReportToServer()
 	{
-		return mClient != null;
+		return mClient != null && mReportEnabled;
 	}
 	
 	/**
@@ -522,73 +617,15 @@ public class ClassifierService extends Service implements SensorEventListener,
 		if(!mReport)
 			return;
 		
-		// If client died, remove it
+		// If client died, try to reconnect
 		if(mClient != null && !mClient.isAlive())
-			mClient = null;
+			initCoordinationClient();
 		
-		if(mClient == null && report)
-		{
-			String host;
-			int port;
-			
-			if(mUsername == null || mUsername.isEmpty())
-				return;
-			
-			if(mServer == null || mServer.isEmpty())
-			{
-				// Use default server and port in case something is missing
-				host = CoordinatorClient.DEFAULT_SERVER_HOST;
-				port = CoordinatorClient.DEFAULT_SERVER_PORT;
-			}
-			else if(mServer.contains(":"))
-			{
-				// Use specified server and port
-				final int idx = mServer.indexOf(":");
-				host = mServer.substring(0, idx);
-				try
-				{
-					port = Integer.parseInt(mServer.substring(idx + 1, mServer.length()));
-				}
-				catch(NumberFormatException ex)
-				{
-					port = CoordinatorClient.DEFAULT_SERVER_PORT;
-				}
-			}
-			else
-			{
-				// Port is missing, use default
-				host = mServer;
-				port = CoordinatorClient.DEFAULT_SERVER_PORT;
-			}
-			
-			// Start reporting
-			mClient = new CoordinatorClient(host, port, mUsername);
-			try
-			{
-				Thread.sleep(1000);
-			}
-			catch(InterruptedException ex)
-			{
-				// Why would I be interrupted?
-			}
-			
-			// In case the connection fails, the thread of the client stops, check
-			if(!mClient.isAlive())
-			{
-				notifyConnectionFail();
-				mClient = null;
-			}
-			else
-				mHandler.post(mRunReportActivity);
-		}
-		else if(mClient != null && !report)
-		{
-			// Stop reporting
+		mReportEnabled = report;
+		if(report && mClient != null)
+			mHandler.post(mRunReportActivity);
+		else
 			mHandler.removeCallbacks(mRunReportActivity);
-			mClient.interrupt();
-			mClient = null;
-		}
-		
 	}
 	
 	/**
@@ -755,7 +792,7 @@ public class ClassifierService extends Service implements SensorEventListener,
 	 */
 	private void reportActivity(String activity)
 	{
-		if(mClient != null)
+		if(mClient != null && mReportEnabled)
 		{
 			if(mClient.isAlive())
 			{
@@ -765,10 +802,7 @@ public class ClassifierService extends Service implements SensorEventListener,
 					mClient.setCurrentActivity(ClassLabel.parse(activity));
 			}
 			else
-			{
-				notifyConnectionFail();
-				mClient = null;
-			}
+				initCoordinationClient();
 		}
 	}
 	
@@ -859,5 +893,32 @@ public class ClassifierService extends Service implements SensorEventListener,
 		{
 			Log.i(LOGTAG, "Classification failed: " + ex.getMessage());
 		}
+	}
+	
+	@Override
+	public void groupStateChanged(UserState[] groupState)
+	{
+		final UserActivities list = new UserActivities(System.currentTimeMillis());
+		
+		// Maintain a list of online users to avoid scanning all entries when the window changes
+		for(UserState u : groupState)
+		{
+			if(u.getUpdateAge() > 10000)
+			{
+				mUsersOnline.remove(u.getUserId());
+			}
+			else
+			{
+				mUsersOnline.add(u.getUserId());
+				list.put(u.getUserId(), u.getActivity());
+			}
+		}
+		
+		mUserSlidingWindow.add(list);
+	}
+	
+	public void onUserWindowChanged(Iterable<UserActivities> window)
+	{
+		
 	}
 }
