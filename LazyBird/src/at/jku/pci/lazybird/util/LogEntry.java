@@ -1,4 +1,4 @@
-package at.jku.pci.lazybird;
+package at.jku.pci.lazybird.util;
 
 import java.io.Serializable;
 import java.util.Date;

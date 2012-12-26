@@ -36,7 +36,7 @@
             android:summary="%s"
             android:title="@string/set_maxNumValues" />
 
-        <at.jku.pci.lazybird.NumberPreference
+        <at.jku.pci.lazybird.util.NumberPreference
             android:defaultValue="6"
             android:dialogLayout="@layout/number_preference"
             android:dialogMessage="@string/set_startDelay_long"
@@ -49,7 +49,7 @@
     <PreferenceCategory
         android:orderingFromXml="true"
         android:title="@string/title_tab_train" >
-        <at.jku.pci.lazybird.NumberPreference
+        <at.jku.pci.lazybird.util.NumberPreference
             android:defaultValue="4"
             android:dialogLayout="@layout/number_preference"
             android:dialogMessage="@string/set_numFolds_long"

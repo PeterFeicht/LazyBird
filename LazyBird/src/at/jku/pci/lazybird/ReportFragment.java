@@ -22,6 +22,8 @@ import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+import at.jku.pci.lazybird.util.LogListAdapter;
+import at.jku.pci.lazybird.util.Storage;
 import weka.classifiers.Classifier;
 import java.io.FileNotFoundException;
 import java.io.IOException;
