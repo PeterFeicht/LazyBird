@@ -1,5 +1,13 @@
 package at.jku.pci.lazybird.features;
 
+import android.os.AsyncTask;
+import at.jku.pci.lazybird.features.SlidingWindow.WindowListener;
+import weka.core.Attribute;
+import weka.core.FastVector;
+import weka.core.Instance;
+import weka.core.Instances;
+import weka.core.UnsupportedAttributeTypeException;
+import weka.core.converters.ArffLoader.ArffReader;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,14 +19,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
-import weka.core.Attribute;
-import weka.core.FastVector;
-import weka.core.Instance;
-import weka.core.Instances;
-import weka.core.UnsupportedAttributeTypeException;
-import weka.core.converters.ArffLoader.ArffReader;
-import android.os.AsyncTask;
-import at.jku.pci.lazybird.features.SlidingWindow.WindowListener;
 
 /**
  * Represents a task that takes an array of {@link File} and {@link Feature} objects and creates
@@ -219,7 +219,7 @@ public class FeatureExtractor
 		}
 		
 		// WindowListener to add extracted features to the output Instances
-		final WindowListener windowListener = new WindowListener() {
+		final WindowListener<Instance> windowListener = new WindowListener<Instance>() {
 			@Override
 			public void onWindowChanged(Iterable<Instance> window)
 			{
@@ -421,18 +421,18 @@ public class FeatureExtractor
 	 * @exception IllegalArgumentException if {@code instances} is empty or {@code flags} is
 	 *            {@code 0}.
 	 */
-	public static Instance extractFeatures(Iterable<Instance> instances, int flags)
+	public static <T extends Instance> Instance extractFeatures(Iterable<T> instances, int flags)
 	{
 		if(flags == 0)
 			throw new IllegalArgumentException("flags cannot be 0.");
 		
 		// The output features need to be in the right order, which depends on the definition of
 		// the Feature class. To be independent, put all features in a map and get them in the
-		// right order
+		// right order.
 		final EnumMap<Feature, Double> values = new EnumMap<Feature, Double>(Feature.class);
 		
 		// Check for empty input set
-		final Iterator<Instance> it = instances.iterator();
+		final Iterator<T> it = instances.iterator();
 		if(!it.hasNext())
 			throw new IllegalArgumentException("instances cannot be empty.");
 		
@@ -512,7 +512,8 @@ public class FeatureExtractor
 	 * @exception IllegalArgumentException if {@code instances} is empty or {@code features}
 	 *            contains no features.
 	 */
-	public static Instance extractFeatures(Iterable<Instance> instances, Feature[] features)
+	public static <T extends Instance> Instance extractFeatures(Iterable<T> instances,
+		Feature[] features)
 	{
 		return extractFeatures(instances, Feature.getMask(features));
 	}
@@ -525,9 +526,9 @@ public class FeatureExtractor
 	 * @return an {@link Instance} with the timestamp of the last input instance and the variance
 	 *         of the specified index. The class is retained, if present.
 	 */
-	private static Instance variance(Iterable<Instance> instances, int idx)
+	private static <T extends Instance> Instance variance(Iterable<T> instances, int idx)
 	{
-		Iterator<Instance> it = instances.iterator();
+		Iterator<T> it = instances.iterator();
 		Instance last = null;
 		
 		double sum = 0.0;
@@ -552,8 +553,8 @@ public class FeatureExtractor
 		
 		// Input instances can have a number of attributes:
 		// * 3: timestamp, coordinate and class
-		// * 4: timestamp and three coordinates
-		// * 5: timestamp, three coordinates and a class
+		// * 4: timestamp and 3 coordinates
+		// * 5: timestamp, 3 coordinates and a class
 		final boolean hasClass = (last.numValues() == 5) || (last.numValues() == 3);
 		final Instance out = new Instance(hasClass ? 3 : 2);
 		out.setValue(0, last.value(0));
@@ -572,7 +573,7 @@ public class FeatureExtractor
 	 * @return an {@link Instance} with the timestamp of the last input instance and the
 	 *         magnitude. The class is retained, if present.
 	 */
-	private static Iterable<Instance> magnitude(Iterable<Instance> instances)
+	private static <T extends Instance> Iterable<Instance> magnitude(Iterable<T> instances)
 	{
 		final LinkedList<Instance> out = new LinkedList<Instance>();
 		
@@ -601,9 +602,9 @@ public class FeatureExtractor
 	 * @param instances a set of {@link Instance} objects.
 	 * @return an averaged {@code Instance}, or {@code null} if {@code instances} is empty.
 	 */
-	private static Instance mean(Iterable<Instance> instances)
+	private static <T extends Instance> Instance mean(Iterable<T> instances)
 	{
-		final Iterator<Instance> it = instances.iterator();
+		final Iterator<T> it = instances.iterator();
 		Instance last = null;
 		double x = 0.0, y = 0.0, z = 0.0;
 		int num = 0;
