@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="app_name">Lazy Bird</string>
+    <string name="title_tab_record">Record</string>
+    <string name="title_tab_train">Train</string>
+    <string name="title_tab_report">Report</string>
+    <string name="title_activity_settings">Einstellungen</string>
+    <string name="title_activity_classifier_info">Classifier Info</string>
+    <string name="menu_settings">Einstellungen</string>
+    <string name="menu_report_on">Senden ist EIN</string>
+    <string name="menu_report_off">Senden ist AUS</string>
+    <string name="menu_help">Hilfe</string>
+    <string name="menu_showlog">Logdatei anzeigen</string>
+    <string name="menu_about">Über</string>
+    <string name="menu_showClassifierInfo">Classifier Info anzeigen</string>
+    
+    <string name="service_started">ARFF Recorder service gestartet</string>
+    <string name="service_stopped">ARFF Recorder service gestoppt</string>
+    <string name="service_label">ARFF Recorder Service</string>
+    <string name="too_many_values">Aufzeichnung gestoppt</string>
+    <string name="too_many_values_long">Aufzeichnung gestoppt nach %d Werten</string>
+    <string name="service_waiting">Aufnahme startet in %s Sekunden</string>
+    <string name="service_waiting_ticker">Recorder service wartet</string>
+    
+    <string name="rservice_started">Reporter service gestartet</string>
+    <string name="rservice_stopped">Reporter service gestoppt</string>
+    <string name="rservice_label">Reporter Service</string>
+    <string name="write_fail">Schreibfehler</string>
+    <string name="write_fail_long">Schreibfehler bei der Logdatei</string>
+    <string name="conn_fail">Verbindung weg</string>
+    <string name="conn_fail_long">Verbindung zum Server verloren</string>
+    
+    <string name="set_valueUpdateSpeed">Anzeigegeschwindigkeit</string>
+    <string name="set_ValueUpdateSpeed_long">Geschwindigkeit der Anzeige der letzten Werte.</string>
+    <string name="set_outputDir">Ausgabeverzeichnis</string>
+    <string name="set_outputDir_long">Verzeichnis in das die Ausgabedateien gespeichert werden.</string>
+    <string name="set_maxNumValues">Datenpunkt Limit</string>
+    <string name="set_maxNumValues_long">Anzahl der Datenpunkte nach der die Aufnahme beendet wird.</string>
+    <string name="set_startDelay">Startverzögerung</string>
+    <string name="set_startDelay_long">Wartezeit (Sekunden) bevor die Aufnahme gestartet wird.</string>
+    <string name="set_numFolds">Anzahl Folds</string>
+    <string name="set_numFolds_long">Die Anzahl von Teilmengen bei der Kreuzvalidierung des trainierten Classifiers.</string>
+    <string name="set_reportServer">Server-Adresse</string>
+    <string name="set_reportServer_long">Server-Adresse oder Hostname und Port für das Senden der Aktivität. Geben Sie nichts ein, um die Standardeinstellungen zu verwenden.</string>
+    <string name="set_reportUser">Benutzername</string>
+    <string name="set_reportUser_long">Die Benutzer ID für die Verbindung zum Server, muss aus 7 Ziffern bestehen.</string>
+    <string name="set_writeLog">Logdatei schreiben</string>
+    <string name="set_writeLog_enable">Aktivitäts-Log wird gespeichert</string>
+    <string name="set_writeLog_diasble">Kein Log wird gespeichert</string>
+    <string name="set_logFilename">Dateiname</string>
+    <string name="set_logFilename_long">Name für die Logdatei.</string>
+    
+    <!-- Record -->
+    <string name="helpRecorder">Hier können Sie Beschleunigungsdaten in ARFF Dateien aufnehmen um Classifier zu trainieren.\nSie müssen Daten aufnehmen und einen Classifier trainieren, bevor Sie ihre Aktivität an den Server melden können.</string>
+    <string name="txtStatus">Recorder Status:</string>
+    <string name="btnMakeFilename">Dateiname erstellen</string>
+    <string name="btnArff">+ .arff</string>
+    <string name="labelInstructions">Geben Sie zuerst einen Dateinamen ein, wählen Sie eine Klasse und starten Sie dann den Recorder.</string>
+    <string name="labelClass">ARFF Klasse:</string>
+    <string name="filename">Dateiname</string>
+    <string name="startTime">Startzeit:</string>
+    <string name="lastValues">Letzte Werte:</string>
+    <string name="numValues">Anzahl Datenpunkte:</string>
+    <string name="nothing">-</string>
+    <string name="dialogInfo">Info:</string>
+    <string name="valsPerSecond">Werte/Sekunde:</string>
+    <string name="btnDelete">Datei löschen</string>
+    <string name="fileNotFound">Datei nicht gefunden</string>
+    <string name="fileDeleted">Datei gelöscht</string>
+    <string name="fileNotDeleted">Datei &lt;i&gt;nicht&lt;/i&gt; gelöscht</string>
+    
+    <!-- Train -->
+    <string name="helpTrain">Hier können Sie einen Classifier mit aufgenommenen Daten trainieren, um Ihre Aktivität zu klassifizieren.\nSie müssen Daten aufnehmen und einen Classifier trainieren, bevor Sie Ihre Aktivität an den Server melden können.</string>
+    <string name="btnSelectFile">Datei(en) auswählen&#8230;</string>
+    <string name="btnSelectFeatures">Features auswählen&#8230;</string>
+    <string name="btnSaveFeatures">Features speichern&#8230;</string>
+    <string name="btnTrain">Trainieren</string>
+    <string name="btnValidate">Testen</string>
+    <string name="labelSelectClassifier">Wählen Sie einen Classifier:</string>
+    <string name="labelSelectWindowSize">Wählen Sie eine Mittelzeit (ms):</string>
+    <string name="selectFileNote">Beachten Sie, dass nur Dateien im Ausgabeverzeichnis angezeigt werden.</string>
+    <string name="selectFeaturesNote">Wählen Sie die Features, mit denen der Classifier trainiert wird.</string>
+    <string name="noFiles">Keine ARFF Dateien im Ausgabeverzeichnis.\nKopieren Sie Dateien die Sie verwenden wollen ins Ausgabeverzeichnis.</string>
+    <string name="trainQuestion">Aktuellen Classifier ersetzen?</string>
+    <string name="trainNote">Wenn Sie einen neuen Classifier trainieren, wird der aktuelle ersetzt.\nWollen Sie fortfahren?</string>
+    <string name="extractionCancelled">Feature Extraction abgebrochen</string>
+    <string name="saveFeaturesQuestion">Geben Sie einen Dateinamen ein</string>
+    <string name="saveFeaturesNote">Wenn die Datei existiert wird sie überschrieben..</string>
+    <string name="fileSaved">Datei gespeichert</string>
+    <string name="trainingCancelled">Training abgebrochen</string>
+    <string name="statusExtract">Extrahierung&#8230;</string>
+    <string name="statusTrain">Training&#8230;</string>
+    <string name="statusValidate">Validierung&#8230;</string>
+    <string name="statusCancel">Abbrechen&#8230;</string>
+    <string name="trainingFinished">Training fertig</string>
+    <string name="trainingFinished_long">Der Classifier wurde erfolgreich trainiert und als Standard eingestellt.\nSie können nun eine Kreuzvalidierung durchführen.</string>
+    <string name="validationQuestion">Kaffee holen?</string>
+    <string name="validateNote">Es wird eine Kreuzvalidierung des generierten Classifiers durchgeführt, um zu bestimmen wie gut dieser Datenpunkte klassifiziert.\nDas kann einige Zeit dauern, wollen Sie fortfahren?</string>
+    <string name="validationCancelled">Validierung abgebrochen</string>
+    <string name="validationResults">Validierungsergebnisse</string>
+    
+    <!-- Report -->
+    <string name="helpReport">Hier können Sie ihre Aktivität klassifizieren und sie dem Sever melden oder anders ausgeben.\nSie müssen Daten aufnehmen und einen Classifier trainieren, bevor Sie Ihre Aktivität an den Server melden können.</string>
+    <string name="lblNoClassifier">Sie müssen zuerst einen Classifier trainieren</string>
+    <string name="swClassify">Klassifizierung:</string>
+    <string name="lblOutputOptions">Ausgabe:</string>
+    <string name="chkTts">Text-to-speech</string>
+    <string name="chkReport">An Server melden</string>
+    <string name="lblLog">Log:</string>
+    <string name="log_new_activity">Neue Aktivität: %s</string>
+    
+    <!-- Classifier Info -->
+    <string name="noValidation">Keine Validierung durchgeführt.</string>
+    <string name="noClassifier">Es ist noch kein Classifier trainiert..</string>
+    <string name="txtClassifierType">Classifier Typ: %1$s&#8195;(%2$d $3$s)</string>
+    <string name="txtTrainDate">Trainiert am %1$s, mit %2$d Werten.</string>
+    <string name="txtTrainedFeatures">Trainierte Features: %s</string>
+    
+    <!-- Errors and stuff -->
+    <string name="error">Fehler</string>
+    <string name="error_generic">Ein Fehler ist aufgetreten, bitte dem Entwickler melden.</string>
+    <string name="error_filename">Kein gültiger Dateiname</string>
+    <string name="error_extstorage">Externer Speicher nicht beschreibbar</string>
+    <string name="error_extstorage_read">Externer Speicher nicht lesbar</string>
+    <string name="error_nodir">Ausgabeverzeichnis existiert nicht</string>
+    <string name="error_nofile">Eine Datei wurde nicht gefunden</string>
+    <string name="error_io">IO Fehler aufgetreten</string>
+    <string name="error_attributes">Datei %s hat nicht das richtige Format.</string>
+    
+    <!-- Words -->
+    <string name="save">Speichern</string>
+    <string name="no">Nein</string>
+    <string name="yes">Ja</string>
+    
+</resources>
