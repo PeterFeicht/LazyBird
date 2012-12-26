@@ -33,7 +33,7 @@ public class TimeInstance extends Instance implements Timestamped
 	 * values and sets the timestamp to the specified value.
 	 * 
 	 * @param numValues the number of values, including the timestamp.
-	 * @param timestamp the timestamp.
+	 * @param timestamp a Linux time in milliseconds.
 	 * @exception IllegalArgumentException if {@code numValues} is less than {@code 1}.
 	 * @see Instance#Instance(int)
 	 */
