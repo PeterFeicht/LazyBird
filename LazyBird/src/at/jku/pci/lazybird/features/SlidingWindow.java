@@ -49,8 +49,8 @@ public class SlidingWindow implements Iterable<Instance>
 	 */
 	public class SlidingWindowIterator implements Iterator<Instance>
 	{
-		private int mExpectedModCount;
-		private Iterator<Instance> it;
+		private final int mExpectedModCount;
+		private final Iterator<Instance> it;
 		
 		private SlidingWindowIterator()
 		{
@@ -103,7 +103,7 @@ public class SlidingWindow implements Iterable<Instance>
 	 * 
 	 * @author Peter
 	 */
-	private enum AttributeOrder
+	protected enum AttributeOrder
 	{
 		/**
 		 * There is a class attribute at the last position.
@@ -121,10 +121,10 @@ public class SlidingWindow implements Iterable<Instance>
 		INVALID;
 	}
 	
-	private int mModCount = 0;
-	private int mWindowSize = 1000;
-	private int mJumpSize = 100;
-	private LinkedList<Instance> mInstances = new LinkedList<Instance>();
+	private volatile int mModCount = 0;
+	private final int mWindowSize;
+	private final int mJumpSize;
+	private final LinkedList<Instance> mInstances = new LinkedList<Instance>();
 	private WindowListener mListener = null;
 	
 	/**
@@ -133,7 +133,7 @@ public class SlidingWindow implements Iterable<Instance>
 	 */
 	public SlidingWindow()
 	{
-		
+		this(1000, 100);
 	}
 	
 	/**
@@ -250,9 +250,9 @@ public class SlidingWindow implements Iterable<Instance>
 		double nextJump = 0.0;
 		if(!mInstances.isEmpty())
 			nextJump = mInstances.getFirst().value(0) + mWindowSize;
-		
-		mInstances.add(i);
+
 		mModCount++;
+		mInstances.add(i);
 		if(i.value(0) > nextJump)
 		{
 			final double cut = i.value(0) - mWindowSize;
@@ -367,7 +367,7 @@ public class SlidingWindow implements Iterable<Instance>
 	 * @return a value of {@link AttributeOrder} corresponding to the order of the specified
 	 *         attributes.
 	 */
-	private static AttributeOrder getAttributeOrder(Enumeration<Attribute> attrs)
+	protected static AttributeOrder getAttributeOrder(Enumeration<Attribute> attrs)
 	{
 		if(!attrs.hasMoreElements())
 			return AttributeOrder.INVALID;
