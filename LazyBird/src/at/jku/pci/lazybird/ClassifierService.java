@@ -224,6 +224,7 @@ public class ClassifierService extends Service implements SensorEventListener,
 			{
 				mServer = intent.getStringExtra(ReportFragment.EXTRA_REPORT_SERVER);
 				mUsername = intent.getStringExtra(ReportFragment.EXTRA_REPORT_USER);
+				initCoordinationClient();
 				// Report is enabled
 				if(intent.getBooleanExtra(ReportFragment.EXTRA_REPORT_ENABLE, false))
 					setReportToServer(true);
@@ -879,7 +880,7 @@ public class ClassifierService extends Service implements SensorEventListener,
 			{
 				if(mNewActivity == clazz)
 				{
-					if(++mNewCount > 30)
+					if(++mNewCount > 13)
 						onActivityChanged(clazz);
 				}
 				else
@@ -888,6 +889,8 @@ public class ClassifierService extends Service implements SensorEventListener,
 					mNewCount = 0;
 				}
 			}
+			else
+				mNewCount = 0;
 		}
 		catch(Exception ex)
 		{
