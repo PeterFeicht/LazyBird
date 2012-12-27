@@ -127,6 +127,7 @@ public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 	private final int mJumpSize;
 	private final LinkedList<T> mInstances = new LinkedList<T>();
 	private WindowListener<T> mListener = null;
+	private long mNextJump;
 	
 	/**
 	 * Initializes a new instance of the {@link SlidingWindow} class with default window size
@@ -242,16 +243,16 @@ public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 		if(i == null)
 			throw new NullPointerException();
 		
-		long nextJump = 0;
-		if(!mInstances.isEmpty())
-			nextJump = mInstances.getFirst().getTime() + mWindowSize;
+		if(mInstances.isEmpty())
+			mNextJump = i.getTime() + mWindowSize;
 		
 		mModCount++;
 		mInstances.add(i);
-		if(i.getTime() > nextJump)
+		if(i.getTime() > mNextJump)
 		{
-			final double cut = i.getTime() - mWindowSize;
-			while(mInstances.size() > 0 && mInstances.getFirst().getTime() < cut)
+			mNextJump += mJumpSize;
+			final long cut = i.getTime() - mWindowSize;
+			while(!mInstances.isEmpty() && mInstances.getFirst().getTime() < cut)
 				mInstances.removeFirst();
 			if(mListener != null)
 				mListener.onWindowChanged(this);
