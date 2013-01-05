@@ -115,7 +115,7 @@ public class ReportFragment extends AbstractTabFragment
 	// Views
 	private TextView mLblNoClassifier;
 	private Switch mSwClassifiy;
-	private ProgressBar mPrograssSerialize;
+	private ProgressBar mProgressSerialize;
 	private CheckBox mChkTts;
 	private CheckBox mChkReport;
 	private ListView mListLog;
@@ -241,7 +241,7 @@ public class ReportFragment extends AbstractTabFragment
 		mSwClassifiy = (Switch)v.findViewById(R.id.swClassify);
 		mSwClassifiy.setOnCheckedChangeListener(onSwClassifyCheckedChange);
 		mSwClassifiy.setEnabled(false);
-		mPrograssSerialize = (ProgressBar)v.findViewById(R.id.progressSerialize);
+		mProgressSerialize = (ProgressBar)v.findViewById(R.id.progressSerialize);
 		
 		mChkTts = (CheckBox)v.findViewById(R.id.chkTts);
 		mChkTts.setOnCheckedChangeListener(onChkTtsCheckedChange);
@@ -489,7 +489,7 @@ public class ReportFragment extends AbstractTabFragment
 		@Override
 		protected void onPreExecute()
 		{
-			mPrograssSerialize.setVisibility(View.VISIBLE);
+			mProgressSerialize.setVisibility(View.VISIBLE);
 		}
 		
 		@Override
@@ -497,7 +497,7 @@ public class ReportFragment extends AbstractTabFragment
 		{
 			setClassifierPresent(result != null);
 			mClassifier = result;
-			mPrograssSerialize.setVisibility(View.GONE);
+			mProgressSerialize.setVisibility(View.GONE);
 			if(LOCAL_LOGV) Log.v(LOGTAG, "CheckForClassifierTask finished");
 		}
 	}
