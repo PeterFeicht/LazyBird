@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
+import android.view.ViewGroup;
 import android.widget.Toast;
 import java.io.BufferedReader;
 import java.io.File;
@@ -93,6 +94,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		mPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 		mViewPager = (ViewPager)findViewById(R.id.pager);
 		mViewPager.setAdapter(mPagerAdapter);
+		mViewPager.setOffscreenPageLimit(2);
 		// When swiping between different sections, select the corresponding tab
 		mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 			@Override
@@ -335,10 +337,24 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		public SectionsPagerAdapter(FragmentManager fm)
 		{
 			super(fm);
+			
+			// Fill array with newly created Fragments, see instantiateItem
 			mTabs = new AbstractTabFragment[3];
 			mTabs[2] = new RecorderFragment();
 			mTabs[1] = new TrainFragment();
 			mTabs[0] = new ReportFragment();
+		}
+		
+		@Override
+		public Object instantiateItem(ViewGroup container, int position)
+		{
+			// When no cached Fragments is present, the super call returns the item returned by
+			// getItem. When a cached Fragment is present, this is returned and stored in the
+			// array to avoid working with the newly created but detached Fragments.
+			AbstractTabFragment tab =
+				(AbstractTabFragment)super.instantiateItem(container, position);
+			mTabs[position] = tab;
+			return tab;
 		}
 		
 		@Override
