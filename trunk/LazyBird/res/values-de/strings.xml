@@ -101,7 +101,7 @@
     <string name="validationResults">Validierungsergebnisse</string>
     
     <!-- Report -->
-    <string name="helpReport">Hier können Sie ihre Aktivität klassifizieren und sie dem Sever melden oder anders ausgeben.\nSie müssen Daten aufnehmen und einen Classifier trainieren, bevor Sie Ihre Aktivität an den Server melden können.</string>
+    <string name="helpReport">Hier können Sie ihre Aktivität klassifizieren und sie dem Sever melden oder anders ausgeben.\nSie müssen Daten aufnehmen und einen Classifier trainieren, bevor Sie Ihre Aktivität an den Server melden können.\nWenn Sie Daten zum Server senden wollen, müssen Sie zuerst einen Benutzernamen einstellen.</string>
     <string name="lblNoClassifier">Sie müssen zuerst einen Classifier trainieren</string>
     <string name="swClassify">Klassifizierung:</string>
     <string name="lblOutputOptions">Ausgabe:</string>
