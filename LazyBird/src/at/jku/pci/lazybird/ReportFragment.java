@@ -75,11 +75,11 @@ public class ReportFragment extends AbstractTabFragment
 	 * 
 	 * @see ARFFRecorderService#getDirname()
 	 */
-	private static String sOutputDir;
+	private static String sOutputDir = "";
 	/**
 	 * Setting: {@link Storage#KEY_CLASSIFIER_FILE}
 	 */
-	private static String sClassifierFile;
+	private static String sClassifierFile = "";
 	/**
 	 * Setting: {@link Storage#KEY_FEATURES}
 	 */
@@ -95,11 +95,11 @@ public class ReportFragment extends AbstractTabFragment
 	/**
 	 * Setting: {@link SettingsActivity#KEY_REPORT_SERVER}
 	 */
-	private static String sReportServer;
+	private static String sReportServer = "";
 	/**
 	 * Setting: {@link SettingsActivity#KEY_REPORT_USER}
 	 */
-	private static String sReportUser;
+	private static String sReportUser = "";
 	/**
 	 * Setting: {@link SettingsActivity#KEY_WRITE_LOG}
 	 */
@@ -107,7 +107,7 @@ public class ReportFragment extends AbstractTabFragment
 	/**
 	 * Setting: {@link SettingsActivity#KEY_LOG_FILENAME}
 	 */
-	private static String sLogFilename;
+	private static String sLogFilename = "";
 	
 	private SharedPreferences mPrefs;
 	private SharedPreferences mPrefsClassifier;
@@ -247,6 +247,7 @@ public class ReportFragment extends AbstractTabFragment
 		mChkTts.setOnCheckedChangeListener(onChkTtsCheckedChange);
 		mChkReport = (CheckBox)v.findViewById(R.id.chkReport);
 		mChkReport.setOnCheckedChangeListener(onChkReportCheckedChange);
+		mChkReport.setEnabled(!sReportUser.isEmpty());
 		
 		mLogAdapter = new LogListAdapter(getActivity());
 		mListLog = (ListView)v.findViewById(R.id.listLog);
@@ -270,7 +271,12 @@ public class ReportFragment extends AbstractTabFragment
 		mSwClassifiy.setChecked(ClassifierService.isRunning());
 		mBroadcastManager.registerReceiver(mBroadcastReceiver, mServiceIntentFilter);
 		if(!ClassifierService.isRunning())
+		{
 			mService = null;
+
+			sReportUser = mPrefs.getString(SettingsActivity.KEY_REPORT_USER, "");
+			mChkReport.setEnabled(!sReportUser.isEmpty());
+		}
 	}
 	
 	@Override
@@ -328,9 +334,8 @@ public class ReportFragment extends AbstractTabFragment
 			return;
 		
 		readSettings();
-		boolean fileSet = (sClassifierFile != null && !sClassifierFile.isEmpty());
 		
-		if(fileSet)
+		if(!sClassifierFile.isEmpty())
 			new CheckForClassifierTask().execute();
 		else
 			setClassifierPresent(false);
@@ -424,7 +429,7 @@ public class ReportFragment extends AbstractTabFragment
 		i.putExtra(EXTRA_FILENAME, sLogFilename);
 		i.putExtra(EXTRA_DIRNAME, sOutputDir);
 		
-		i.putExtra(EXTRA_REPORT, true);
+		i.putExtra(EXTRA_REPORT, !sReportUser.isEmpty());
 		i.putExtra(EXTRA_REPORT_ENABLE, mChkReport.isChecked());
 		i.putExtra(EXTRA_REPORT_SERVER, sReportServer);
 		i.putExtra(EXTRA_REPORT_USER, sReportUser);
