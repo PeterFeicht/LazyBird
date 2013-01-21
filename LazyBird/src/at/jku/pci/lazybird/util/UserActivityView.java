@@ -143,4 +143,12 @@ public class UserActivityView extends TextView
 		
 		mAge = age;
 	}
+	
+	/**
+	 * Sets the background color of this view.
+	 */
+	public void setBackgroundColor(int argb)
+	{
+		mBackground.setColor(argb);
+	}
 }
