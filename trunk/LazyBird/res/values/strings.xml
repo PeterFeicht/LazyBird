@@ -7,6 +7,7 @@
     <string name="title_tab_report">Report</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_classifier_info">Classifier Info</string>
+    <string name="title_activity_live_view">Live View</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_report_on">Reporting is ON</string>
     <string name="menu_report_off">Reporting is OFF</string>
@@ -15,6 +16,7 @@
     <string name="menu_about">About</string>
     <string name="menu_showClassifierInfo">Show classifier info</string>
     
+    <!-- Services -->
     <string name="service_started">ARFF Recorder service started</string>
     <string name="service_stopped">ARFF Recorder service stopped</string>
     <string name="service_label">ARFF Recorder Service</string>
@@ -30,6 +32,7 @@
     <string name="conn_fail">Connection lost</string>
     <string name="conn_fail_long">Connection to the server lost</string>
     
+    <!-- Settings -->
     <string name="set_valueUpdateSpeed">Update speed (display)</string>
     <string name="set_ValueUpdateSpeed_long">Update speed of the last values displayed.</string>
     <string name="set_outputDir">Output directory</string>
@@ -108,13 +111,18 @@
     <string name="chkReport">Report to server</string>
     <string name="lblLog">Log:</string>
     <string name="log_new_activity">Activity changed: %s</string>
-    
+
     <!-- Classifier Info -->
     <string name="noValidation">No validation performed.</string>
     <string name="noClassifier">No classifier trained yet.</string>
     <string name="txtClassifierType">Classifier type: %1$s&#8195;(%2$d %3$s)</string>
     <string name="txtTrainDate">Trained on %1$s, with %2$d instances.</string>
     <string name="txtTrainedFeatures">Trained features: %s</string>
+    
+    <!-- Live View -->
+    <string name="chkShowOffline">Show offline</string>
+    <string name="lblNoUsername">You have to set a username before connecting to the server.</string>
+    <string name="globalView">Global View</string>
 
     <!-- Errors and stuff -->
     <string name="error">Error</string>

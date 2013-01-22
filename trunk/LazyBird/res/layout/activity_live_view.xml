@@ -1,0 +1,47 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:flow="http://schemas.android.com/apk/res/at.jku.pci.lazybird"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="10dp"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
+    android:paddingTop="10dp"
+    tools:context=".LiveViewActivity"
+    tools:ignore="MergeRootFrame" >
+
+    <TextView
+        android:id="@+id/lblNoUsername"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:text="@string/lblNoUsername"
+        android:textAppearance="?android:attr/textAppearance"
+        android:textColor="@android:color/holo_orange_dark"
+        android:visibility="gone" />
+
+    <CheckBox
+        android:id="@+id/chkShowOffline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/chkShowOffline" />
+
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+
+        <at.jku.pci.lazybird.FlowLayout
+            android:id="@+id/userContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            flow:horizontalSpacing="12dp"
+            flow:verticalSpacing="12dp" >
+
+        </at.jku.pci.lazybird.FlowLayout>
+
+    </ScrollView>
+
+</LinearLayout>

@@ -60,6 +60,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="at.jku.pci.lazybird.MainActivity" />
         </activity>
+        <activity
+            android:name="at.jku.pci.lazybird.LiveViewActivity"
+            android:label="@string/title_activity_live_view" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="at.jku.pci.lazybird.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
