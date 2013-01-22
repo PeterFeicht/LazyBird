@@ -113,6 +113,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 				actionBar.newTab().setText(mPagerAdapter.getPageTitle(i)).setTabListener(this));
 		}
 		
+		// TTS outputs on the music stream so we want to control that one
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 	}
 	
@@ -152,6 +153,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		menu.findItem(R.id.menu_about).setOnMenuItemClickListener(onMenuAboutClick);
 		menu.findItem(R.id.menu_showClassifierInfo)
 			.setOnMenuItemClickListener(onMenuShowClassifierInfo);
+		menu.findItem(R.id.menu_liveView).setOnMenuItemClickListener(onMenuLiveViewClick);
 		return true;
 	}
 	
@@ -160,6 +162,15 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		public boolean onMenuItemClick(MenuItem item)
 		{
 			startActivity(new Intent(MainActivity.this, ClassifierInfoActivity.class));
+			return true;
+		}
+	};
+	
+	private OnMenuItemClickListener onMenuLiveViewClick = new OnMenuItemClickListener() {
+		@Override
+		public boolean onMenuItemClick(MenuItem item)
+		{
+			startActivity(new Intent(MainActivity.this, LiveViewActivity.class));
 			return true;
 		}
 	};
