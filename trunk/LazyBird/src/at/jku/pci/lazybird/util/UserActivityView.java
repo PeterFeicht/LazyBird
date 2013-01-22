@@ -112,7 +112,7 @@ public class UserActivityView extends TextView
 			mAgeBarTop,
 			mAgeBarLeft + (width > 0 ? width : 0),
 			mAgeBarTop + mAgeBarHeight);
-		invalidate();
+		postInvalidate();
 	}
 	
 	@Override
@@ -142,6 +142,7 @@ public class UserActivityView extends TextView
 			throw new IllegalArgumentException();
 		
 		mAge = age;
+		onAgeChanged();
 	}
 	
 	/**
@@ -150,5 +151,6 @@ public class UserActivityView extends TextView
 	public void setBackgroundColor(int argb)
 	{
 		mBackground.setColor(argb);
+		postInvalidate();
 	}
 }
