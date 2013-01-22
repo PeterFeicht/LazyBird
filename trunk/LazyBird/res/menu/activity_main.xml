@@ -5,21 +5,28 @@
         android:icon="@drawable/ic_action_report_off"
         android:orderInCategory="50"
         android:showAsAction="always"
-        android:title="@string/menu_report_off"/>
+        android:title="@string/menu_report_off" />
     
     <item
         android:id="@+id/menu_help"
         android:icon="@drawable/ic_action_help"
         android:orderInCategory="60"
         android:showAsAction="ifRoom"
-        android:title="@string/menu_help"/>
+        android:title="@string/menu_help" />
+    
+    <item
+        android:id="@+id/menu_liveView"
+        android:icon="@drawable/ic_action_live_view"
+        android:orderInCategory="80"
+        android:showAsAction="ifRoom"
+        android:title="@string/title_activity_live_view" />
     
     <item
         android:id="@+id/menu_showlog"
         android:icon="@drawable/ic_action_showlog"
         android:orderInCategory="90"
         android:showAsAction="ifRoom"
-        android:title="@string/menu_showlog"/>
+        android:title="@string/menu_showlog" />
     
     <item
         android:id="@+id/menu_showClassifierInfo"
@@ -33,7 +40,7 @@
         android:icon="@drawable/ic_action_settings"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
-        android:title="@string/menu_settings"/>
+        android:title="@string/menu_settings" />
     
     <item
         android:id="@+id/menu_about"
