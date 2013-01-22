@@ -6,4 +6,14 @@
         <attr name="maxValue" format="integer" />
     </declare-styleable>
     
+    <declare-styleable name="FlowLayout">
+        <attr name="horizontalSpacing" format="dimension" />
+        <attr name="verticalSpacing" format="dimension" />
+    </declare-styleable>
+    
+    <declare-styleable name="FlowLayout_LayoutParams">
+        <attr name="layout_spacing" format="dimension" />
+        <attr name="layout_breakLine" format="boolean" />
+    </declare-styleable>
+    
 </resources>
