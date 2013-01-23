@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -47,6 +48,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 	private CheckBox mChkShowOffline;
 	private TextView mLblNoUsername;
 	private TextView mLblCannotConnect;
+	private TextView mLblConnectionLost;
 	private ProgressBar mProgressServerUpdate;
 	
 	// Fields
@@ -62,8 +64,11 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			// incremented until the server sends an update
 			for(UserActivityView v : mUserViews.values())
 				v.setAge(v.getAge() + AUTO_UPDATE_DELAY);
-			// TODO check connection
-			mHandler.postDelayed(mRunUpdateAges, AUTO_UPDATE_DELAY);
+			
+			if(mClient.isConnected())
+				mHandler.postDelayed(mRunUpdateAges, AUTO_UPDATE_DELAY);
+			else
+				mLblConnectionLost.setVisibility(View.VISIBLE);
 		}
 	};
 	
@@ -104,6 +109,9 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		mLblNoUsername.setVisibility(sReportUser.isEmpty() ? View.VISIBLE : View.GONE);
 		
 		mLblCannotConnect = (TextView)findViewById(R.id.lblCannotConnect);
+		
+		mLblConnectionLost = (TextView)findViewById(R.id.lblConnectionLost);
+		mLblConnectionLost.setOnClickListener(onLblConnectionLostClick);
 		
 		mProgressServerUpdate = (ProgressBar)findViewById(R.id.progressServerUpdate);
 	}
@@ -189,26 +197,32 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		// Start reporting
 		if(LOCAL_LOGV) Log.v(LOGTAG, "Connecting to server...");
 		mClient = new CoordinatorClient(host, port, sReportUser);
-		try
-		{
-			Thread.sleep(1000);
-		}
-		catch(InterruptedException ex)
-		{
-		}
 		
-		// In case the connection fails, the thread of the client stops; check
-		if(mClient.isAlive())
-		{
-			mClient.addGroupStateListener(this);
-			if(LOCAL_LOGV) Log.v(LOGTAG, "Connected.");
-		}
-		else
-		{
-			if(LOCAL_LOGV) Log.v(LOGTAG, "Connection failed.");
-			mLblCannotConnect.setVisibility(View.VISIBLE);
-			mClient = null;
-		}
+		mHandler.postDelayed(new Runnable() {
+			int timeouts = 0;
+			
+			@Override
+			public void run()
+			{
+				// In case the connection fails, the thread of the client stops; check
+				if(mClient.isConnected())
+				{
+					mClient.addGroupStateListener(LiveViewActivity.this);
+					if(LOCAL_LOGV) Log.v(LOGTAG, "Connected.");
+				}
+				else
+				{
+					if(timeouts++ > 12)
+					{
+						if(LOCAL_LOGV) Log.v(LOGTAG, "Connection failed.");
+						mLblCannotConnect.setVisibility(View.VISIBLE);
+						mClient = null;
+					}
+					else
+						mHandler.postDelayed(this, 250);
+				}
+			}
+		}, 250);
 	}
 	
 	@Override
@@ -240,6 +254,16 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 					v.setShowOffline(mChkShowOffline.isChecked());
 			}
 		};
+	
+	private OnClickListener onLblConnectionLostClick = new OnClickListener() {
+		@Override
+		public void onClick(View v)
+		{
+			mLblConnectionLost.setVisibility(View.GONE);
+			mProgressServerUpdate.setVisibility(View.VISIBLE);
+			connect();
+		}
+	};
 	
 	@Override
 	public void groupStateChanged(UserState[] groupState)
@@ -297,7 +321,6 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			}
 		});
 		
-		// maybe remove offline users from view user list
 		mHandler.postDelayed(mRunUpdateAges, AUTO_UPDATE_DELAY);
 	}
 }
