@@ -290,6 +290,14 @@ public class CoordinatorClient extends Thread {
 			}
 		}
 	}
+	
+	public boolean isConnected()
+	{
+		if(inputThread != null)
+			return this.isAlive() && inputThread.isAlive();
+		else
+			return this.isAlive();
+	}
 
 	// Test this class
 	/* debug code
