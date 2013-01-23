@@ -252,7 +252,7 @@ public class CoordinatorClient extends Thread {
 							if(e.getMessage() == null)
 								e.printStackTrace(System.out);
 							else
-								System.out.println(e.getMessage());
+								System.out.println(e.getClass().getSimpleName() + ": " + e.getMessage());
 							interrupt();
 						}
 					}
