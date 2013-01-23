@@ -8,6 +8,8 @@ import android.graphics.drawable.GradientDrawable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
+import at.jku.pci.lazybird.R;
+import at.jku.pervasive.sd12.actclient.ClassLabel;
 
 /**
  * A {@link TextView} with a background and rounded border that has an age bar at the bottom.
@@ -33,6 +35,7 @@ public class UserActivityView extends TextView
 	// Fields
 	private long mAge = 5000;
 	private boolean mShowOffline = true;
+	private ClassLabel mActivity = null;
 	private int mAgeBarTop;
 	private int mAgeBarLeft;
 	private int mAgeBarWidth;
@@ -71,7 +74,7 @@ public class UserActivityView extends TextView
 		setBackgroundDrawable(mBackground);
 		setPadding((int)(9 * dp), (int)(6 * dp),
 			(int)(9 * dp), (int)((9 + 2 * AGE_BAR_PADDING) * dp));
-		setTextAppearance(context, android.R.style.TextAppearance_Large);
+		setTextAppearance(context, android.R.style.TextAppearance_Medium);
 		
 		mAgeBackground = new GradientDrawable();
 		mAgeBackground.setShape(GradientDrawable.RECTANGLE);
@@ -111,6 +114,7 @@ public class UserActivityView extends TextView
 			mAgeBarLeft + (width > 0 ? width : 0),
 			mAgeBarTop + mAgeBarHeight);
 		
+		updateBackgroundColor();
 		if(isOffline())
 			setVisibility(mShowOffline ? View.VISIBLE : View.GONE);
 		else
@@ -122,7 +126,8 @@ public class UserActivityView extends TextView
 	{
 		super.onDraw(canvas);
 		mAgeBackground.draw(canvas);
-		mAgeBar.draw(canvas);
+		if(!isOffline())
+			mAgeBar.draw(canvas);
 	}
 	
 	/**
@@ -178,9 +183,60 @@ public class UserActivityView extends TextView
 	/**
 	 * Sets the background color of this view.
 	 */
+	@Override
 	public void setBackgroundColor(int argb)
 	{
 		mBackground.setColor(argb);
 		postInvalidate();
+	}
+	
+	/**
+	 * Gets the activity class label last set for this view, or {@code null} if none was set.
+	 */
+	public ClassLabel getActivity()
+	{
+		return mActivity;
+	}
+	
+	public void setActivity(ClassLabel activity)
+	{
+		mActivity = activity;
+		updateBackgroundColor();
+	}
+
+	private void updateBackgroundColor()
+	{
+		int color;
+		if(isOffline())
+		{
+			color = getContext().getResources().getColor(R.color.offlineColor);
+		}
+		else
+		{
+			switch(mActivity)
+			{
+				case sitting:
+					color = getContext().getResources().getColor(R.color.sittingColor);
+					break;
+				case standing:
+					color = getContext().getResources().getColor(R.color.standingColor);
+					break;
+				case walking:
+					color = getContext().getResources().getColor(R.color.walkingColor);
+					break;	
+				default:
+					color = getContext().getResources().getColor(R.color.nullColor);
+					break;
+			}
+		}
+		
+		final int newColor = color;
+		post(new Runnable() {
+			@Override
+			public void run()
+			{
+				setBackgroundColor(newColor);
+			}
+		});
 	}
 }

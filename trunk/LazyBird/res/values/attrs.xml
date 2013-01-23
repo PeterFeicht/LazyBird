@@ -16,4 +16,10 @@
         <attr name="layout_breakLine" format="boolean" />
     </declare-styleable>
     
+    <color name="offlineColor">#999999</color>
+    <color name="nullColor">#CC5500</color>
+    <color name="walkingColor">#0099CC</color>
+    <color name="standingColor">#DDDD22</color>
+    <color name="sittingColor">#22DD22</color>
+    
 </resources>
