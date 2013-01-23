@@ -2,21 +2,29 @@ package at.jku.pci.lazybird;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.FrameLayout.LayoutParams;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import at.jku.pci.lazybird.util.UserActivityView;
+import at.jku.pervasive.sd12.actclient.ClassLabel;
 import at.jku.pervasive.sd12.actclient.CoordinatorClient;
 import at.jku.pervasive.sd12.actclient.CoordinatorClient.UserState;
 import at.jku.pervasive.sd12.actclient.GroupStateListener;
@@ -119,6 +127,17 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		mLblConnectionLost.setOnClickListener(onLblConnectionLostClick);
 		
 		mProgressServerUpdate = (ProgressBar)findViewById(R.id.progressServerUpdate);
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		super.onCreateOptionsMenu(menu);
+		getMenuInflater().inflate(R.menu.activity_live_view, menu);
+		
+		menu.findItem(R.id.liveViewLegend).setOnMenuItemClickListener(onMenuLiveViewLegendClick);
+		
+		return true;
 	}
 	
 	@Override
@@ -269,6 +288,64 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			mLblConnectionLost.setVisibility(View.GONE);
 			mProgressServerUpdate.setVisibility(View.VISIBLE);
 			connect();
+		}
+	};
+	
+	private OnMenuItemClickListener onMenuLiveViewLegendClick = new OnMenuItemClickListener() {
+		AlertDialog legend = null;
+		
+		@Override
+		public boolean onMenuItemClick(MenuItem item)
+		{
+			// Build a legend and show it
+			if(legend == null)
+			{
+				final AlertDialog.Builder b = new AlertDialog.Builder(LiveViewActivity.this);
+				final ScrollView sv = new ScrollView(LiveViewActivity.this);
+				final LinearLayout l = new LinearLayout(LiveViewActivity.this);
+				final float dp = getResources().getDisplayMetrics().density;
+				
+				b.setTitle(R.string.menu_liveViewLegend);
+				b.setPositiveButton(android.R.string.ok, null);
+				
+				l.setOrientation(LinearLayout.VERTICAL);
+				// l.setGravity(Gravity.CENTER_HORIZONTAL);
+				l.setPadding((int)(9 * dp), (int)(9 * dp), (int)(9 * dp), (int)(9 * dp));
+				l.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
+				l.setDividerDrawable(getResources().getDrawable(R.drawable.layout_divider));
+				final LayoutParams lp =
+					new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+				lp.gravity = Gravity.CENTER_HORIZONTAL;
+				l.setLayoutParams(lp);
+				
+				UserActivityView v = new UserActivityView(LiveViewActivity.this);
+				v.setText("sitting");
+				v.setActivity(ClassLabel.sitting);
+				l.addView(v);
+				v = new UserActivityView(LiveViewActivity.this);
+				v.setText("standing");
+				v.setActivity(ClassLabel.standing);
+				l.addView(v);
+				v = new UserActivityView(LiveViewActivity.this);
+				v.setText("walking");
+				v.setActivity(ClassLabel.walking);
+				l.addView(v);
+				v = new UserActivityView(LiveViewActivity.this);
+				v.setText("null");
+				v.setActivity(null);
+				l.addView(v);
+				v = new UserActivityView(LiveViewActivity.this);
+				v.setText(R.string.offline);
+				v.setAge(UserActivityView.MAX_AGE + 1);
+				l.addView(v);
+				
+				sv.addView(l);
+				b.setView(sv);
+				legend = b.create();
+			}
+			
+			legend.show();
+			return true;
 		}
 	};
 	

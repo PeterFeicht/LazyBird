@@ -20,7 +20,7 @@
     <color name="offlineColor">#999999</color>
     <color name="nullColor">#CC5500</color>
     <color name="walkingColor">#0099CC</color>
-    <color name="standingColor">#DDDD22</color>
-    <color name="sittingColor">#22DD22</color>
+    <color name="standingColor">#DDDD33</color>
+    <color name="sittingColor">#33CC33</color>
     
 </resources>

@@ -125,6 +125,7 @@
     <string name="globalView">Global View</string>
     <string name="lblCannotConnect">Cannot connect to the server, please check your settings and make sure you have an internet connection.</string>
     <string name="lblConnectionLost">Connection lost. Tap to reconnect.</string>
+    <string name="menu_liveViewLegend">Legend</string>
 
     <!-- Errors and stuff -->
     <string name="error">Error</string>
@@ -141,5 +142,6 @@
     <string name="save">Save</string>
     <string name="no">No</string>
     <string name="yes">Yes</string>
+    <string name="offline">Offline</string>
 
 </resources>
