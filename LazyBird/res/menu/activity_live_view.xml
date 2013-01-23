@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/liveViewLegend"
+        android:icon="@drawable/ic_action_live_view_legend"
+        android:orderInCategory="50"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/menu_liveViewLegend">
+    </item>
+
+</menu>

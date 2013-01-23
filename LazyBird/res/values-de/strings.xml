@@ -125,6 +125,7 @@
     <string name="globalView">Globale Ansicht</string>
     <string name="lblCannotConnect">Verbindung zum Server fehlgeschlagen, bitte überprüfen Sie Ihre Einstellungen und stellen Sie sicher, dass eine Internetverbindung besteht.</string>
     <string name="lblConnectionLost">Verbindung verloren. Tippen Sie hier um neu zu verbinden.</string>
+    <string name="menu_liveViewLegend">Legend</string>
     
     <!-- Errors and stuff -->
     <string name="error">Fehler</string>
@@ -141,5 +142,6 @@
     <string name="save">Speichern</string>
     <string name="no">Nein</string>
     <string name="yes">Ja</string>
+    <string name="offline">Offline</string>
     
 </resources>
