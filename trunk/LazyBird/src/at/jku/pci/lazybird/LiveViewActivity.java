@@ -12,8 +12,8 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ProgressBar;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import at.jku.pci.lazybird.util.UserActivityView;
 import at.jku.pervasive.sd12.actclient.CoordinatorClient;
@@ -21,7 +21,7 @@ import at.jku.pervasive.sd12.actclient.CoordinatorClient.UserState;
 import at.jku.pervasive.sd12.actclient.GroupStateListener;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedList;
 
 public class LiveViewActivity extends Activity implements ActionBar.OnNavigationListener,
 		GroupStateListener
@@ -30,8 +30,6 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 	public static final String LOGTAG = "LiveViewActivity";
 	public static final boolean LOCAL_LOGV = true;
 	public static final int AUTO_UPDATE_DELAY = 500;
-	public static final String STATE_VIEW_USERS = "at.jku.pci.lazybird.STATE_VIEW_USERS";
-	public static final String STATE_USER_VIEWS = "at.jku.pci.lazybird.STATE_USER_VIEWS";
 	// Settings
 	/**
 	 * Setting: {@link SettingsActivity#KEY_REPORT_SERVER}
@@ -64,6 +62,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			// incremented until the server sends an update
 			for(UserActivityView v : mUserViews.values())
 				v.setAge(v.getAge() + AUTO_UPDATE_DELAY);
+			// TODO check connection
 			mHandler.postDelayed(mRunUpdateAges, AUTO_UPDATE_DELAY);
 		}
 	};
@@ -92,7 +91,6 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			android.R.id.text1);
 		mViewUsers.add(getString(R.string.globalView));
 		actionBar.setListNavigationCallbacks(mViewUsers, this);
-		// TODO Add users for user dependent view
 	}
 	
 	private void getWidgets()
@@ -252,7 +250,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		mHandler.removeCallbacks(mRunUpdateAges);
 		
 		// We don't need to remove users from our list, since the server doesn't drop users
-		final HashSet<UserState> newUsers = new HashSet<UserState>(groupState.length);
+		final LinkedList<UserState> newUsers = new LinkedList<UserState>();
 		for(UserState u : groupState)
 		{
 			UserActivityView v = mUserViews.get(u.getUserId());
@@ -270,14 +268,13 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			new ArrayList<UserActivityView>(newUsers.size());
 		for(UserState u : newUsers)
 		{
-			UserActivityView v = new UserActivityView(this);
+			final UserActivityView v = new UserActivityView(this);
 			v.setText(u.getUserId());
 			v.setAge(u.getUpdateAge());
 			v.setActivity(u.getActivity());
 			v.setShowOffline(mChkShowOffline.isChecked());
 			mUserViews.put(u.getUserId(), v);
 			newViews.add(v);
-			// TODO add user to dropdown
 		}
 		
 		runOnUiThread(new Runnable() {
@@ -286,11 +283,20 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			{
 				mProgressServerUpdate.setVisibility(View.GONE);
 				for(UserActivityView v : newViews)
+				{
 					mUserContainer.addView(v);
+					final String id = (String)v.getText();
+					final int count = mViewUsers.getCount();
+					// Add user to dropdown in sorted order
+					int idx = 1;
+					while(idx < count && mViewUsers.getItem(idx).compareTo(id) < 0)
+						idx++;
+					mViewUsers.insert(id, idx);
+				}
+				// TODO sort users
 			}
 		});
 		
-		// TODO sort users
 		// maybe remove offline users from view user list
 		mHandler.postDelayed(mRunUpdateAges, AUTO_UPDATE_DELAY);
 	}
