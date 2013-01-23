@@ -21,25 +21,48 @@
         android:textColor="@android:color/holo_orange_dark"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/lblCannotConnect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:text="@string/lblCannotConnect"
+        android:textAppearance="?android:attr/textAppearance"
+        android:textColor="@android:color/holo_orange_dark"
+        android:visibility="gone" />
+
     <CheckBox
         android:id="@+id/chkShowOffline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:checked="true"
         android:text="@string/chkShowOffline" />
+
+    <ProgressBar
+        android:id="@+id/progressServerUpdate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
+        android:indeterminate="true" />
 
     <ScrollView
         android:id="@+id/scrollView1"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="6dp"
         android:layout_weight="1" >
 
         <at.jku.pci.lazybird.FlowLayout
             android:id="@+id/userContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+        	android:animateLayoutChanges="true"
+        	android:paddingTop="6dp"
+        	android:paddingBottom="6dp"
             flow:horizontalSpacing="12dp"
-            flow:verticalSpacing="12dp" >
-
+            flow:verticalSpacing="12dp">
+            
         </at.jku.pci.lazybird.FlowLayout>
 
     </ScrollView>
