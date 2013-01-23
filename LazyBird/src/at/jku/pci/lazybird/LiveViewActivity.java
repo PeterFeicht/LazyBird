@@ -77,6 +77,8 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_live_view);
+		
+		// Maintain a list of user views to update age and activity
 		mUserViews = new HashMap<String, UserActivityView>(20);
 		
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -89,7 +91,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		actionBar.setDisplayHomeAsUpEnabled(true);
-		
+		// The first element is always for the global view
 		mViewUsers = new ArrayAdapter<String>(
 			actionBar.getThemedContext(),
 			android.R.layout.simple_list_item_1,
@@ -98,6 +100,9 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		actionBar.setListNavigationCallbacks(mViewUsers, this);
 	}
 	
+	/**
+	 * Sets the fields for the views of this activity and registers listeners and stuff.
+	 */
 	private void getWidgets()
 	{
 		mUserContainer = (FlowLayout)findViewById(R.id.userContainer);
@@ -123,6 +128,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		
 		mLblCannotConnect.setVisibility(View.GONE);
 		
+		// If there's no username set, inform the user, otherwise connect
 		if(sReportUser.isEmpty())
 		{
 			mLblNoUsername.setVisibility(View.VISIBLE);
@@ -143,6 +149,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 	{
 		super.onPause();
 		
+		// Terminate the connection when the activity loses focus
 		if(mClient != null)
 			mClient.interrupt();
 		mClient = null;
@@ -273,6 +280,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		
 		mHandler.removeCallbacks(mRunUpdateAges);
 		
+		// Update ages and activities for all users, adding all new users to a list
 		// We don't need to remove users from our list, since the server doesn't drop users
 		final LinkedList<UserState> newUsers = new LinkedList<UserState>();
 		for(UserState u : groupState)
@@ -301,6 +309,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			newViews.add(v);
 		}
 		
+		// Hide connecting progress and add new users to dropdown and activity list
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run()
