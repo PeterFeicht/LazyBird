@@ -123,6 +123,7 @@
     <string name="chkShowOffline">Show offline</string>
     <string name="lblNoUsername">You have to set a username before connecting to the server.</string>
     <string name="globalView">Global View</string>
+    <string name="lblCannotConnect">Cannot connect to the server, please check your settings and make sure you have an internet connection.</string>
 
     <!-- Errors and stuff -->
     <string name="error">Error</string>
