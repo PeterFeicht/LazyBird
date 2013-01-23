@@ -73,11 +73,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true"
-            android:paddingTop="6dp"
             android:paddingBottom="6dp"
-            flow:distributeHorizontal="true"
+            android:paddingTop="6dp"
+            flow:distributeHorizontal="false"
             flow:horizontalSpacing="12dp"
-            flow:verticalSpacing="12dp">
+            flow:verticalSpacing="12dp" >
             
         </at.jku.pci.lazybird.FlowLayout>
 
