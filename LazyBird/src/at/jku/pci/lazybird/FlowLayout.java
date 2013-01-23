@@ -53,6 +53,9 @@ public class FlowLayout extends ViewGroup
 		for(int j = 0; j < count; j++)
 		{
 			View child = getChildAt(j);
+			if(child.getVisibility() == View.GONE)
+				continue;
+			
 			LayoutParams lp = (LayoutParams)child.getLayoutParams();
 			measureChild(child, widthMeasureSpec, heightMeasureSpec);
 			
@@ -91,6 +94,9 @@ public class FlowLayout extends ViewGroup
 		for(int j = 0; j < count; j++)
 		{
 			View child = getChildAt(j);
+			if(child.getVisibility() == View.GONE)
+				continue;
+			
 			LayoutParams lp = (LayoutParams)child.getLayoutParams();
 			child.layout(lp.x, lp.y, lp.x + child.getMeasuredWidth(),
 				lp.y + child.getMeasuredHeight());
@@ -123,8 +129,8 @@ public class FlowLayout extends ViewGroup
 	
 	public static class LayoutParams extends ViewGroup.LayoutParams
 	{
-		public boolean breakLine;
-		public int spacing;
+		public boolean breakLine = false;
+		public int spacing = -1;
 		
 		private int x;
 		private int y;
@@ -142,10 +148,10 @@ public class FlowLayout extends ViewGroup
 				context.obtainStyledAttributes(attrs, R.styleable.FlowLayout_LayoutParams);
 			try
 			{
-				spacing =
-					a.getDimensionPixelSize(R.styleable.FlowLayout_LayoutParams_layout_spacing, -1);
-				breakLine =
-					a.getBoolean(R.styleable.FlowLayout_LayoutParams_layout_breakLine, false);
+				spacing = a.getDimensionPixelSize(
+					R.styleable.FlowLayout_LayoutParams_layout_spacing, spacing);
+				breakLine = a.getBoolean(
+					R.styleable.FlowLayout_LayoutParams_layout_breakLine, breakLine);
 			}
 			finally
 			{
