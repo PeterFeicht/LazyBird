@@ -308,16 +308,26 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 				mProgressServerUpdate.setVisibility(View.GONE);
 				for(UserActivityView v : newViews)
 				{
-					mUserContainer.addView(v);
 					final String id = (String)v.getText();
-					final int count = mViewUsers.getCount();
+					
 					// Add user to dropdown in sorted order
+					final int count = mViewUsers.getCount();
 					int idx = 1;
 					while(idx < count && mViewUsers.getItem(idx).compareTo(id) < 0)
 						idx++;
 					mViewUsers.insert(id, idx);
+					
+					// Add user view in sorted order
+					final int count2 = mUserContainer.getChildCount();
+					idx = 0;
+					while(idx < count2 &&
+						((String)((UserActivityView)mUserContainer.getChildAt(idx))
+							.getText()).compareTo(id) < 0)
+					{
+						idx++;
+					}
+					mUserContainer.addView(v, idx);
 				}
-				// TODO sort users
 			}
 		});
 		
