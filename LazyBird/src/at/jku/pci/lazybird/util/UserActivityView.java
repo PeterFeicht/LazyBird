@@ -57,7 +57,7 @@ public class UserActivityView extends TextView
 		super(context, attrs);
 		init(context);
 	}
-
+	
 	private void init(Context context)
 	{
 		final Resources res = context.getResources();
@@ -203,7 +203,7 @@ public class UserActivityView extends TextView
 		mActivity = activity;
 		updateBackgroundColor();
 	}
-
+	
 	private void updateBackgroundColor()
 	{
 		int color;
@@ -213,20 +213,25 @@ public class UserActivityView extends TextView
 		}
 		else
 		{
-			switch(mActivity)
+			if(mActivity == null)
+				color = getContext().getResources().getColor(R.color.nullColor);
+			else
 			{
-				case sitting:
-					color = getContext().getResources().getColor(R.color.sittingColor);
-					break;
-				case standing:
-					color = getContext().getResources().getColor(R.color.standingColor);
-					break;
-				case walking:
-					color = getContext().getResources().getColor(R.color.walkingColor);
-					break;	
-				default:
-					color = getContext().getResources().getColor(R.color.nullColor);
-					break;
+				switch(mActivity)
+				{
+					case sitting:
+						color = getContext().getResources().getColor(R.color.sittingColor);
+						break;
+					case standing:
+						color = getContext().getResources().getColor(R.color.standingColor);
+						break;
+					case walking:
+						color = getContext().getResources().getColor(R.color.walkingColor);
+						break;
+					default:
+						color = getContext().getResources().getColor(R.color.nullColor);
+						break;
+				}
 			}
 		}
 		
