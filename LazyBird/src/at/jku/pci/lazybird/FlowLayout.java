@@ -5,11 +5,14 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import java.util.LinkedList;
 
 public class FlowLayout extends ViewGroup
 {
 	private int mHorizontalSpacing;
 	private int mVerticalSpacing;
+	private boolean mDistributeHorizontal;
+	private LinkedList<Integer> mLineBreaks = new LinkedList<Integer>();
 	
 	public FlowLayout(Context context)
 	{
@@ -27,6 +30,8 @@ public class FlowLayout extends ViewGroup
 				a.getDimensionPixelSize(R.styleable.FlowLayout_horizontalSpacing, 0);
 			mVerticalSpacing =
 				a.getDimensionPixelSize(R.styleable.FlowLayout_verticalSpacing, 0);
+			mDistributeHorizontal =
+				a.getBoolean(R.styleable.FlowLayout_distributeHorizontal, false);
 		}
 		finally
 		{
@@ -39,6 +44,7 @@ public class FlowLayout extends ViewGroup
 	{
 		int widthSize = MeasureSpec.getSize(widthMeasureSpec);
 		boolean growHeight = (MeasureSpec.getMode(widthMeasureSpec) != MeasureSpec.UNSPECIFIED);
+		mLineBreaks.clear();
 		
 		int width = 0;
 		int height = getPaddingTop();
@@ -69,6 +75,7 @@ public class FlowLayout extends ViewGroup
 				currentHeight = 0;
 				width = Math.max(width, currentWidth - spacing);
 				currentWidth = getPaddingLeft();
+				mLineBreaks.add(j);
 			}
 			
 			lp.x = currentWidth;
@@ -91,6 +98,41 @@ public class FlowLayout extends ViewGroup
 	protected void onLayout(boolean changed, int l, int t, int r, int b)
 	{
 		final int count = getChildCount();
+		
+		// If horizontal distribution is enabled, move children to fill the measured width
+		if(mDistributeHorizontal && count > 1)
+		{
+			int lastIdx = 0;
+			
+			// For every line but the last one, distribute the views equally
+			for(Integer line : mLineBreaks)
+			{
+				int width = 0;
+				// Sum up all widths to calculate remaining space
+				for(int j = lastIdx; j < line; j++)
+				{
+					final View v = getChildAt(j);
+					if(v.getVisibility() == View.GONE)
+						continue;
+					width += v.getMeasuredWidth();
+				}
+				
+				width = getMeasuredWidth() - getPaddingLeft() - getPaddingRight() - width;
+				final int space = width / (line - lastIdx - 1);
+				
+				int nextX = getChildAt(lastIdx + 1).getMeasuredWidth() + space;
+				for(int j = lastIdx + 1; j < line; j++)
+				{
+					final View v = getChildAt(j);
+					if(v.getVisibility() == View.GONE)
+						continue;
+					((LayoutParams)v.getLayoutParams()).x = nextX;
+					nextX += v.getMeasuredWidth() + space;
+				}
+				lastIdx = line;
+			}
+		}
+		
 		for(int j = 0; j < count; j++)
 		{
 			View child = getChildAt(j);
