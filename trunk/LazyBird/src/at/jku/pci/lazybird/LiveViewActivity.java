@@ -153,12 +153,13 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			mLblNoUsername.setVisibility(View.VISIBLE);
 			mChkShowOffline.setEnabled(false);
 			mUserContainer.removeAllViews();
+			mProgressServerUpdate.setVisibility(View.GONE);
 		}
 		else
 		{
 			mLblNoUsername.setVisibility(View.GONE);
 			mChkShowOffline.setEnabled(true);
-			
+			mProgressServerUpdate.setVisibility(View.GONE);
 			connect();
 		}
 	}
