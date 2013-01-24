@@ -18,7 +18,7 @@ import at.jku.pervasive.sd12.actclient.ClassLabel;
  * 
  * @author Peter
  */
-public class UserActivityView extends TextView
+public class UserActivityView extends TextView implements Comparable<UserActivityView>
 {
 	// Constants
 	public static final String LOGTAG = "UserActivityView";
@@ -243,5 +243,11 @@ public class UserActivityView extends TextView
 				setBackgroundColor(newColor);
 			}
 		});
+	}
+
+	@Override
+	public int compareTo(UserActivityView another)
+	{
+		return ((String)getText()).compareTo((String)another.getText());
 	}
 }
