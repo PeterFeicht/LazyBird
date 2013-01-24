@@ -103,7 +103,7 @@
     <string name="validationResults">Validation results</string>
 
     <!-- Report -->
-    <string name="helpReport">Here you can classify your acitvity and report it to the server or output it a few other ways.\nYou have to record data and train a classifier, before you can report your activity to the server.\nIf you want to report to the server, you have to set a username first.</string>
+    <string name="helpReport">Here you can classify your activity and report it to the server or output it a few other ways.\nYou have to record data and train a classifier, before you can report your activity to the server.\nIf you want to report to the server, you have to set a username first.</string>
     <string name="lblNoClassifier">You have to train a classifier first.</string>
     <string name="swClassify">Classification:</string>
     <string name="lblOutputOptions">Output options:</string>
