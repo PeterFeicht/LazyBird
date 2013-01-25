@@ -43,7 +43,7 @@ public class GuiClient extends Thread
 		}
 		
 		/**
-		 * The users ID.
+		 * The user's ID.
 		 * 
 		 * @return String
 		 */
@@ -53,7 +53,7 @@ public class GuiClient extends Thread
 		}
 		
 		/**
-		 * Time since the users activity was last updated in ms.
+		 * Time since the user's activity was last updated in ms.
 		 * 
 		 * @return long
 		 */
@@ -63,13 +63,23 @@ public class GuiClient extends Thread
 		}
 		
 		/**
-		 * The users last known activity.
+		 * The user's last known activity.
 		 * 
 		 * @return ClassLabel
 		 */
 		public ClassLabel getActivity()
 		{
 			return activity;
+		}
+		
+		/**
+		 * The user's last known role.
+		 * 
+		 * @return UserRole
+		 */
+		public UserRole getRole()
+		{
+			return role;
 		}
 		
 		@Override
