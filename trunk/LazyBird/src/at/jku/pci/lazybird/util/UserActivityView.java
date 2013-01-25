@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.TextView;
 import at.jku.pci.lazybird.R;
 import at.jku.pervasive.sd12.actclient.ClassLabel;
+import at.jku.pervasive.sd12.actclient.UserRole;
 
 /**
  * A {@link TextView} with a background and rounded border that has an age bar at the bottom.
@@ -27,6 +28,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	public static final long MAX_AGE = 10000;
 	public static final int AGE_BAR_HEIGHT = 4;
 	public static final int AGE_BAR_PADDING = 5;
+	public static final int AGE_BAR_OFFSET = 2;
 	public static final int AGE_BAR_BG = 0x22000000;
 	public static final int AGE_BAR_FG = 0x66000000;
 	public static final int CORNER_RADIUS = 6;
@@ -36,11 +38,13 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	private long mAge = 5000;
 	private boolean mShowOffline = true;
 	private ClassLabel mActivity = null;
+	private UserRole mRole = null;
 	private int mAgeBarTop;
 	private int mAgeBarLeft;
 	private int mAgeBarWidth;
 	private int mAgeBarHeight = 4;
 	private int mAgeBarPadding = 1;
+	private int mPaddingOffset = 1;
 	
 	private GradientDrawable mBackground;
 	private GradientDrawable mAgeBackground;
@@ -64,6 +68,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 		final float dp = res.getDisplayMetrics().density;
 		mAgeBarHeight = (int)(AGE_BAR_HEIGHT * dp);
 		mAgeBarPadding = (int)(AGE_BAR_PADDING * dp);
+		mPaddingOffset = (int)((2 * AGE_BAR_PADDING + AGE_BAR_HEIGHT - AGE_BAR_OFFSET) * dp);
 		
 		mBackground = new GradientDrawable();
 		mBackground.setShape(GradientDrawable.RECTANGLE);
@@ -72,8 +77,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 		mBackground.setColor(res.getColor(android.R.color.holo_blue_dark));
 		
 		setBackgroundDrawable(mBackground);
-		setPadding((int)(9 * dp), (int)(6 * dp),
-			(int)(9 * dp), (int)((9 + 2 * AGE_BAR_PADDING) * dp));
+		setPadding((int)(9 * dp), (int)(6 * dp), (int)(9 * dp), (int)(6 * dp));
 		setTextAppearance(context, android.R.style.TextAppearance_Medium);
 		
 		mAgeBackground = new GradientDrawable();
@@ -85,6 +89,18 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 		mAgeBar.setShape(GradientDrawable.RECTANGLE);
 		mAgeBar.setColor(AGE_BAR_FG);
 		mAgeBar.setCornerRadius(mAgeBarHeight / 2f);
+	}
+	
+	@Override
+	public void setPadding(int left, int top, int right, int bottom)
+	{
+		super.setPadding(left, top, right, bottom + mPaddingOffset);
+	}
+	
+	@Override
+	public int getPaddingBottom()
+	{
+		return super.getPaddingBottom() - mPaddingOffset;
 	}
 	
 	@Override
@@ -119,6 +135,11 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 			setVisibility(mShowOffline ? View.VISIBLE : View.GONE);
 		else
 			postInvalidate();
+	}
+	
+	private void onRoleChanged()
+	{
+		// TODO set role image
 	}
 	
 	@Override
@@ -243,6 +264,20 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 				setBackgroundColor(newColor);
 			}
 		});
+	}
+	
+	/**
+	 * Gets the role last set for this view, or {@code null} if none was set.
+	 */
+	public UserRole getRole()
+	{
+		return mRole;
+	}
+	
+	public void setRole(UserRole role)
+	{
+		mRole = role;
+		onRoleChanged();
 	}
 	
 	@Override
