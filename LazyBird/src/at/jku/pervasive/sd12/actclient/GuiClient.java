@@ -85,7 +85,10 @@ public class GuiClient extends Thread
 		}
 	}
 	
-	private HashMap<String, UserState> mGroupState = new HashMap<String, GuiClient.UserState>();
+	private final HashMap<String, UserState> mGroupState;
+	private final String mHost;
+	private final int mPort;
+	
 	private GroupStateListener mListener = null;
 	private RoomState mRoomState = null;
 	private String mActiveId = "";
@@ -96,14 +99,12 @@ public class GuiClient extends Thread
 	
 	private UserState[] groupStateList;
 	
-	public GuiClient(String host, int port) throws IOException
+	public GuiClient(String host, int port)
 	{
-		mSocket = new Socket();
-		mSocket.connect(new InetSocketAddress(host, port), 5000);
-		mInput =
-			new BufferedReader(new InputStreamReader(mSocket.getInputStream(), NET_CHARSET));
-		mOutput =
-			new PrintWriter(new OutputStreamWriter(mSocket.getOutputStream(), NET_CHARSET), true);
+		mGroupState = new HashMap<String, GuiClient.UserState>();
+		mHost = host;
+		mPort = port;
+		start();
 	}
 	
 	public void setActiveUser(String n)
@@ -123,74 +124,98 @@ public class GuiClient extends Thread
 	@Override
 	public void run()
 	{
-		String line = null;
-		while(!interrupted())
+		try
 		{
-			try
+			mSocket = new Socket();
+			mSocket.connect(new InetSocketAddress(mHost, mPort), 5000);
+			mInput =
+				new BufferedReader(new InputStreamReader(mSocket.getInputStream(), NET_CHARSET));
+			mOutput = new PrintWriter(
+				new OutputStreamWriter(mSocket.getOutputStream(), NET_CHARSET), true);
+			
+			String line = null;
+			while(!interrupted())
 			{
-				line = mInput.readLine();
-				if(line != null)
+				try
 				{
-					String[] users = OptionParser.split(line, ",", BRACKETS);
-					synchronized(mGroupState)
+					line = mInput.readLine();
+					if(line != null)
 					{
-						mRoomState = RoomState.parse(users[0]);
-						for(int j = 1; j < users.length; j++)
+						String[] users = OptionParser.split(line, ",", BRACKETS);
+						synchronized(mGroupState)
 						{
-							if(!users[j].isEmpty())
+							mRoomState = RoomState.parse(users[0]);
+							for(int j = 1; j < users.length; j++)
 							{
-								String[] up = OptionParser.split(users[j]);
-								if(up.length != 4)
-									throw new Exception("Invalid server response");
-								
-								final long age = Long.parseLong(up[0]);
-								final ClassLabel activity = ClassLabel.parse(up[2]);
-								final UserRole role = UserRole.parse(up[3]);
-								
-								final UserState state = mGroupState.get(up[1]);
-								if(state != null)
-								{
-									state.age = age;
-									state.activity = activity;
-									state.role = role;
-								}
-								else
-								{
-									mGroupState.put(up[1],
-										new UserState(age, up[1], activity, role));
-								}
+								if(!users[j].isEmpty())
+									updateUser(users[j]);
 							}
 						}
 					}
+					else
+					{
+						// this never happens with my java runtime ...
+						interrupt();
+					}
 				}
-				else
+				catch(Exception e)
 				{
-					// this never happens with my java runtime ...
+					if(e.getMessage() == null)
+						e.printStackTrace(System.out);
+					else
+						System.out.println(e.getClass().getSimpleName() + ": " + e.getMessage());
 					interrupt();
 				}
 			}
-			catch(Exception e)
+			if(mSocket.isConnected())
 			{
-				if(e.getMessage() == null)
-					e.printStackTrace(System.out);
-				else
-					System.out.println(e.getClass().getSimpleName() + ": " + e.getMessage());
-				interrupt();
+				try
+				{
+					mSocket.close();
+				}
+				catch(IOException e)
+				{
+					e.printStackTrace();
+				}
 			}
 		}
-		if(mSocket.isConnected())
+		catch(IOException e)
 		{
-			try
-			{
-				mSocket.close();
-			}
-			catch(IOException e)
-			{
-				e.printStackTrace();
-			}
+			System.out.println("connection failed: " + e.getMessage());
 		}
 	}
 	
+	/**
+	 * Updates or adds a user from the given String.
+	 */
+	private void updateUser(String user) throws Exception
+	{
+		String[] up = OptionParser.split(user);
+		if(up.length != 4)
+			throw new Exception("Invalid server response");
+		
+		final long age = Long.parseLong(up[0]);
+		final ClassLabel activity = ClassLabel.parse(up[2]);
+		final UserRole role = UserRole.parse(up[3]);
+		
+		final UserState state = mGroupState.get(up[1]);
+		if(state != null)
+		{
+			state.age = age;
+			state.activity = activity;
+			state.role = role;
+		}
+		else
+		{
+			mGroupState.put(up[1],
+				new UserState(age, up[1], activity, role));
+		}
+	}
+	
+	/**
+	 * If not {@code null}, notifies {@link #mListener} of a group state change, updating the
+	 * array if necessary.
+	 */
 	protected void notifyGroupStateListener()
 	{
 		if(mListener != null)
