@@ -97,7 +97,7 @@ public class GuiClient extends Thread
 	private BufferedReader mInput;
 	private PrintWriter mOutput;
 	
-	private UserState[] groupStateList;
+	private UserState[] groupStateList = new UserState[0];
 	
 	public GuiClient(String host, int port)
 	{
@@ -142,15 +142,14 @@ public class GuiClient extends Thread
 					if(line != null)
 					{
 						String[] users = OptionParser.split(line, ",", BRACKETS);
-						synchronized(mGroupState)
+						mRoomState = RoomState.parse(users[0]);
+						
+						for(int j = 1; j < users.length; j++)
 						{
-							mRoomState = RoomState.parse(users[0]);
-							for(int j = 1; j < users.length; j++)
-							{
-								if(!users[j].isEmpty())
-									updateUser(users[j]);
-							}
+							if(!users[j].isEmpty())
+								updateUser(users[j]);
 						}
+						notifyGroupStateListener();
 					}
 					else
 					{
