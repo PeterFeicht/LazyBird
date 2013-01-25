@@ -109,6 +109,10 @@ public class GuiClient extends Thread
 	
 	public void setActiveUser(String n)
 	{
+		// Ignore if not connected yet
+		if(mOutput == null)
+			return;
+		
 		mActiveId = n;
 		if(n == null)
 			mOutput.println("");
