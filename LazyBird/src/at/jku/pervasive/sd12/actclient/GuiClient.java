@@ -212,6 +212,11 @@ public class GuiClient extends Thread
 		}
 	}
 	
+	public void setGroupStateListener(GroupStateListener listener)
+	{
+		mListener = listener;
+	}
+	
 	/**
 	 * If not {@code null}, notifies {@link #mListener} of a group state change, updating the
 	 * array if necessary.
