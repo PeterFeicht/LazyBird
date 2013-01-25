@@ -78,6 +78,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 		
 		setBackgroundDrawable(mBackground);
 		setPadding((int)(9 * dp), (int)(6 * dp), (int)(9 * dp), (int)(6 * dp));
+		setCompoundDrawablePadding((int)(6 * dp));
 		setTextAppearance(context, android.R.style.TextAppearance_Medium);
 		
 		mAgeBackground = new GradientDrawable();
