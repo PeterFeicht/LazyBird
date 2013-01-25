@@ -244,9 +244,27 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 			}
 		});
 	}
-
+	
 	@Override
 	public int compareTo(UserActivityView another)
+	{
+		if(this.isOffline() && !another.isOffline())
+			return 1;
+		if(!this.isOffline() && another.isOffline())
+			return -1;
+		return compareToText(another);
+	}
+	
+	/**
+	 * Compares this object to the specified object to determine their relative order, only
+	 * considering their text.
+	 * 
+	 * @param another the object to compare to this instance.
+	 * @return a negative integer if this instance is less than {@code another}; a positive
+	 *         integer if this instance is greater than {@code another}; 0 if this instance has
+	 *         the same order as {@code another}.
+	 */
+	public int compareToText(UserActivityView another)
 	{
 		return ((String)getText()).compareTo((String)another.getText());
 	}
