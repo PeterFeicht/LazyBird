@@ -80,9 +80,14 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			sortOffline();
 			
 			if(mClient.isAlive())
+			{
 				mHandler.postDelayed(mRunUpdateAges, AUTO_UPDATE_DELAY);
+			}
 			else
+			{
 				mLblConnectionLost.setVisibility(View.VISIBLE);
+				mClient = null;
+			}
 		}
 	};
 	
@@ -276,8 +281,11 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 	@Override
 	public boolean onNavigationItemSelected(int position, long id)
 	{
-		// TODO Change user for user dependent view
 		if(LOCAL_LOGV) Log.v(LOGTAG, "onNavigationItemSelected: position = " + position);
+		
+		if(mClient != null)
+			mClient.setActiveUser(position != 0 ? mViewUsers.getItem(position) : null);
+		
 		return true;
 	}
 	
