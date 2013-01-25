@@ -106,6 +106,7 @@ public class GuiClient extends Thread
 	private Socket mSocket;
 	private BufferedReader mInput;
 	private PrintWriter mOutput;
+	private boolean mConnected = false;
 	
 	private UserState[] groupStateList = new UserState[0];
 	
@@ -146,6 +147,7 @@ public class GuiClient extends Thread
 				new BufferedReader(new InputStreamReader(mSocket.getInputStream(), NET_CHARSET));
 			mOutput = new PrintWriter(
 				new OutputStreamWriter(mSocket.getOutputStream(), NET_CHARSET), true);
+			mConnected = true;
 			
 			String line = null;
 			while(!interrupted())
@@ -190,11 +192,16 @@ public class GuiClient extends Thread
 				{
 					e.printStackTrace();
 				}
+				finally
+				{
+					mConnected = false;
+				}
 			}
 		}
 		catch(IOException e)
 		{
 			System.out.println("connection failed: " + e.getMessage());
+			mConnected = false;
 		}
 	}
 	
@@ -252,5 +259,10 @@ public class GuiClient extends Thread
 	public RoomState getRoomState()
 	{
 		return mRoomState;
+	}
+	
+	public boolean isConnected()
+	{
+		return isAlive() && mConnected;
 	}
 }
