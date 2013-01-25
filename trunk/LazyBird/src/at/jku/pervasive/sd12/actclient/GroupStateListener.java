@@ -5,6 +5,7 @@ import at.jku.pervasive.sd12.actclient.CoordinatorClient.UserState;
 /**
  * A GroupStateListener will be notified of any user activity changes.
  */
-public interface GroupStateListener {
+public interface GroupStateListener
+{
 	void groupStateChanged(UserState[] groupState);
 }
