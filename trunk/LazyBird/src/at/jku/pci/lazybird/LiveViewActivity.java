@@ -63,6 +63,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 	private ArrayAdapter<String> mViewUsers;
 	private HashMap<String, UserActivityView> mUserViews;
 	private CoordinatorClient mClient = null;
+	private int mOfflineIndex = 0;
 	// Handlers
 	private Handler mHandler = new Handler();
 	private Runnable mRunUpdateAges = new Runnable() {
@@ -72,6 +73,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			// incremented until the server sends an update
 			for(UserActivityView v : mUserViews.values())
 				v.setAge(v.getAge() + AUTO_UPDATE_DELAY);
+			sortOffline();
 			
 			if(mClient.isConnected())
 				mHandler.postDelayed(mRunUpdateAges, AUTO_UPDATE_DELAY);
@@ -159,7 +161,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		{
 			mLblNoUsername.setVisibility(View.GONE);
 			mChkShowOffline.setEnabled(true);
-			mProgressServerUpdate.setVisibility(View.GONE);
+			mProgressServerUpdate.setVisibility(View.VISIBLE);
 			connect();
 		}
 	}
@@ -358,11 +360,11 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		
 		mHandler.removeCallbacks(mRunUpdateAges);
 		
-		// Update ages and activities for all users, adding all new users to a list
 		// We don't need to remove users from our list, since the server doesn't drop users
 		final LinkedList<UserState> newUsers = new LinkedList<UserState>();
 		for(UserState u : groupState)
 		{
+			// Update ages and activities for all users, adding all new users to a list
 			UserActivityView v = mUserViews.get(u.getUserId());
 			if(v != null)
 			{
@@ -373,7 +375,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 				newUsers.add(u);
 		}
 		
-		// Create views for the new users and add them to our list
+		// Create views for the new users
 		final ArrayList<UserActivityView> newViews =
 			new ArrayList<UserActivityView>(newUsers.size());
 		for(UserState u : newUsers)
@@ -393,6 +395,10 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			public void run()
 			{
 				mProgressServerUpdate.setVisibility(View.GONE);
+				
+				// Sort users before sorted insertion
+				sortOffline();
+				
 				for(UserActivityView v : newViews)
 				{
 					final String id = (String)v.getText();
@@ -408,8 +414,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 					final int count2 = mUserContainer.getChildCount();
 					idx = 0;
 					while(idx < count2 &&
-						((String)((UserActivityView)mUserContainer.getChildAt(idx))
-							.getText()).compareTo(id) < 0)
+						((UserActivityView)mUserContainer.getChildAt(idx)).compareTo(v) < 0)
 					{
 						idx++;
 					}
@@ -419,5 +424,60 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		});
 		
 		mHandler.postDelayed(mRunUpdateAges, AUTO_UPDATE_DELAY);
+	}
+	
+	/**
+	 * Sort the user views by offline status, moving offline views to the bottom.
+	 * <p>
+	 * {@link #mOfflineIndex} has the boundary between the offline and online users, so we only
+	 * need to move online users beyond this index to the front and offline users before that to
+	 * the end. Since no users are dropped by the server, this is the easiest method.
+	 */
+	protected void sortOffline()
+	{
+		final int count = mUserContainer.getChildCount();
+		if(count < 2)
+			return;
+		
+		// Move offline users to the bottom
+		int j = 0;
+		while(j < mOfflineIndex)
+		{
+			final UserActivityView v = (UserActivityView)mUserContainer.getChildAt(j);
+			if(v.isOffline())
+			{
+				int idx = mOfflineIndex;
+				while(idx < count &&
+					((UserActivityView)mUserContainer.getChildAt(idx)).compareToText(v) < 0)
+				{
+					idx++;
+				}
+				
+				mUserContainer.removeViewAt(j);
+				mUserContainer.addView(v, idx - 1);
+				mOfflineIndex--;
+			}
+			else
+				j++;
+		}
+		
+		// Move online users to the top
+		for(j = mOfflineIndex; j < count; j++)
+		{
+			final UserActivityView v = (UserActivityView)mUserContainer.getChildAt(j);
+			if(!v.isOffline())
+			{
+				int idx = 0;
+				while(idx < mOfflineIndex &&
+					((UserActivityView)mUserContainer.getChildAt(idx)).compareToText(v) < 0)
+				{
+					idx++;
+				}
+				
+				mUserContainer.removeViewAt(j);
+				mUserContainer.addView(v, idx);
+				mOfflineIndex++;
+			}
+		}
 	}
 }
