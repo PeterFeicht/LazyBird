@@ -413,11 +413,8 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 					// Add user view in sorted order
 					final int count2 = mUserContainer.getChildCount();
 					idx = 0;
-					while(idx < count2 &&
-						((UserActivityView)mUserContainer.getChildAt(idx)).compareTo(v) < 0)
-					{
+					while(idx < count2 && getUserViewAt(idx).compareTo(v) < 0)
 						idx++;
-					}
 					mUserContainer.addView(v, idx);
 				}
 			}
@@ -443,15 +440,12 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		int j = 0;
 		while(j < mOfflineIndex)
 		{
-			final UserActivityView v = (UserActivityView)mUserContainer.getChildAt(j);
+			final UserActivityView v = getUserViewAt(j);
 			if(v.isOffline())
 			{
 				int idx = mOfflineIndex;
-				while(idx < count &&
-					((UserActivityView)mUserContainer.getChildAt(idx)).compareToText(v) < 0)
-				{
+				while(idx < count && getUserViewAt(idx).compareToText(v) < 0)
 					idx++;
-				}
 				
 				mUserContainer.removeViewAt(j);
 				mUserContainer.addView(v, idx - 1);
@@ -464,20 +458,30 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		// Move online users to the top
 		for(j = mOfflineIndex; j < count; j++)
 		{
-			final UserActivityView v = (UserActivityView)mUserContainer.getChildAt(j);
+			final UserActivityView v = getUserViewAt(j);
 			if(!v.isOffline())
 			{
 				int idx = 0;
-				while(idx < mOfflineIndex &&
-					((UserActivityView)mUserContainer.getChildAt(idx)).compareToText(v) < 0)
-				{
+				while(idx < mOfflineIndex && getUserViewAt(idx).compareToText(v) < 0)
 					idx++;
-				}
 				
 				mUserContainer.removeViewAt(j);
 				mUserContainer.addView(v, idx);
 				mOfflineIndex++;
 			}
 		}
+	}
+	
+	/**
+	 * Returns the view at the specified position in {@link #mUserContainer}, cast to a
+	 * {@code UserActivityView}.
+	 * 
+	 * @param position the position at which to get the view from.
+	 * @return the view at the specified position or null if the position does not exist within
+	 *         the group
+	 */
+	private UserActivityView getUserViewAt(int position)
+	{
+		return (UserActivityView)mUserContainer.getChildAt(position);
 	}
 }
