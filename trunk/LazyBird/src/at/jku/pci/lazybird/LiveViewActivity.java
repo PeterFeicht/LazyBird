@@ -26,8 +26,9 @@ import android.widget.TextView;
 import at.jku.pci.lazybird.util.UserActivityView;
 import at.jku.pervasive.sd12.actclient.ClassLabel;
 import at.jku.pervasive.sd12.actclient.CoordinatorClient;
-import at.jku.pervasive.sd12.actclient.CoordinatorClient.UserState;
-import at.jku.pervasive.sd12.actclient.GroupStateListener;
+import at.jku.pervasive.sd12.actclient.GuiClient;
+import at.jku.pervasive.sd12.actclient.GuiClient.GroupStateListener;
+import at.jku.pervasive.sd12.actclient.GuiClient.UserState;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -62,20 +63,23 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 	// Fields
 	private ArrayAdapter<String> mViewUsers;
 	private HashMap<String, UserActivityView> mUserViews;
-	private CoordinatorClient mClient = null;
+	private GuiClient mClient = null;
 	private int mOfflineIndex = 0;
 	// Handlers
 	private Handler mHandler = new Handler();
 	private Runnable mRunUpdateAges = new Runnable() {
 		public void run()
 		{
+			if(mClient == null)
+				return;
+			
 			// When there are no updates from the server in a long time, the displayed ages are
 			// incremented until the server sends an update
 			for(UserActivityView v : mUserViews.values())
 				v.setAge(v.getAge() + AUTO_UPDATE_DELAY);
 			sortOffline();
 			
-			if(mClient.isConnected())
+			if(mClient.isAlive())
 				mHandler.postDelayed(mRunUpdateAges, AUTO_UPDATE_DELAY);
 			else
 				mLblConnectionLost.setVisibility(View.VISIBLE);
@@ -172,10 +176,10 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		super.onPause();
 		
 		// Terminate the connection when the activity loses focus
+		mHandler.removeCallbacks(mRunUpdateAges);
 		if(mClient != null)
 			mClient.interrupt();
 		mClient = null;
-		mHandler.removeCallbacks(mRunUpdateAges);
 	}
 	
 	/**
@@ -193,13 +197,13 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 	private void connect()
 	{
 		String host;
-		int port;
+		int port = 1;
 		
 		if(sReportServer.isEmpty())
 		{
 			// Use default server and port in case something is missing
 			host = CoordinatorClient.DEFAULT_SERVER_HOST;
-			port = CoordinatorClient.DEFAULT_SERVER_PORT;
+			port += CoordinatorClient.DEFAULT_SERVER_PORT;
 		}
 		else if(sReportServer.contains(":"))
 		{
@@ -208,24 +212,24 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			host = sReportServer.substring(0, idx);
 			try
 			{
-				port = Integer.parseInt(
+				port += Integer.parseInt(
 					sReportServer.substring(idx + 1, sReportServer.length()));
 			}
 			catch(NumberFormatException ex)
 			{
-				port = CoordinatorClient.DEFAULT_SERVER_PORT;
+				port += CoordinatorClient.DEFAULT_SERVER_PORT;
 			}
 		}
 		else
 		{
 			// Port is missing, use default
 			host = sReportServer;
-			port = CoordinatorClient.DEFAULT_SERVER_PORT;
+			port += CoordinatorClient.DEFAULT_SERVER_PORT;
 		}
 		
-		// Start reporting
-		if(LOCAL_LOGV) Log.v(LOGTAG, "Connecting to server...");
-		mClient = new CoordinatorClient(host, port, sReportUser);
+		// Connect to the server, the GUI port is one above the client port
+		if(LOCAL_LOGV) Log.v(LOGTAG, "Connecting to " + host + " on port " + port + "...");
+		mClient = new GuiClient(host, port);
 		
 		mHandler.postDelayed(new Runnable() {
 			int timeouts = 0;
@@ -234,17 +238,20 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			public void run()
 			{
 				// In case the connection fails, the thread of the client stops; check
-				if(mClient.isConnected())
+				if(mClient.isAlive())
 				{
-					mClient.addGroupStateListener(LiveViewActivity.this);
+					mClient.setGroupStateListener(LiveViewActivity.this);
 					if(LOCAL_LOGV) Log.v(LOGTAG, "Connected.");
 				}
 				else
 				{
-					if(timeouts++ > 12)
+					// Check for a connection for 5 seconds, after that consider it failed
+					if(timeouts++ > 20)
 					{
 						if(LOCAL_LOGV) Log.v(LOGTAG, "Connection failed.");
 						mLblCannotConnect.setVisibility(View.VISIBLE);
+						mProgressServerUpdate.setVisibility(View.GONE);
+						mClient.interrupt();
 						mClient = null;
 					}
 					else
