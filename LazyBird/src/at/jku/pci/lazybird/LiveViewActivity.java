@@ -79,7 +79,8 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 				v.setAge(v.getAge() + AUTO_UPDATE_DELAY);
 			sortOffline();
 			
-			if(mClient.isAlive())
+			// Also, check whether the connection is still alive
+			if(mClient.isConnected())
 			{
 				mHandler.postDelayed(mRunUpdateAges, AUTO_UPDATE_DELAY);
 			}
@@ -243,15 +244,15 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			public void run()
 			{
 				// In case the connection fails, the thread of the client stops; check
-				if(mClient.isAlive())
+				if(mClient.isConnected())
 				{
 					mClient.setGroupStateListener(LiveViewActivity.this);
 					if(LOCAL_LOGV) Log.v(LOGTAG, "Connected.");
 				}
 				else
 				{
-					// Check for a connection for 5 seconds, after that consider it failed
-					if(timeouts++ > 20)
+					// Check for a connection for about 5 seconds, after that consider it failed
+					if(timeouts++ > 20 || !mClient.isAlive())
 					{
 						if(LOCAL_LOGV) Log.v(LOGTAG, "Connection failed.");
 						mLblCannotConnect.setVisibility(View.VISIBLE);
@@ -385,6 +386,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			{
 				v.setAge(u.getUpdateAge());
 				v.setActivity(u.getActivity());
+				v.setRole(u.getRole());
 			}
 			else
 				newUsers.add(u);
@@ -399,6 +401,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			v.setText(u.getUserId());
 			v.setAge(u.getUpdateAge());
 			v.setActivity(u.getActivity());
+			v.setRole(u.getRole());
 			v.setShowOffline(mChkShowOffline.isChecked());
 			mUserViews.put(u.getUserId(), v);
 			newViews.add(v);
@@ -492,8 +495,8 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 	 * {@code UserActivityView}.
 	 * 
 	 * @param position the position at which to get the view from.
-	 * @return the view at the specified position or null if the position does not exist within
-	 *         the group
+	 * @return the view at the specified position or {@code null} if the position does not exist
+	 *         within the group
 	 */
 	private UserActivityView getUserViewAt(int position)
 	{
