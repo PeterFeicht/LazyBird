@@ -19,6 +19,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.FrameLayout.LayoutParams;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
@@ -60,6 +61,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 	private TextView mLblCannotConnect;
 	private TextView mLblConnectionLost;
 	private ProgressBar mProgressServerUpdate;
+	private ImageView mImgRoomState;
 	
 	// Fields
 	private ArrayAdapter<String> mViewUsers;
@@ -79,6 +81,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			for(UserActivityView v : mUserViews.values())
 				v.setAge(v.getAge() + AUTO_UPDATE_DELAY);
 			sortOffline();
+			updateRoomState();
 			
 			// Also, check whether the connection is still alive
 			if(mClient.isConnected())
@@ -130,6 +133,8 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		
 		mChkShowOffline = (CheckBox)findViewById(R.id.chkShowOffline);
 		mChkShowOffline.setOnCheckedChangeListener(onChkShowOfflineCheckedChange);
+		
+		mImgRoomState = (ImageView)findViewById(R.id.imgRoomState);
 		
 		mLblNoUsername = (TextView)findViewById(R.id.lblNoUsername);
 		mLblNoUsername.setVisibility(sReportUser.isEmpty() ? View.VISIBLE : View.GONE);
@@ -324,7 +329,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			legend.show();
 			return true;
 		}
-
+		
 		private void buildLegend()
 		{
 			final AlertDialog.Builder b = new AlertDialog.Builder(LiveViewActivity.this);
@@ -461,12 +466,13 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			newViews.add(v);
 		}
 		
-		// Hide connecting progress and add new users to dropdown and activity list
+		// Hide progress bar, update room state and add new users to dropdown and activity list
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run()
 			{
 				mProgressServerUpdate.setVisibility(View.GONE);
+				updateRoomState();
 				
 				// Sort users before sorted insertion
 				sortOffline();
@@ -493,6 +499,32 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		});
 		
 		mHandler.postDelayed(mRunUpdateAges, AUTO_UPDATE_DELAY);
+	}
+	
+	/**
+	 * Set the image of {@link #mImgRoomState} according to the current room state.
+	 */
+	protected void updateRoomState()
+	{
+		int img = R.drawable.role_gnull;
+		
+		if(mClient != null && mClient.isConnected() && mClient.getRoomState() != null)
+		{
+			switch(mClient.getRoomState())
+			{
+				case lecture:
+					img = R.drawable.role_glecture;
+					break;
+				case transition:
+					img = R.drawable.role_gtransitional;
+					break;
+				case empty:
+					img = R.drawable.role_gempty;
+					break;
+			}
+		}
+		
+		mImgRoomState.setImageResource(img);
 	}
 	
 	/**
@@ -552,7 +584,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 	 * @return the view at the specified position or {@code null} if the position does not exist
 	 *         within the group
 	 */
-	private UserActivityView getUserViewAt(int position)
+	protected UserActivityView getUserViewAt(int position)
 	{
 		return (UserActivityView)mUserContainer.getChildAt(position);
 	}
