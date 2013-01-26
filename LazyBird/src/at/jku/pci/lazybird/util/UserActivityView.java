@@ -194,8 +194,17 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 					role = sRoleTransition;
 			}
 		}
+		
+		final Drawable newRole = role;
 		final Drawable[] cd = getCompoundDrawables();
-		setCompoundDrawablesWithIntrinsicBounds(role, cd[1], cd[2], cd[3]);
+		
+		post(new Runnable() {
+			@Override
+			public void run()
+			{
+				setCompoundDrawablesWithIntrinsicBounds(newRole, cd[1], cd[2], cd[3]);
+			}
+		});
 	}
 	
 	@Override
