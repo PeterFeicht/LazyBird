@@ -126,6 +126,15 @@
     <string name="lblCannotConnect">Verbindung zum Server fehlgeschlagen, bitte überprüfen Sie Ihre Einstellungen und stellen Sie sicher, dass eine Internetverbindung besteht.</string>
     <string name="lblConnectionLost">Verbindung verloren. Tippen Sie hier um neu zu verbinden.</string>
     <string name="menu_liveViewLegend">Legend</string>
+    <string name="legend_activities">Aktivitäten</string>
+    <string name="legend_roles">Rollen</string>
+    <string name="legend_roomStates">Raumzustände</string>
+    <string name="role_speaker">Sprecher</string>
+    <string name="role_listener">Zuhörer</string>
+    <string name="role_transition">Unbekannt</string>
+    <string name="room_empty">Leer</string>
+    <string name="room_lecture">Vorlesung</string>
+    <string name="room_transition">Übergang</string>
     
     <!-- Errors and stuff -->
     <string name="error">Fehler</string>
