@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -34,6 +35,11 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	public static final int CORNER_RADIUS = 6;
 	public static final int STROKE_WIDTH = 2;
 	
+	// Static fields
+	protected static Drawable sRoleTransition = null;
+	protected static Drawable sRoleSpeaker = null;
+	protected static Drawable sRoleListener = null;
+	
 	// Fields
 	private long mAge = 5000;
 	private boolean mShowOffline = true;
@@ -44,7 +50,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	private int mAgeBarWidth;
 	private int mAgeBarHeight = 4;
 	private int mAgeBarPadding = 1;
-	private int mPaddingOffset = 1;
+	private int mAgeBarOffset = 1;
 	
 	private GradientDrawable mBackground;
 	private GradientDrawable mAgeBackground;
@@ -68,7 +74,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 		final float dp = res.getDisplayMetrics().density;
 		mAgeBarHeight = (int)(AGE_BAR_HEIGHT * dp);
 		mAgeBarPadding = (int)(AGE_BAR_PADDING * dp);
-		mPaddingOffset = (int)((2 * AGE_BAR_PADDING + AGE_BAR_HEIGHT - AGE_BAR_OFFSET) * dp);
+		mAgeBarOffset = (int)(AGE_BAR_OFFSET * dp);
 		
 		mBackground = new GradientDrawable();
 		mBackground.setShape(GradientDrawable.RECTANGLE);
@@ -93,15 +99,39 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	}
 	
 	@Override
-	public void setPadding(int left, int top, int right, int bottom)
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
 	{
-		super.setPadding(left, top, right, bottom + mPaddingOffset);
-	}
-	
-	@Override
-	public int getPaddingBottom()
-	{
-		return super.getPaddingBottom() - mPaddingOffset;
+		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		
+		// Parent told us how large to be, make it so
+		final int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+		if(heightMode == MeasureSpec.EXACTLY)
+			return;
+		
+		// The value of 1.35 for the text size plus text padding was determined experimentally,
+		// I have no idea where it comes from
+		final int textSize = (int)(getTextSize() * 1.35f);
+		final Drawable[] cd = getCompoundDrawables();
+		
+		// Check whether compound drawables are larger than text size
+		int diff = 0;
+		if(cd[0] != null)
+			diff = Math.max(diff, cd[0].getBounds().bottom - textSize);
+		if(cd[2] != null)
+			diff = Math.max(diff, cd[2].getBounds().bottom - textSize);
+		
+		diff = (mAgeBarHeight + 2 * mAgeBarPadding - mAgeBarOffset) - diff;
+		
+		// Compound drawables already enlarged the view enough for the age bar to fit, return
+		if(diff <= 0)
+			return;
+		
+		// Enlarge the view by the needed age bar space
+		int height = getMeasuredHeight() + diff;
+		if(heightMode == MeasureSpec.AT_MOST)
+			height = Math.min(MeasureSpec.getSize(heightMeasureSpec), height);
+		
+		setMeasuredDimension(getMeasuredWidthAndState(), height);
 	}
 	
 	@Override
@@ -110,7 +140,8 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 		super.onSizeChanged(w, h, oldw, oldh);
 		
 		mAgeBarLeft = getCompoundPaddingLeft() + mAgeBarPadding;
-		mAgeBarTop = h - getCompoundPaddingBottom() + mAgeBarPadding;
+		mAgeBarTop =
+			h - getCompoundPaddingBottom() - mAgeBarHeight - mAgeBarPadding + mAgeBarOffset;
 		mAgeBarWidth =
 			w - getCompoundPaddingLeft() - getCompoundPaddingRight() - 2 * mAgeBarPadding;
 		
@@ -134,13 +165,37 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 		updateBackgroundColor();
 		if(isOffline())
 			setVisibility(mShowOffline ? View.VISIBLE : View.GONE);
-		else
-			postInvalidate();
+		postInvalidate();
 	}
 	
 	private void onRoleChanged()
 	{
-		// TODO set role image
+		Drawable role = null;
+		if(mRole != null)
+		{
+			switch(mRole)
+			{
+				case listener:
+					if(sRoleListener == null)
+						sRoleListener = getResources().getDrawable(R.drawable.role_listener);
+					role = sRoleListener;
+					break;
+				case speaker:
+					if(sRoleSpeaker == null)
+						sRoleSpeaker = getResources().getDrawable(R.drawable.role_speaker);
+					role = sRoleSpeaker;
+					break;
+				default:
+					if(sRoleTransition == null)
+					{
+						sRoleTransition =
+								getResources().getDrawable(R.drawable.role_transitional);
+					}
+					role = sRoleTransition;
+			}
+		}
+		final Drawable[] cd = getCompoundDrawables();
+		setCompoundDrawablesWithIntrinsicBounds(role, cd[1], cd[2], cd[3]);
 	}
 	
 	@Override
