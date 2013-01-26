@@ -29,6 +29,7 @@ import at.jku.pervasive.sd12.actclient.CoordinatorClient;
 import at.jku.pervasive.sd12.actclient.GuiClient;
 import at.jku.pervasive.sd12.actclient.GuiClient.GroupStateListener;
 import at.jku.pervasive.sd12.actclient.GuiClient.UserState;
+import at.jku.pervasive.sd12.actclient.UserRole;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -318,53 +319,106 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		{
 			// Build a legend and show it
 			if(legend == null)
-			{
-				final AlertDialog.Builder b = new AlertDialog.Builder(LiveViewActivity.this);
-				final ScrollView sv = new ScrollView(LiveViewActivity.this);
-				final LinearLayout l = new LinearLayout(LiveViewActivity.this);
-				final float dp = getResources().getDisplayMetrics().density;
-				
-				b.setTitle(R.string.menu_liveViewLegend);
-				b.setPositiveButton(android.R.string.ok, null);
-				
-				l.setOrientation(LinearLayout.VERTICAL);
-				// l.setGravity(Gravity.CENTER_HORIZONTAL);
-				l.setPadding((int)(9 * dp), (int)(9 * dp), (int)(9 * dp), (int)(9 * dp));
-				l.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
-				l.setDividerDrawable(getResources().getDrawable(R.drawable.layout_divider));
-				final LayoutParams lp =
-					new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-				lp.gravity = Gravity.CENTER_HORIZONTAL;
-				l.setLayoutParams(lp);
-				
-				UserActivityView v = new UserActivityView(LiveViewActivity.this);
-				v.setText("sitting");
-				v.setActivity(ClassLabel.sitting);
-				l.addView(v);
-				v = new UserActivityView(LiveViewActivity.this);
-				v.setText("standing");
-				v.setActivity(ClassLabel.standing);
-				l.addView(v);
-				v = new UserActivityView(LiveViewActivity.this);
-				v.setText("walking");
-				v.setActivity(ClassLabel.walking);
-				l.addView(v);
-				v = new UserActivityView(LiveViewActivity.this);
-				v.setText("null");
-				v.setActivity(null);
-				l.addView(v);
-				v = new UserActivityView(LiveViewActivity.this);
-				v.setText(R.string.offline);
-				v.setAge(UserActivityView.MAX_AGE + 1);
-				l.addView(v);
-				
-				sv.addView(l);
-				b.setView(sv);
-				legend = b.create();
-			}
+				buildLegend();
 			
 			legend.show();
 			return true;
+		}
+
+		private void buildLegend()
+		{
+			final AlertDialog.Builder b = new AlertDialog.Builder(LiveViewActivity.this);
+			final ScrollView sv = new ScrollView(LiveViewActivity.this);
+			final LinearLayout l = new LinearLayout(LiveViewActivity.this);
+			final float dp = getResources().getDisplayMetrics().density;
+			
+			b.setTitle(R.string.menu_liveViewLegend);
+			b.setPositiveButton(android.R.string.ok, null);
+			
+			// Linear layout
+			l.setOrientation(LinearLayout.VERTICAL);
+			l.setPadding((int)(9 * dp), (int)(9 * dp), (int)(9 * dp), (int)(12 * dp));
+			l.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
+			l.setDividerDrawable(getResources().getDrawable(R.drawable.layout_divider));
+			final LayoutParams lp =
+				new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+			lp.gravity = Gravity.CENTER_HORIZONTAL;
+			l.setLayoutParams(lp);
+			
+			// Activities
+			TextView tv = new TextView(LiveViewActivity.this);
+			tv.setTextAppearance(LiveViewActivity.this, android.R.style.TextAppearance_Medium);
+			tv.setText(R.string.legend_activities);
+			l.addView(tv);
+			UserActivityView v = new UserActivityView(LiveViewActivity.this);
+			v.setText("sitting");
+			v.setActivity(ClassLabel.sitting);
+			l.addView(v);
+			v = new UserActivityView(LiveViewActivity.this);
+			v.setText("standing");
+			v.setActivity(ClassLabel.standing);
+			l.addView(v);
+			v = new UserActivityView(LiveViewActivity.this);
+			v.setText("walking");
+			v.setActivity(ClassLabel.walking);
+			l.addView(v);
+			v = new UserActivityView(LiveViewActivity.this);
+			v.setText("null");
+			v.setActivity(null);
+			l.addView(v);
+			v = new UserActivityView(LiveViewActivity.this);
+			v.setText(R.string.offline);
+			v.setAge(UserActivityView.MAX_AGE + 1);
+			l.addView(v);
+			
+			// Roles
+			tv = new TextView(LiveViewActivity.this);
+			tv.setTextAppearance(LiveViewActivity.this, android.R.style.TextAppearance_Medium);
+			tv.setText(R.string.legend_roles);
+			l.addView(tv);
+			v = new UserActivityView(LiveViewActivity.this);
+			v.setText(R.string.role_speaker);
+			v.setRole(UserRole.speaker);
+			l.addView(v);
+			v = new UserActivityView(LiveViewActivity.this);
+			v.setText(R.string.role_listener);
+			v.setRole(UserRole.listener);
+			l.addView(v);
+			v = new UserActivityView(LiveViewActivity.this);
+			v.setText(R.string.role_transition);
+			v.setRole(UserRole.transition);
+			l.addView(v);
+			
+			// Room states
+			tv = new TextView(LiveViewActivity.this);
+			tv.setTextAppearance(LiveViewActivity.this, android.R.style.TextAppearance_Medium);
+			tv.setText(R.string.legend_roomStates);
+			l.addView(tv);
+			tv = new TextView(LiveViewActivity.this);
+			tv.setText(R.string.room_lecture);
+			tv.setTextAppearance(LiveViewActivity.this, android.R.style.TextAppearance_Medium);
+			tv.setCompoundDrawablePadding((int)(6 * dp));
+			tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.role_glecture, 0, 0, 0);
+			tv.setGravity(Gravity.CENTER_VERTICAL);
+			l.addView(tv);
+			tv = new TextView(LiveViewActivity.this);
+			tv.setText(R.string.room_transition);
+			tv.setTextAppearance(LiveViewActivity.this, android.R.style.TextAppearance_Medium);
+			tv.setCompoundDrawablePadding((int)(6 * dp));
+			tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.role_gtransitional, 0, 0, 0);
+			tv.setGravity(Gravity.CENTER_VERTICAL);
+			l.addView(tv);
+			tv = new TextView(LiveViewActivity.this);
+			tv.setText(R.string.room_empty);
+			tv.setTextAppearance(LiveViewActivity.this, android.R.style.TextAppearance_Medium);
+			tv.setCompoundDrawablePadding((int)(6 * dp));
+			tv.setCompoundDrawablesWithIntrinsicBounds(R.drawable.role_gempty, 0, 0, 0);
+			tv.setGravity(Gravity.CENTER_VERTICAL);
+			l.addView(tv);
+			
+			sv.addView(l);
+			b.setView(sv);
+			legend = b.create();
 		}
 	};
 	
