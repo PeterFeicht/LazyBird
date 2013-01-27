@@ -153,4 +153,10 @@
     <string name="yes">Ja</string>
     <string name="offline">Offline</string>
     
+    <!-- Misc -->
+    <string name="class_sitting">sitting</string>
+    <string name="class_standing">standing</string>
+    <string name="class_walking">walking</string>
+    <string name="class_null">null</string>
+    
 </resources>
