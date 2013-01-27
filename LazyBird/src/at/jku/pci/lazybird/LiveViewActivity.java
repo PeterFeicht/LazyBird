@@ -236,6 +236,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		// Connect to the server, the GUI port is one above the client port
 		if(LOCAL_LOGV) Log.v(LOGTAG, "Connecting to " + host + " on port " + port + "...");
 		mClient = new GuiClient(host, port);
+		mClient.setGroupStateListener(LiveViewActivity.this);
 		
 		mHandler.postDelayed(new Runnable() {
 			int timeouts = 0;
@@ -243,13 +244,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			@Override
 			public void run()
 			{
-				// In case the connection fails, the thread of the client stops; check
-				if(mClient.isConnected())
-				{
-					mClient.setGroupStateListener(LiveViewActivity.this);
-					if(LOCAL_LOGV) Log.v(LOGTAG, "Connected.");
-				}
-				else
+				if(!mClient.isConnected())
 				{
 					// Check for a connection for about 5 seconds, after that consider it failed
 					if(timeouts++ > 20 || !mClient.isAlive())
@@ -263,6 +258,8 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 					else
 						mHandler.postDelayed(this, 250);
 				}
+				else if(LOCAL_LOGV)
+					Log.v(LOGTAG, "Connected.");
 			}
 		}, 250);
 	}
