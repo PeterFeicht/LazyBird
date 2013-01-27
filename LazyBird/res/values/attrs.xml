@@ -6,6 +6,18 @@
         <attr name="maxValue" format="integer" />
     </declare-styleable>
     
+    <declare-styleable name="UserActivityView">
+        <attr name="maxAge" format="integer" />
+        <attr name="age" format="integer" />
+        <attr name="showOffline" format="boolean" />
+        <attr name="activity" format="string" />
+        <attr name="role" format="string" />
+        <attr name="ageBarHeight" format="dimension|reference" />
+        <attr name="ageBarPadding" format="dimension|reference" />
+        <attr name="ageBarBackgroundColor" format="color|reference" />
+        <attr name="ageBarForegroundColor" format="color|reference"/>
+    </declare-styleable>
+    
     <declare-styleable name="FlowLayout">
         <attr name="horizontalSpacing" format="dimension" />
         <attr name="verticalSpacing" format="dimension" />
