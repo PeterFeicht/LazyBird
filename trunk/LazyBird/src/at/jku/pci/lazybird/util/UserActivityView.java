@@ -1,7 +1,7 @@
 package at.jku.pci.lazybird.util;
 
 import android.content.Context;
-import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -16,7 +16,7 @@ import at.jku.pervasive.sd12.actclient.UserRole;
 /**
  * A {@link TextView} with a background and rounded border that has an age bar at the bottom.
  * <p>
- * An age of {@code 0} means a full bar, an age of {@link #MAX_AGE} means the bar is empty.
+ * An age of {@code 0} means a full bar, an age of {@link #getMaxAge()} means the bar is empty.
  * 
  * @author Peter
  */
@@ -26,7 +26,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	static final String LOGTAG = "UserActivityView";
 	static final boolean LOCAL_LOGV = true;
 	// Default values
-	public static final long MAX_AGE = 10000;
+	public static final int MAX_AGE = 10000;
 	public static final int AGE_BAR_HEIGHT = 4;
 	public static final int AGE_BAR_PADDING = 5;
 	public static final int AGE_BAR_OFFSET = 2;
@@ -40,18 +40,38 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	protected static Drawable sRoleSpeaker = null;
 	protected static Drawable sRoleListener = null;
 	
-	// Fields
+	// Property fields
+	private int mMaxAge = MAX_AGE;
 	private long mAge = 5000;
 	private boolean mShowOffline = true;
 	private ClassLabel mActivity = null;
 	private UserRole mRole = null;
-	private int mAgeBarTop;
-	private int mAgeBarLeft;
+	private int mAgeBarBackground = AGE_BAR_BG;
+	private int mAgeBarForeground = AGE_BAR_FG;
 	private int mAgeBarWidth;
 	private int mAgeBarHeight;
 	private int mAgeBarPadding;
+	
+	// Fields
+	private int mAgeBarTop;
+	private int mAgeBarLeft;
 	private int mAgeBarOffset;
 	
+	private final Runnable mRunUpdateBackgroundColor = new Runnable() {
+		@Override
+		public void run()
+		{
+			setBackgroundColor(getActivityColor());
+		}
+	};
+	private final Runnable mRunUpdateRoleDrawable = new Runnable() {
+		@Override
+		public void run()
+		{
+			final Drawable[] cd = getCompoundDrawables();
+			setCompoundDrawablesWithIntrinsicBounds(getRoleDrawable(), cd[1], cd[2], cd[3]);
+		}
+	};
 	private GradientDrawable mBackground;
 	private GradientDrawable mAgeBackground;
 	private GradientDrawable mAgeBar;
@@ -59,43 +79,96 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	public UserActivityView(Context context)
 	{
 		super(context);
-		init(context);
+		init(null);
 	}
 	
 	public UserActivityView(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
-		init(context);
+		init(attrs);
 	}
 	
-	private void init(Context context)
+	private final void init(AttributeSet attrs)
 	{
-		final Resources res = context.getResources();
-		final float dp = res.getDisplayMetrics().density;
+		// Set defaults for values depending on display metrics
+		final float dp = getResources().getDisplayMetrics().density;
 		mAgeBarHeight = (int)(AGE_BAR_HEIGHT * dp);
 		mAgeBarPadding = (int)(AGE_BAR_PADDING * dp);
 		mAgeBarOffset = (int)(AGE_BAR_OFFSET * dp);
+		
+		if(attrs != null)
+		{
+			final TypedArray a =
+				getContext().obtainStyledAttributes(attrs, R.styleable.UserActivityView);
+			final int count = a.getIndexCount();
+			for(int j = 0; j < count; j++)
+			{
+				int attr = a.getIndex(j);
+				switch(attr)
+				{
+					case R.styleable.UserActivityView_age:
+						mAge = a.getInt(attr, 5000);
+						break;
+					case R.styleable.UserActivityView_maxAge:
+						mMaxAge = a.getInt(attr, MAX_AGE);
+						break;
+					case R.styleable.UserActivityView_showOffline:
+						mShowOffline = a.getBoolean(attr, true);
+						break;
+					case R.styleable.UserActivityView_activity:
+						final String activity = a.getString(attr);
+						// Background color is set later
+						if(activity != null)
+							mActivity = ClassLabel.parse(activity);
+						break;
+					case R.styleable.UserActivityView_role:
+						final String role = a.getString(attr);
+						// Set compound drawable immediately
+						if(role != null)
+						{
+							mRole = UserRole.parse(role);
+							final Drawable[] cd = getCompoundDrawables();
+							setCompoundDrawablesWithIntrinsicBounds(getRoleDrawable(),
+								cd[1], cd[2], cd[3]);
+						}
+						break;
+					case R.styleable.UserActivityView_ageBarHeight:
+						mAgeBarHeight = a.getDimensionPixelSize(attr, mAgeBarHeight);
+						break;
+					case R.styleable.UserActivityView_ageBarPadding:
+						mAgeBarPadding = a.getDimensionPixelSize(attr, mAgeBarPadding);
+						break;
+					case R.styleable.UserActivityView_ageBarBackgroundColor:
+						mAgeBarBackground = a.getColor(attr, AGE_BAR_BG);
+						break;
+					case R.styleable.UserActivityView_ageBarForegroundColor:
+						mAgeBarForeground = a.getColor(attr, AGE_BAR_FG);
+						break;
+				}
+			}
+		}
 		
 		mBackground = new GradientDrawable();
 		mBackground.setShape(GradientDrawable.RECTANGLE);
 		mBackground.setCornerRadius(BG_CORNER_RADIUS * dp);
 		mBackground.setStroke((int)(BG_STROKE_WIDTH * dp), Color.BLACK);
-		mBackground.setColor(res.getColor(android.R.color.holo_blue_dark));
+		mBackground.setColor(getActivityColor());
 		
 		setBackgroundDrawable(mBackground);
 		setPadding((int)(9 * dp), (int)(6 * dp), (int)(9 * dp), (int)(6 * dp));
 		setCompoundDrawablePadding((int)(6 * dp));
-		setTextAppearance(context, android.R.style.TextAppearance_Medium);
+		setTextAppearance(getContext(), android.R.style.TextAppearance_Medium);
 		
 		mAgeBackground = new GradientDrawable();
 		mAgeBackground.setShape(GradientDrawable.RECTANGLE);
-		mAgeBackground.setColor(AGE_BAR_BG);
+		mAgeBackground.setColor(mAgeBarBackground);
 		mAgeBackground.setCornerRadius(mAgeBarHeight / 2f);
 		
 		mAgeBar = new GradientDrawable();
 		mAgeBar.setShape(GradientDrawable.RECTANGLE);
-		mAgeBar.setColor(AGE_BAR_FG);
+		mAgeBar.setColor(mAgeBarForeground);
 		mAgeBar.setCornerRadius(mAgeBarHeight / 2f);
+		onAgeChanged();
 	}
 	
 	@Override
@@ -167,66 +240,23 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	 */
 	protected void onAgeChanged()
 	{
-		int width = (int)((mAgeBarWidth * (MAX_AGE - mAge)) / MAX_AGE);
+		int width = (int)((mAgeBarWidth * (mMaxAge - mAge)) / mMaxAge);
 		mAgeBar.setBounds(
 			mAgeBarLeft,
 			mAgeBarTop,
 			mAgeBarLeft + (width > 0 ? width : 0),
 			mAgeBarTop + mAgeBarHeight);
 		
-		updateBackgroundColor();
+		post(mRunUpdateBackgroundColor);
 		if(isOffline())
 			setVisibility(mShowOffline ? View.VISIBLE : View.GONE);
 		postInvalidate();
 	}
 	
 	/**
-	 * Sets the left compound drawable according to the role, does so on the UI-thread.
+	 * Gets the appropriate color for this view's activity and age.
 	 */
-	protected void onRoleChanged()
-	{
-		Drawable role = null;
-		if(mRole != null)
-		{
-			switch(mRole)
-			{
-				case listener:
-					if(sRoleListener == null)
-						sRoleListener = getResources().getDrawable(R.drawable.role_listener);
-					role = sRoleListener;
-					break;
-				case speaker:
-					if(sRoleSpeaker == null)
-						sRoleSpeaker = getResources().getDrawable(R.drawable.role_speaker);
-					role = sRoleSpeaker;
-					break;
-				default:
-					if(sRoleTransition == null)
-					{
-						sRoleTransition =
-							getResources().getDrawable(R.drawable.role_transitional);
-					}
-					role = sRoleTransition;
-			}
-		}
-		
-		final Drawable newRole = role;
-		final Drawable[] cd = getCompoundDrawables();
-		
-		post(new Runnable() {
-			@Override
-			public void run()
-			{
-				setCompoundDrawablesWithIntrinsicBounds(newRole, cd[1], cd[2], cd[3]);
-			}
-		});
-	}
-	
-	/**
-	 * Updates the background color of the view according to age and activity, does so on the
-	 * UI-thread.
-	 */
-	protected void updateBackgroundColor()
+	protected int getActivityColor()
 	{
 		int color;
 		if(isOffline())
@@ -256,15 +286,39 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 				}
 			}
 		}
-		
-		final int newColor = color;
-		post(new Runnable() {
-			@Override
-			public void run()
+		return color;
+	}
+	
+	/**
+	 * Gets the appropriate role drawable for this view's role.
+	 */
+	protected Drawable getRoleDrawable()
+	{
+		Drawable role = null;
+		if(mRole != null)
+		{
+			switch(mRole)
 			{
-				setBackgroundColor(newColor);
+				case listener:
+					if(sRoleListener == null)
+						sRoleListener = getResources().getDrawable(R.drawable.role_listener);
+					role = sRoleListener;
+					break;
+				case speaker:
+					if(sRoleSpeaker == null)
+						sRoleSpeaker = getResources().getDrawable(R.drawable.role_speaker);
+					role = sRoleSpeaker;
+					break;
+				default:
+					if(sRoleTransition == null)
+					{
+						sRoleTransition =
+							getResources().getDrawable(R.drawable.role_transitional);
+					}
+					role = sRoleTransition;
 			}
-		});
+		}
+		return role;
 	}
 	
 	/**
@@ -312,11 +366,11 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	}
 	
 	/**
-	 * Gets whether the age of this view is greater than {@link #MAX_AGE}.
+	 * Gets whether the age of this view is greater than {@link #getMaxAge()}.
 	 */
 	public boolean isOffline()
 	{
-		return mAge > MAX_AGE;
+		return mAge > mMaxAge;
 	}
 	
 	/**
@@ -347,7 +401,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	public void setActivity(ClassLabel activity)
 	{
 		mActivity = activity;
-		updateBackgroundColor();
+		post(mRunUpdateBackgroundColor);
 	}
 	
 	/**
@@ -367,7 +421,29 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	public void setRole(UserRole role)
 	{
 		mRole = role;
-		onRoleChanged();
+		post(mRunUpdateRoleDrawable);
+	}
+	
+	/**
+	 * Gets the maximum age for this view, that is the age after which the view is considered
+	 * offline.
+	 */
+	public long getMaxAge()
+	{
+		return mMaxAge;
+	}
+	
+	/**
+	 * Sets the maximum age for this view, that is the age after which the view is considered
+	 * offline.
+	 * 
+	 * @param maxAge the maximum age, needs to be positive.
+	 */
+	public void setMaxAge(int maxAge)
+	{
+		if(maxAge < 1)
+			throw new IllegalArgumentException("maxAge needs to be positive.");
+		mMaxAge = maxAge;
 	}
 	
 	/**
