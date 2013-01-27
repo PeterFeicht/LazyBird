@@ -21,8 +21,8 @@ import java.util.Date;
 public class ClassifierInfoActivity extends Activity
 {
 	// Constants
-	public static final String LOGTAG = "ClassifierInfoActivity";
-	public static final boolean LOCAL_LOGV = true;
+	static final String LOGTAG = "ClassifierInfoActivity";
+	static final boolean LOCAL_LOGV = true;
 	// Settings
 	/**
 	 * Setting: {@link Storage#KEY_CLASSIFIER_FILE}

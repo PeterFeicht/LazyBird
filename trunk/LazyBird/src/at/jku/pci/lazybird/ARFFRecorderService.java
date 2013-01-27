@@ -28,8 +28,8 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 {
 	private static ARFFRecorderService sInstance = null;
 	
-	public static final String LOGTAG = "ARFFRecorderService";
-	public static final boolean LOCAL_LOGV = true;
+	static final String LOGTAG = "ARFFRecorderService";
+	static final boolean LOCAL_LOGV = true;
 	/**
 	 * Format string used to format the acceleration values written to the output file.
 	 */

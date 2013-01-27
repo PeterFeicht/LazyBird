@@ -84,8 +84,8 @@ public class SettingsActivity extends Activity
 	 */
 	public static final String KEY_LOG_FILENAME = "logFilename";
 	
-	public static final String LOGTAG = "SettingsActivity";
-	public static final boolean LOCAL_LOGV = true;
+	static final String LOGTAG = "SettingsActivity";
+	static final boolean LOCAL_LOGV = true;
 	
 	/**
 	 * This is the fragment containing all settings.

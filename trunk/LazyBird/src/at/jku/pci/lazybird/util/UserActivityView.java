@@ -23,8 +23,8 @@ import at.jku.pervasive.sd12.actclient.UserRole;
 public class UserActivityView extends TextView implements Comparable<UserActivityView>
 {
 	// Constants
-	public static final String LOGTAG = "UserActivityView";
-	public static final boolean LOCAL_LOGV = true;
+	static final String LOGTAG = "UserActivityView";
+	static final boolean LOCAL_LOGV = true;
 	
 	public static final long MAX_AGE = 10000;
 	public static final int AGE_BAR_HEIGHT = 4;
@@ -108,17 +108,17 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 		if(heightMode == MeasureSpec.EXACTLY)
 			return;
 		
-		// The value of 1.35 for the text size plus text padding was determined experimentally,
-		// I have no idea where it comes from
-		final int textSize = (int)(getTextSize() * 1.35f);
+		// The value for the line height was determined experimentally, I have no idea where it
+		// comes from
+		final int lineHeight = (int)(getTextSize() * 1.36f);
 		final Drawable[] cd = getCompoundDrawables();
 		
 		// Check whether compound drawables are larger than text size
 		int diff = 0;
 		if(cd[0] != null)
-			diff = Math.max(diff, cd[0].getBounds().bottom - textSize);
+			diff = Math.max(diff, cd[0].getBounds().bottom - lineHeight);
 		if(cd[2] != null)
-			diff = Math.max(diff, cd[2].getBounds().bottom - textSize);
+			diff = Math.max(diff, cd[2].getBounds().bottom - lineHeight);
 		
 		diff = (mAgeBarHeight + 2 * mAgeBarPadding - mAgeBarOffset) - diff;
 		
@@ -189,7 +189,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 					if(sRoleTransition == null)
 					{
 						sRoleTransition =
-								getResources().getDrawable(R.drawable.role_transitional);
+							getResources().getDrawable(R.drawable.role_transitional);
 					}
 					role = sRoleTransition;
 			}

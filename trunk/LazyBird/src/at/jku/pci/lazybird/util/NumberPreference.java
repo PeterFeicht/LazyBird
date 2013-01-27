@@ -15,8 +15,8 @@ import at.jku.pci.lazybird.R;
  */
 public class NumberPreference extends DialogPreference
 {
-	public static final String LOGTAG = "NumberPreference";
-	public static final boolean LOCAL_LOGV = true;
+	static final String LOGTAG = "NumberPreference";
+	static final boolean LOCAL_LOGV = true;
 	
 	public static final int DEFAULT_VALUE = 0;
 	public static final int DEFAULT_MIN_VALUE = 0;

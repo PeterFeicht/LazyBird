@@ -54,8 +54,8 @@ public class ReportFragment extends AbstractTabFragment
 	public static final String BCAST_NEW_ACTIVITY = "at.jku.pci.lazybird.REP_NEW_ACTIVITY";
 	public static final String BCAST_NEW_CLASSIFIER = "at.jku.pci.lazybird.NEW_CLASSIFIER";
 	// Constants
-	public static final String LOGTAG = "ReportFragment";
-	public static final boolean LOCAL_LOGV = true;
+	static final String LOGTAG = "ReportFragment";
+	static final boolean LOCAL_LOGV = true;
 	public static final String STATE_CLASSIFIER = "at.jku.pci.lazybird.STATE_CLASSIFIER";
 	public static final String STATE_LOG = "at.jku.pci.lazybird.STATE_LOG";
 	/**

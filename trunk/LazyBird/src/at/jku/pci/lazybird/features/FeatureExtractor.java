@@ -66,7 +66,7 @@ public class FeatureExtractor
 	 */
 	public static final int IMPLEMENTED_FEATURES = 0xFF;
 	
-	public static final String LOGTAG = "FeatureExtractor";
+	static final String LOGTAG = "FeatureExtractor";
 	
 	private final File[] mFiles;
 	private final Feature[] mFeatures;
