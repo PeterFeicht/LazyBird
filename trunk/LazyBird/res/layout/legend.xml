@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/at.jku.pci.lazybird"
+    android:id="@+id/scrollLegend"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:id="@+id/layoutLegend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:divider="@drawable/layout_divider"
+        android:orientation="vertical"
+        android:paddingBottom="12dp"
+        android:paddingLeft="9dp"
+        android:paddingRight="9dp"
+        android:paddingTop="9dp"
+        android:showDividers="middle" >
+
+        <TextView
+            android:id="@+id/lblLegendActivities"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/legend_activities"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <at.jku.pci.lazybird.util.UserActivityView
+            android:id="@+id/legendSitting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/class_sitting"
+            app:activity="sitting" />
+
+        <at.jku.pci.lazybird.util.UserActivityView
+            android:id="@+id/legendStanding"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/class_standing"
+            app:activity="standing" />
+
+        <at.jku.pci.lazybird.util.UserActivityView
+            android:id="@+id/legendWalking"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/class_walking"
+            app:activity="walking" />
+
+        <at.jku.pci.lazybird.util.UserActivityView
+            android:id="@+id/legendNull"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/class_null"
+            app:activity="null" />
+
+        <at.jku.pci.lazybird.util.UserActivityView
+            android:id="@+id/legendOffline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/offline"
+            app:age="11"
+            app:maxAge="10" />
+
+        <TextView
+            android:id="@+id/lblLegendRoles"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/legend_roles"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <at.jku.pci.lazybird.util.UserActivityView
+            android:id="@+id/legendSpeaker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/role_speaker"
+            app:role="speaker" />
+
+        <at.jku.pci.lazybird.util.UserActivityView
+            android:id="@+id/legendListener"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/role_listener"
+            app:role="listener" />
+
+        <at.jku.pci.lazybird.util.UserActivityView
+            android:id="@+id/legendUnknown"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/role_transition"
+            app:role="transition" />
+
+        <TextView
+            android:id="@+id/lblLegendRoomStates"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/legend_roomStates"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/legendLecture"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/role_glecture"
+            android:drawablePadding="6dp"
+            android:gravity="center_vertical"
+            android:text="@string/room_lecture"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/legendTransition"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/role_gtransitional"
+            android:drawablePadding="6dp"
+            android:gravity="center_vertical"
+            android:text="@string/room_transition"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/legendEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/role_gempty"
+            android:drawablePadding="6dp"
+            android:gravity="center_vertical"
+            android:text="@string/room_empty"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    </LinearLayout>
+
+</ScrollView>
