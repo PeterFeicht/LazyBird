@@ -78,17 +78,22 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	
 	public UserActivityView(Context context)
 	{
-		super(context);
-		init(null);
+		this(context, null);
 	}
 	
 	public UserActivityView(Context context, AttributeSet attrs)
 	{
-		super(context, attrs);
-		init(attrs);
+		super(context, attrs, R.attr.userActivityViewStyle);
+		init(attrs, R.attr.userActivityViewStyle);
 	}
 	
-	private final void init(AttributeSet attrs)
+	public UserActivityView(Context context, AttributeSet attrs, int defStyle)
+	{
+		super(context, attrs, defStyle);
+		init(attrs, defStyle);
+	}
+
+	private final void init(AttributeSet attrs, int defStyle)
 	{
 		// Set defaults for values depending on display metrics
 		final float dp = getResources().getDisplayMetrics().density;
@@ -98,8 +103,8 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 		
 		if(attrs != null)
 		{
-			final TypedArray a =
-				getContext().obtainStyledAttributes(attrs, R.styleable.UserActivityView);
+			final TypedArray a = getContext().obtainStyledAttributes(attrs,
+				R.styleable.UserActivityView, defStyle, 0);
 			final int count = a.getIndexCount();
 			for(int j = 0; j < count; j++)
 			{
@@ -146,6 +151,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 						break;
 				}
 			}
+			a.recycle();
 		}
 		
 		mBackground = new GradientDrawable();
@@ -157,7 +163,6 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 		setBackgroundDrawable(mBackground);
 		setPadding((int)(9 * dp), (int)(6 * dp), (int)(9 * dp), (int)(6 * dp));
 		setCompoundDrawablePadding((int)(6 * dp));
-		setTextAppearance(getContext(), android.R.style.TextAppearance_Medium);
 		
 		mAgeBackground = new GradientDrawable();
 		mAgeBackground.setShape(GradientDrawable.RECTANGLE);
