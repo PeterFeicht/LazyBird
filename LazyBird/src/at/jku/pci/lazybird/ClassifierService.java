@@ -47,8 +47,8 @@ public class ClassifierService extends Service implements SensorEventListener,
 {
 	private static ClassifierService sInstance = null;
 	
-	public static final String LOGTAG = "ClassifierService";
-	public static final boolean LOCAL_LOGV = true;
+	static final String LOGTAG = "ClassifierService";
+	static final boolean LOCAL_LOGV = true;
 	
 	/**
 	 * Format string to use for log entries, formatted by {@link SimpleDateFormat} and

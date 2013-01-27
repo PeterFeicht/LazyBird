@@ -45,8 +45,8 @@ public class RecorderFragment extends AbstractTabFragment
 	public static final String BCAST_SERVICE_STOPPED = "at.jku.pci.lazybird.REC_SERVICE_STOPPED";
 	public static final String BCAST_SERVICE_STARTED = "at.jku.pci.lazybird.REC_SERVICE_STARTED";
 	// Constants
-	public static final String LOGTAG = "RecorderFragment";
-	public static final boolean LOCAL_LOGV = true;
+	static final String LOGTAG = "RecorderFragment";
+	static final boolean LOCAL_LOGV = true;
 	/**
 	 * Standard extension for ARFF files.
 	 * <p> {@value}

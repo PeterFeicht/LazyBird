@@ -83,8 +83,8 @@ public class TrainFragment extends AbstractTabFragment
 	}
 	
 	// Constants
-	public static final String LOGTAG = "TrainFragment";
-	public static final boolean LOCAL_LOGV = true;
+	static final String LOGTAG = "TrainFragment";
+	static final boolean LOCAL_LOGV = true;
 	/**
 	 * Bundle key for the selected files.
 	 */

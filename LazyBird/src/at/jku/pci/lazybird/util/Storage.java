@@ -15,8 +15,8 @@ import weka.core.Instances;
  */
 public final class Storage
 {
-	public static final String LOGTAG = "Storage";
-	public static final boolean LOCAL_LOGV = true;
+	static final String LOGTAG = "Storage";
+	static final boolean LOCAL_LOGV = true;
 	
 	/**
 	 * Name for the classifier preferences: {@value}

@@ -36,8 +36,8 @@ import java.io.InputStreamReader;
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener
 {
 	// Constants
-	public static final String LOGTAG = "MainActivity";
-	public static final boolean LOCAL_LOGV = true;
+	static final String LOGTAG = "MainActivity";
+	static final boolean LOCAL_LOGV = true;
 	// Settings
 	/**
 	 * Setting: {@link SettingsActivity#KEY_OUTPUT_DIR}

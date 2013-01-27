@@ -39,8 +39,8 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		GroupStateListener
 {
 	// Constants
-	public static final String LOGTAG = "LiveViewActivity";
-	public static final boolean LOCAL_LOGV = true;
+	static final String LOGTAG = "LiveViewActivity";
+	static final boolean LOCAL_LOGV = true;
 	public static final int AUTO_UPDATE_DELAY = 500;
 	// Settings
 	/**
