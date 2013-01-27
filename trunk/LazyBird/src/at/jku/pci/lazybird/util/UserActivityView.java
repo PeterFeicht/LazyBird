@@ -25,15 +25,15 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	// Constants
 	static final String LOGTAG = "UserActivityView";
 	static final boolean LOCAL_LOGV = true;
-	
+	// Default values
 	public static final long MAX_AGE = 10000;
 	public static final int AGE_BAR_HEIGHT = 4;
 	public static final int AGE_BAR_PADDING = 5;
 	public static final int AGE_BAR_OFFSET = 2;
 	public static final int AGE_BAR_BG = 0x22000000;
 	public static final int AGE_BAR_FG = 0x66000000;
-	public static final int CORNER_RADIUS = 6;
-	public static final int STROKE_WIDTH = 2;
+	public static final int BG_CORNER_RADIUS = 6;
+	public static final int BG_STROKE_WIDTH = 2;
 	
 	// Static fields
 	protected static Drawable sRoleTransition = null;
@@ -48,9 +48,9 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	private int mAgeBarTop;
 	private int mAgeBarLeft;
 	private int mAgeBarWidth;
-	private int mAgeBarHeight = 4;
-	private int mAgeBarPadding = 1;
-	private int mAgeBarOffset = 1;
+	private int mAgeBarHeight;
+	private int mAgeBarPadding;
+	private int mAgeBarOffset;
 	
 	private GradientDrawable mBackground;
 	private GradientDrawable mAgeBackground;
@@ -78,8 +78,8 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 		
 		mBackground = new GradientDrawable();
 		mBackground.setShape(GradientDrawable.RECTANGLE);
-		mBackground.setCornerRadius(CORNER_RADIUS * dp);
-		mBackground.setStroke((int)(STROKE_WIDTH * dp), Color.BLACK);
+		mBackground.setCornerRadius(BG_CORNER_RADIUS * dp);
+		mBackground.setStroke((int)(BG_STROKE_WIDTH * dp), Color.BLACK);
 		mBackground.setColor(res.getColor(android.R.color.holo_blue_dark));
 		
 		setBackgroundDrawable(mBackground);
@@ -153,7 +153,19 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 		onAgeChanged();
 	}
 	
-	private void onAgeChanged()
+	@Override
+	protected void onDraw(Canvas canvas)
+	{
+		super.onDraw(canvas);
+		mAgeBackground.draw(canvas);
+		if(!isOffline())
+			mAgeBar.draw(canvas);
+	}
+	
+	/**
+	 * Updates the width of the age bar, the background color and visibility.
+	 */
+	protected void onAgeChanged()
 	{
 		int width = (int)((mAgeBarWidth * (MAX_AGE - mAge)) / MAX_AGE);
 		mAgeBar.setBounds(
@@ -168,7 +180,10 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 		postInvalidate();
 	}
 	
-	private void onRoleChanged()
+	/**
+	 * Sets the left compound drawable according to the role, does so on the UI-thread.
+	 */
+	protected void onRoleChanged()
 	{
 		Drawable role = null;
 		if(mRole != null)
@@ -207,90 +222,11 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 		});
 	}
 	
-	@Override
-	protected void onDraw(Canvas canvas)
-	{
-		super.onDraw(canvas);
-		mAgeBackground.draw(canvas);
-		if(!isOffline())
-			mAgeBar.draw(canvas);
-	}
-	
 	/**
-	 * Gets the age for this view.
+	 * Updates the background color of the view according to age and activity, does so on the
+	 * UI-thread.
 	 */
-	public long getAge()
-	{
-		return mAge;
-	}
-	
-	/**
-	 * Sets the age for this view.
-	 * 
-	 * @param age the age to set, cannot be less than {@code 0}.
-	 */
-	public void setAge(long age)
-	{
-		if(age < 0)
-			throw new IllegalArgumentException();
-		
-		mAge = age;
-		onAgeChanged();
-	}
-	
-	/**
-	 * Gets whether this view will be hidden if the age is greater than {@link #MAX_AGE}.
-	 */
-	public boolean getShowOffline()
-	{
-		return mShowOffline;
-	}
-	
-	/**
-	 * Sets whether this view should be shown even if the age is greater than {@link #MAX_AGE}.
-	 * 
-	 * @param showOffline {@code true} to always show the view, {@code false} to hide it, if the
-	 *        age is greater than {@link #MAX_AGE}.
-	 */
-	public void setShowOffline(boolean showOffline)
-	{
-		mShowOffline = showOffline;
-		setVisibility((!showOffline && isOffline()) ? View.GONE : View.VISIBLE);
-	}
-	
-	/**
-	 * Gets whether the age of this view is greater than {@link #MAX_AGE}.
-	 */
-	public boolean isOffline()
-	{
-		return mAge > MAX_AGE;
-	}
-	
-	/**
-	 * Sets the background color of this view.
-	 */
-	@Override
-	public void setBackgroundColor(int argb)
-	{
-		mBackground.setColor(argb);
-		postInvalidate();
-	}
-	
-	/**
-	 * Gets the activity class label last set for this view, or {@code null} if none was set.
-	 */
-	public ClassLabel getActivity()
-	{
-		return mActivity;
-	}
-	
-	public void setActivity(ClassLabel activity)
-	{
-		mActivity = activity;
-		updateBackgroundColor();
-	}
-	
-	private void updateBackgroundColor()
+	protected void updateBackgroundColor()
 	{
 		int color;
 		if(isOffline())
@@ -332,6 +268,89 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	}
 	
 	/**
+	 * Gets the age for this view.
+	 */
+	public long getAge()
+	{
+		return mAge;
+	}
+	
+	/**
+	 * Sets the age for this view.
+	 * 
+	 * @param age the age to set, cannot be less than {@code 0}.
+	 */
+	public void setAge(long age)
+	{
+		if(age < 0)
+			throw new IllegalArgumentException();
+		
+		mAge = age;
+		onAgeChanged();
+	}
+	
+	/**
+	 * Gets whether this view will be hidden if it is offline.
+	 * 
+	 * @see #isOffline()
+	 */
+	public boolean getShowOffline()
+	{
+		return mShowOffline;
+	}
+	
+	/**
+	 * Sets whether this view should be shown even if it is offline.
+	 * 
+	 * @param showOffline {@code true} to always show the view, {@code false} otherwise.
+	 * @see #isOffline()
+	 */
+	public void setShowOffline(boolean showOffline)
+	{
+		mShowOffline = showOffline;
+		setVisibility((!showOffline && isOffline()) ? View.GONE : View.VISIBLE);
+	}
+	
+	/**
+	 * Gets whether the age of this view is greater than {@link #MAX_AGE}.
+	 */
+	public boolean isOffline()
+	{
+		return mAge > MAX_AGE;
+	}
+	
+	/**
+	 * Sets the background color of this view. Note that it is safe to call this method from a
+	 * non-UI thread.
+	 */
+	@Override
+	public void setBackgroundColor(int argb)
+	{
+		mBackground.setColor(argb);
+		postInvalidate();
+	}
+	
+	/**
+	 * Gets the activity class label last set for this view, or {@code null} if none was set.
+	 */
+	public ClassLabel getActivity()
+	{
+		return mActivity;
+	}
+	
+	/**
+	 * Sets the activity class label for this view, updating the background color. Note that it
+	 * is safe to call this method from a non-UI thread.
+	 * 
+	 * @param role the new {@link ClassLabel} for this view, or {@code null}.
+	 */
+	public void setActivity(ClassLabel activity)
+	{
+		mActivity = activity;
+		updateBackgroundColor();
+	}
+	
+	/**
 	 * Gets the role last set for this view, or {@code null} if none was set.
 	 */
 	public UserRole getRole()
@@ -339,12 +358,28 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 		return mRole;
 	}
 	
+	/**
+	 * Sets the role for this view, updating the role image. Note that it is safe to call this
+	 * method from a non-UI thread.
+	 * 
+	 * @param role the new {@link UserRole} for this view, or {@code null}.
+	 */
 	public void setRole(UserRole role)
 	{
 		mRole = role;
 		onRoleChanged();
 	}
 	
+	/**
+	 * Compares this object to the specified object to determine their relative order,
+	 * considering their offline status and text. A view that is offline is considered larger
+	 * than an online view, so that offline views will be sorted after online views.
+	 * 
+	 * @param another the object to compare to this instance.
+	 * @return a negative integer if this instance is less than {@code another}; a positive
+	 *         integer if this instance is greater than {@code another}; 0 if this instance has
+	 *         the same order as {@code another}.
+	 */
 	@Override
 	public int compareTo(UserActivityView another)
 	{
