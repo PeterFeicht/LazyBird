@@ -121,7 +121,6 @@
     
     <!-- Live View -->
     <string name="chkShowOffline">Offline anzeigen</string>
-    <string name="lblNoUsername">Sie müssen einen Benutzernamen einstellen, bevor eine Verbindung zum Server möglich ist.</string>
     <string name="globalView">Globale Ansicht</string>
     <string name="lblCannotConnect">Verbindung zum Server fehlgeschlagen, bitte überprüfen Sie Ihre Einstellungen und stellen Sie sicher, dass eine Internetverbindung besteht.</string>
     <string name="lblConnectionLost">Verbindung verloren. Tippen Sie hier um neu zu verbinden.</string>
