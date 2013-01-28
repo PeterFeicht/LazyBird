@@ -41,17 +41,12 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 	 * Setting: {@link SettingsActivity#KEY_REPORT_SERVER}
 	 */
 	private static String sReportServer = "";
-	/**
-	 * Setting: {@link SettingsActivity#KEY_REPORT_USER}
-	 */
-	private static String sReportUser = "";
 	
 	private SharedPreferences mPrefs;
 	
 	// Views
 	private FlowLayout mUserContainer;
 	private CheckBox mChkShowOffline;
-	private TextView mLblNoUsername;
 	private TextView mLblCannotConnect;
 	private TextView mLblConnectionLost;
 	private ProgressBar mProgressServerUpdate;
@@ -130,9 +125,6 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		
 		mImgRoomState = (ImageView)findViewById(R.id.imgRoomState);
 		
-		mLblNoUsername = (TextView)findViewById(R.id.lblNoUsername);
-		mLblNoUsername.setVisibility(sReportUser.isEmpty() ? View.VISIBLE : View.GONE);
-		
 		mLblCannotConnect = (TextView)findViewById(R.id.lblCannotConnect);
 		
 		mLblConnectionLost = (TextView)findViewById(R.id.lblConnectionLost);
@@ -158,22 +150,8 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		super.onResume();
 		
 		mLblCannotConnect.setVisibility(View.GONE);
-		
-		// If there's no username set, inform the user, otherwise connect
-		if(sReportUser.isEmpty())
-		{
-			mLblNoUsername.setVisibility(View.VISIBLE);
-			mChkShowOffline.setEnabled(false);
-			mUserContainer.removeAllViews();
-			mProgressServerUpdate.setVisibility(View.GONE);
-		}
-		else
-		{
-			mLblNoUsername.setVisibility(View.GONE);
-			mChkShowOffline.setEnabled(true);
-			mProgressServerUpdate.setVisibility(View.VISIBLE);
-			connect();
-		}
+		mProgressServerUpdate.setVisibility(View.VISIBLE);
+		connect();
 	}
 	
 	@Override
@@ -194,7 +172,6 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 	private void readSettings()
 	{
 		sReportServer = mPrefs.getString(SettingsActivity.KEY_REPORT_SERVER, "");
-		sReportUser = mPrefs.getString(SettingsActivity.KEY_REPORT_USER, "");
 	}
 	
 	/**

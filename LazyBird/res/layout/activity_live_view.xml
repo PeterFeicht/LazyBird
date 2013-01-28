@@ -12,17 +12,6 @@
     tools:ignore="MergeRootFrame" >
 
     <TextView
-        android:id="@+id/lblNoUsername"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="6dp"
-        android:text="@string/lblNoUsername"
-        android:textAppearance="?android:attr/textAppearance"
-        android:textColor="@android:color/holo_orange_dark"
-        android:visibility="gone" />
-
-    <TextView
         android:id="@+id/lblCannotConnect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -83,7 +72,7 @@
         android:indeterminate="true" />
 
     <ScrollView
-        android:id="@+id/scrollView1"
+        android:id="@+id/scrollLiveView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="6dp"
