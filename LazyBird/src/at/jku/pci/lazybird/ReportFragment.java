@@ -275,6 +275,8 @@ public class ReportFragment extends AbstractTabFragment
 			mService = null;
 
 			sReportUser = mPrefs.getString(SettingsActivity.KEY_REPORT_USER, "");
+			if(sReportUser.isEmpty())
+				mChkReport.setChecked(false);
 			mChkReport.setEnabled(!sReportUser.isEmpty());
 		}
 	}
