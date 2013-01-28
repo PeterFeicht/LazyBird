@@ -188,7 +188,7 @@ public class ReportFragment extends AbstractTabFragment
 			// Restore the log if the service is running
 			if(savedInstanceState != null)
 			{
-				LogListAdapter log =
+				final LogListAdapter log =
 					(LogListAdapter)savedInstanceState.getSerializable(STATE_LOG);
 				if(log != null)
 				{
@@ -211,7 +211,7 @@ public class ReportFragment extends AbstractTabFragment
 		else
 		{
 			// When freshly starting the app, restore previous selection of output methods
-			SharedPreferences uiPrefs = Storage.getUiPreferences(getActivity());
+			final SharedPreferences uiPrefs = Storage.getUiPreferences(getActivity());
 			mChkReport.setChecked(uiPrefs.getBoolean(Storage.KEY_CHK_REPORT_CHECKED, false));
 			mChkTts.setChecked(uiPrefs.getBoolean(Storage.KEY_CHK_TTS_CHECKED, false));
 			checkForClassifier();
@@ -317,6 +317,9 @@ public class ReportFragment extends AbstractTabFragment
 		sLogFilename = mPrefs.getString(SettingsActivity.KEY_LOG_FILENAME, "");
 	}
 	
+	/**
+	 * Enable or disable the report switch and set visibility of {@link #mLblNoClassifier}.
+	 */
 	private void setClassifierPresent(boolean present)
 	{
 		mLblNoClassifier.setVisibility(present ? View.GONE : View.VISIBLE);
