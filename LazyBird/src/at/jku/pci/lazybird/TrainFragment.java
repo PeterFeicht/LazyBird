@@ -58,6 +58,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.zip.GZIPOutputStream;
 
 public class TrainFragment extends AbstractTabFragment
 {
@@ -1072,7 +1073,7 @@ public class TrainFragment extends AbstractTabFragment
 				// Make new filenames and save info
 				sClassifierFile = String.format("classifier-%X%s", out.hashCode(), ".bin");
 				sTrainingFile = String.format("trainfile-%X%s",
-					out.hashCode(), Instances.SERIALIZED_OBJ_FILE_EXTENSION);
+					out.hashCode(), Instances.SERIALIZED_OBJ_FILE_EXTENSION + "z");
 				sValidationLogFile = "";
 				sClassifierType = mType.toString();
 				sTrainInstances = fe.getNumInputInstances();
@@ -1090,7 +1091,7 @@ public class TrainFragment extends AbstractTabFragment
 				// Serialize training data to internal storage
 				os = getActivity().openFileOutput(sTrainingFile, Context.MODE_PRIVATE);
 				final SerializedInstancesSaver saver = new SerializedInstancesSaver();
-				saver.setDestination(os);
+				saver.setDestination(new GZIPOutputStream(os));
 				saver.setInstances(fe.getOutput());
 				saver.writeBatch();
 				// writeBatch() closes the stream
