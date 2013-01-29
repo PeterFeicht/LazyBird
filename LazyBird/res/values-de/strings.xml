@@ -124,6 +124,9 @@
     <string name="globalView">Globale Ansicht</string>
     <string name="lblCannotConnect">Verbindung zum Server fehlgeschlagen, bitte überprüfen Sie Ihre Einstellungen und stellen Sie sicher, dass eine Internetverbindung besteht.</string>
     <string name="lblConnectionLost">Verbindung verloren. Tippen Sie hier um neu zu verbinden.</string>
+    <string name="statusDisconnected">Nicht verbunden</string>
+    <string name="statusConnecting">Verbinden&#8230;</string>
+    <string name="statusConnected">Verbunden</string>
     <string name="menu_liveViewLegend">Legend</string>
     <string name="legend_activities">Aktivitäten</string>
     <string name="legend_roles">Rollen</string>

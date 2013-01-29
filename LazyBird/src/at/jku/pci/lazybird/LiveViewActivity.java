@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
@@ -20,6 +21,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import at.jku.pci.lazybird.util.UserActivityView;
 import at.jku.pervasive.sd12.actclient.CoordinatorClient;
 import at.jku.pervasive.sd12.actclient.GuiClient;
@@ -51,12 +53,14 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 	private TextView mLblConnectionLost;
 	private ProgressBar mProgressServerUpdate;
 	private ImageView mImgRoomState;
+	private ImageView mImgConnectionStatus;
 	
 	// Fields
 	private ArrayAdapter<String> mViewUsers;
 	private HashMap<String, UserActivityView> mUserViews;
 	private GuiClient mClient = null;
 	private int mOfflineIndex = 0;
+	private int mConnectionStatus = R.string.statusDisconnected;
 	// Handlers
 	private Handler mHandler = new Handler();
 	private Runnable mRunUpdateAges = new Runnable() {
@@ -80,6 +84,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			else
 			{
 				mLblConnectionLost.setVisibility(View.VISIBLE);
+				setConnectionStatus(R.drawable.status_disconnected);
 				mClient = null;
 			}
 		}
@@ -119,6 +124,9 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 	private void getWidgets()
 	{
 		mUserContainer = (FlowLayout)findViewById(R.id.userContainer);
+		
+		mImgConnectionStatus = (ImageView)findViewById(R.id.imgConnectionStatus);
+		mImgConnectionStatus.setOnClickListener(onImgConnectionStatusClick);
 		
 		mChkShowOffline = (CheckBox)findViewById(R.id.chkShowOffline);
 		mChkShowOffline.setOnCheckedChangeListener(onChkShowOfflineCheckedChange);
@@ -214,6 +222,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		if(LOCAL_LOGV) Log.v(LOGTAG, "Connecting to " + host + " on port " + port + "...");
 		mClient = new GuiClient(host, port);
 		mClient.setGroupStateListener(LiveViewActivity.this);
+		setConnectionStatus(R.drawable.status_connecting);
 		
 		mHandler.postDelayed(new Runnable() {
 			int timeouts = 0;
@@ -227,6 +236,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 					if(timeouts++ > 20 || !mClient.isAlive())
 					{
 						if(LOCAL_LOGV) Log.v(LOGTAG, "Connection failed.");
+						setConnectionStatus(R.drawable.status_disconnected);
 						mLblCannotConnect.setVisibility(View.VISIBLE);
 						mProgressServerUpdate.setVisibility(View.GONE);
 						mClient.interrupt();
@@ -235,10 +245,40 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 					else
 						mHandler.postDelayed(this, 250);
 				}
-				else if(LOCAL_LOGV)
-					Log.v(LOGTAG, "Connected.");
+				else
+				{
+					setConnectionStatus(R.drawable.status_connected);
+					if(LOCAL_LOGV)
+						Log.v(LOGTAG, "Connected.");
+				}
 			}
 		}, 250);
+	}
+	
+	/**
+	 * Sets the image of {@link #mImgConnectionStatus} and the value of
+	 * {@link #mConnectionStatus} to the appropriate string resource.
+	 * 
+	 * @param statusResource the drawable for the image view.
+	 */
+	protected void setConnectionStatus(int statusResource)
+	{
+		switch(statusResource)
+		{
+			case R.drawable.status_connected:
+				mConnectionStatus = R.string.statusConnected;
+				break;
+			case R.drawable.status_connecting:
+				mConnectionStatus = R.string.statusConnecting;
+				break;
+			case R.drawable.status_disconnected:
+				mConnectionStatus = R.string.statusDisconnected;
+				break;
+			
+			default:
+				throw new InternalError("statusResource can only be a status drawable.");
+		}
+		mImgConnectionStatus.setImageResource(statusResource);
 	}
 	
 	@Override
@@ -281,6 +321,19 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			mLblConnectionLost.setVisibility(View.GONE);
 			mProgressServerUpdate.setVisibility(View.VISIBLE);
 			connect();
+		}
+	};
+	
+	private OnClickListener onImgConnectionStatusClick = new OnClickListener() {
+		@Override
+		public void onClick(View v)
+		{
+			final Toast t =
+				Toast.makeText(LiveViewActivity.this, mConnectionStatus, Toast.LENGTH_LONG);
+			int[] coords = new int[2];
+			mImgConnectionStatus.getLocationOnScreen(coords);
+			t.setGravity(Gravity.LEFT | Gravity.TOP, coords[0], coords[1]);
+			t.show();
 		}
 	};
 	
