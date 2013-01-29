@@ -329,7 +329,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		public void onClick(View v)
 		{
 			final Toast t =
-				Toast.makeText(LiveViewActivity.this, mConnectionStatus, Toast.LENGTH_LONG);
+				Toast.makeText(LiveViewActivity.this, mConnectionStatus, Toast.LENGTH_SHORT);
 			int[] coords = new int[2];
 			mImgConnectionStatus.getLocationOnScreen(coords);
 			t.setGravity(Gravity.LEFT | Gravity.TOP, coords[0], coords[1]);
