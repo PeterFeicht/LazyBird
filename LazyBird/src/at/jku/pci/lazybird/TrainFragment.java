@@ -157,8 +157,8 @@ public class TrainFragment extends AbstractTabFragment
 	private TextView mTxtTrainStatus;
 	
 	// Fields
-	private Drawable mCompoundCheck;
-	private Drawable mCompoundUncheck;
+	private final int mCompoundCheck = android.R.drawable.checkbox_on_background;
+	private final int mCompoundUncheck = android.R.drawable.checkbox_off_background;
 	private Drawable mCompoundAlert;
 	
 	private List<ClassifierEntry> mClassifiers;
@@ -192,6 +192,7 @@ public class TrainFragment extends AbstractTabFragment
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 		Bundle savedInstanceState)
 	{
+		if(LOCAL_LOGV) Log.v(LOGTAG, "View created.");
 		// Just return the inflated layout, other initializations will be done when the host
 		// activity is created
 		return inflater.inflate(R.layout.fragment_train, container, false);
@@ -201,6 +202,7 @@ public class TrainFragment extends AbstractTabFragment
 	public void onActivityCreated(Bundle savedInstanceState)
 	{
 		super.onActivityCreated(savedInstanceState);
+		if(LOCAL_LOGV) Log.v(LOGTAG, "Activity created.");
 		
 		mBroadcastManager = LocalBroadcastManager.getInstance(getActivity());
 		mServiceIntentFilter = new IntentFilter();
@@ -213,14 +215,10 @@ public class TrainFragment extends AbstractTabFragment
 		
 		getWidgets(getView());
 		
-		// Get drawables for the select buttons, bounds are from a button in XML
-		Resources r = getResources();
-		mCompoundUncheck = r.getDrawable(android.R.drawable.checkbox_off_background);
-		mCompoundUncheck.setBounds(mBtnSelectFile.getCompoundDrawables()[0].copyBounds());
-		mCompoundCheck = r.getDrawable(android.R.drawable.checkbox_on_background);
-		mCompoundCheck.setBounds(mCompoundUncheck.copyBounds());
-		mCompoundAlert = r.getDrawable(android.R.drawable.ic_dialog_alert);
-		mCompoundAlert.setBounds(mCompoundUncheck.copyBounds());
+		final Drawable check =
+			getResources().getDrawable(android.R.drawable.checkbox_off_background);
+		mCompoundAlert = getResources().getDrawable(android.R.drawable.ic_dialog_alert);
+		mCompoundAlert.setBounds(0, 0, check.getIntrinsicWidth(), check.getIntrinsicHeight());
 		
 		mArffFilter = new FileFilter() {
 			@Override
@@ -323,7 +321,6 @@ public class TrainFragment extends AbstractTabFragment
 		super.onResume();
 		mBroadcastManager.registerReceiver(mBroadcastReceiver, mServiceIntentFilter);
 		updateTrainEnabled();
-		
 	}
 	
 	@Override
@@ -340,6 +337,8 @@ public class TrainFragment extends AbstractTabFragment
 	public void onViewStateRestored(Bundle savedInstanceState)
 	{
 		super.onViewStateRestored(savedInstanceState);
+		if(LOCAL_LOGV)
+			Log.v(LOGTAG, "onViewStateRestored: savedInstanceState = " + savedInstanceState);
 		
 		if(savedInstanceState != null)
 		{
@@ -350,6 +349,7 @@ public class TrainFragment extends AbstractTabFragment
 				try
 				{
 					mFiles = Arrays.copyOf(files, files.length, File[].class);
+					if(LOCAL_LOGV) Log.v(LOGTAG, "onViewStateRestored: Files restored.");
 				}
 				catch(ArrayStoreException ex)
 				{
@@ -362,7 +362,10 @@ public class TrainFragment extends AbstractTabFragment
 			
 			int features = savedInstanceState.getInt(STATE_FEATURES, 0);
 			if(features != 0)
+			{
 				mFeatures = Feature.getFeatures(features);
+				if(LOCAL_LOGV) Log.v(LOGTAG, "onViewStateRestored: Features restored.");
+			}
 			updateTrainEnabled();
 			updateCheckButtons();
 		}
@@ -427,10 +430,12 @@ public class TrainFragment extends AbstractTabFragment
 	 */
 	private void updateTrainEnabled()
 	{
-		boolean enabled = mFiles.length > 0 && mFeatures.length > 0;
-		enabled = enabled && mSpinClassifier.getSelectedItem() != null;
-		enabled = enabled && mSpinWindowSize.getSelectedItem() != null;
-		enabled = enabled && !ClassifierService.isRunning();
+		boolean enabled = mFiles.length > 0 &&
+			mFeatures.length > 0 &&
+			mSpinClassifier.getSelectedItem() != null &&
+			mSpinWindowSize.getSelectedItem() != null &&
+			!ClassifierService.isRunning();
+		
 		mBtnTrain.setEnabled(enabled);
 		mBtnSaveFeatures.setEnabled(enabled);
 	}
@@ -441,9 +446,10 @@ public class TrainFragment extends AbstractTabFragment
 	 */
 	private void updateCheckButtons()
 	{
-		setLeftDrawable(mBtnSelectFile, (mFiles.length > 0) ? mCompoundCheck : mCompoundUncheck);
-		setLeftDrawable(mBtnSelectFeatures,
-			(mFeatures.length > 0) ? mCompoundCheck : mCompoundUncheck);
+		mBtnSelectFile.setCompoundDrawablesWithIntrinsicBounds(
+			(mFiles.length > 0) ? mCompoundCheck : mCompoundUncheck, 0, 0, 0);
+		mBtnSelectFeatures.setCompoundDrawablesWithIntrinsicBounds(
+			(mFeatures.length > 0) ? mCompoundCheck : mCompoundUncheck, 0, 0, 0);
 	}
 	
 	/**
@@ -476,7 +482,7 @@ public class TrainFragment extends AbstractTabFragment
 			{
 				Toast.makeText(getActivity(), R.string.error_extstorage_read, Toast.LENGTH_LONG)
 					.show();
-				setLeftDrawable(mBtnSelectFile, mCompoundAlert);
+				mBtnSelectFile.setCompoundDrawables(mCompoundAlert, null, null, null);
 				return;
 			}
 			
@@ -485,7 +491,7 @@ public class TrainFragment extends AbstractTabFragment
 			if(!dir.exists() || !dir.isDirectory())
 			{
 				Toast.makeText(getActivity(), R.string.error_nodir, Toast.LENGTH_LONG).show();
-				setLeftDrawable(mBtnSelectFile, mCompoundAlert);
+				mBtnSelectFile.setCompoundDrawables(mCompoundAlert, null, null, null);
 				return;
 			}
 			allFiles = dir.listFiles(mArffFilter);
@@ -772,14 +778,6 @@ public class TrainFragment extends AbstractTabFragment
 				showEvaluation();
 		}
 	};
-	
-	/**
-	 * Sets the left compound drawable of the specified button.
-	 */
-	private void setLeftDrawable(Button btn, Drawable drawable)
-	{
-		btn.setCompoundDrawables(drawable, null, null, null);
-	}
 	
 	/**
 	 * Shows a dialog informing the user that an error occurred while performing a task.
