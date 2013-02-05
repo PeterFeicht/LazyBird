@@ -480,7 +480,7 @@ public class TrainFragment extends AbstractTabFragment
 			if(!state.equals(Environment.MEDIA_MOUNTED) &&
 				!state.equals(Environment.MEDIA_MOUNTED_READ_ONLY))
 			{
-				Toast.makeText(getActivity(), R.string.error_extstorage_read, Toast.LENGTH_LONG)
+				Toast.makeText(getActivity(), R.string.error_extstorage_read, Toast.LENGTH_SHORT)
 					.show();
 				mBtnSelectFile.setCompoundDrawables(mCompoundAlert, null, null, null);
 				return;
@@ -490,7 +490,7 @@ public class TrainFragment extends AbstractTabFragment
 			final File dir = new File(Environment.getExternalStorageDirectory(), sOutputDir);
 			if(!dir.exists() || !dir.isDirectory())
 			{
-				Toast.makeText(getActivity(), R.string.error_nodir, Toast.LENGTH_LONG).show();
+				Toast.makeText(getActivity(), R.string.error_nodir, Toast.LENGTH_SHORT).show();
 				mBtnSelectFile.setCompoundDrawables(mCompoundAlert, null, null, null);
 				return;
 			}
@@ -792,10 +792,7 @@ public class TrainFragment extends AbstractTabFragment
 		b.setNeutralButton(android.R.string.ok, null);
 		
 		if(ex instanceof UnsupportedAttributeTypeException)
-		{
-			b.setMessage(
-				getString(R.string.error_attributes, ex.getMessage()));
-		}
+			b.setMessage(getString(R.string.error_attributes, ex.getMessage()));
 		else if(ex instanceof FileNotFoundException)
 			b.setMessage(R.string.error_nofile);
 		else if(ex instanceof IOException)
@@ -822,8 +819,7 @@ public class TrainFragment extends AbstractTabFragment
 			public void onClick(DialogInterface dialog, int which)
 			{
 				// Check for writable external storage
-				if(!Environment.getExternalStorageState().equals(
-					Environment.MEDIA_MOUNTED))
+				if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
 				{
 					Toast.makeText(getActivity(), R.string.error_extstorage,
 						Toast.LENGTH_LONG).show();
@@ -846,7 +842,7 @@ public class TrainFragment extends AbstractTabFragment
 					saver.setFile(out);
 					saver.setInstances(mCalculatedFeatures);
 					saver.writeBatch();
-					Toast.makeText(getActivity(), R.string.fileSaved, Toast.LENGTH_LONG)
+					Toast.makeText(getActivity(), R.string.fileSaved, Toast.LENGTH_SHORT)
 						.show();
 				}
 				catch(IOException ex)
