@@ -810,7 +810,7 @@ public class TrainFragment extends AbstractTabFragment
 	{
 		final EditText txt = new EditText(getActivity());
 		final AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
-		b.setTitle(R.string.saveFeaturesQuestion);
+		b.setTitle(R.string.enterFilename);
 		b.setMessage(R.string.saveFeaturesNote);
 		b.setView(txt);
 		b.setNegativeButton(android.R.string.cancel, null);
