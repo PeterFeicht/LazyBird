@@ -464,7 +464,9 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 	 * <p>
 	 * {@link #mOfflineIndex} has the boundary between the offline and online users, so we only
 	 * need to move online users beyond this index to the front and offline users before that to
-	 * the end. Since no users are dropped by the server, this is the easiest method.
+	 * the end. Since no users are dropped by the server, this is the easiest method.<br>
+	 * Also, should we want to add an animation when users are moved, then this is easily
+	 * possible.
 	 */
 	protected void sortOffline()
 	{
