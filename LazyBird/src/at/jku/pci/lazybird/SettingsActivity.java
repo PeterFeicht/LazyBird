@@ -122,11 +122,6 @@ public class SettingsActivity extends Activity
 			mReportUser = (EditTextPreference)findPreference(KEY_REPORT_USER);
 			mLogFilename = (EditTextPreference)findPreference(KEY_LOG_FILENAME);
 			
-			// What layout do non-custom preferences use?
-			final int layout = mValueUpdateSpeed.getLayoutResource();
-			mStartDelay.setLayoutResource(layout);
-			mNumFolds.setLayoutResource(layout);
-			
 			// Set summaries to preference values where necessary
 			final SharedPreferences p = getPreferenceScreen().getSharedPreferences();
 			mOutputDir.setSummary(p.getString(KEY_OUTPUT_DIR, ""));

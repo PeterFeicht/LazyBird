@@ -24,12 +24,12 @@ public class NumberPreference extends DialogPreference
 	
 	protected int mMinValue = DEFAULT_MIN_VALUE;
 	protected int mMaxValue = DEFAULT_MAX_VALUE;
-	protected int mValue = 0;
+	protected int mValue = DEFAULT_VALUE;
 	protected NumberPicker mPicker = null;
 	
 	public NumberPreference(Context context, AttributeSet attrs)
 	{
-		this(context, attrs, 0);
+		this(context, attrs, android.R.attr.dialogPreferenceStyle);
 	}
 	
 	public NumberPreference(Context context, AttributeSet attrs, int defStyle)
@@ -97,17 +97,17 @@ public class NumberPreference extends DialogPreference
 	@Override
 	protected Object onGetDefaultValue(TypedArray a, int index)
 	{
-		return a.getInt(index, 0);
+		return a.getInt(index, DEFAULT_VALUE);
 	}
 	
 	@Override
 	protected void onSetInitialValue(boolean restoreValue, Object defaultValue)
 	{
-		int time = DEFAULT_VALUE;
+		int val = DEFAULT_VALUE;
 		
 		if(restoreValue)
 		{
-			time = getPersistedInt(0);
+			val = getPersistedInt(DEFAULT_VALUE);
 		}
 		else
 		{
@@ -115,25 +115,25 @@ public class NumberPreference extends DialogPreference
 			{
 				if(Integer.class.isAssignableFrom(defaultValue.getClass()))
 				{
-					time = (Integer)defaultValue;
+					val = (Integer)defaultValue;
 				}
 				else if(String.class.isAssignableFrom(defaultValue.getClass()))
 				{
 					try
 					{
-						time = Integer.parseInt((String)defaultValue);
+						val = Integer.parseInt((String)defaultValue);
 					}
 					catch(NumberFormatException ex)
 					{
-						time = 0;
+						val = DEFAULT_VALUE;
 					}
 				}
 			}
 			
-			if(shouldPersist()) persistInt(time);
+			if(shouldPersist()) persistInt(val);
 		}
 		
-		mValue = time;
+		mValue = val;
 		setSummary(Integer.toString(mValue));
 	}
 }
