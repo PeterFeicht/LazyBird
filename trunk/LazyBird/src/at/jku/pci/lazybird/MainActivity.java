@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -26,12 +27,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
+import at.jku.pci.lazybird.util.Storage;
+import weka.core.Instances;
+import weka.core.converters.ArffLoader;
+import weka.core.converters.ArffSaver;
+import weka.core.converters.SerializedInstancesLoader;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.zip.GZIPInputStream;
 
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener
 {
@@ -49,6 +57,10 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	 * Setting: {@link SettingsActivity#KEY_LOG_FILENAME}
 	 */
 	private static String sLogFilename;
+	/**
+	 * Setting {@link Storage#KEY_TRAINING_FILE}
+	 */
+	private static String sTrainingFile;
 	
 	private SharedPreferences mPrefs;
 	
@@ -117,10 +129,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 	}
 	
-	private void updateSettings()
+	protected void updateSettings()
 	{
 		sOutputDir = mPrefs.getString(SettingsActivity.KEY_OUTPUT_DIR, "");
 		sLogFilename = mPrefs.getString(SettingsActivity.KEY_LOG_FILENAME, "");
+		sTrainingFile = Storage.getClassifierPreferences(this)
+			.getString(Storage.KEY_TRAINING_FILE, "");
 	}
 	
 	@Override
@@ -153,9 +167,20 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		menu.findItem(R.id.menu_about).setOnMenuItemClickListener(onMenuAboutClick);
 		menu.findItem(R.id.menu_showClassifierInfo)
 			.setOnMenuItemClickListener(onMenuShowClassifierInfo);
+		menu.findItem(R.id.menu_saveTrainingData)
+			.setOnMenuItemClickListener(onMenuSaveTrainingDataClick);
 		menu.findItem(R.id.menu_liveView).setOnMenuItemClickListener(onMenuLiveViewClick);
 		return true;
 	}
+	
+	private OnMenuItemClickListener onMenuSaveTrainingDataClick = new OnMenuItemClickListener() {
+		@Override
+		public boolean onMenuItemClick(MenuItem item)
+		{
+			saveTrainData();
+			return true;
+		}
+	};
 	
 	private OnMenuItemClickListener onMenuShowClassifierInfo = new OnMenuItemClickListener() {
 		@Override
@@ -307,6 +332,69 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			mMenuReport.setIcon(R.drawable.ic_action_report_off);
 			mMenuReport.setTitle(R.string.menu_report_off);
 		}
+	}
+	
+	/**
+	 * Displays a dialog asking for a filename and writes the calculated features to this file.
+	 */
+	private void saveTrainData()
+	{
+		final EditText txt = new EditText(this);
+		final AlertDialog.Builder b = new AlertDialog.Builder(this);
+		b.setTitle(R.string.enterFilename);
+		b.setMessage(R.string.saveTrainingData);
+		b.setView(txt);
+		b.setNegativeButton(android.R.string.cancel, null);
+		b.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				// Check for writable external storage
+				if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
+				{
+					Toast.makeText(MainActivity.this, R.string.error_extstorage,
+						Toast.LENGTH_SHORT).show();
+					return;
+				}
+				
+				updateSettings();
+				String name = txt.getText().toString();
+				if(!name.endsWith(ArffLoader.FILE_EXTENSION))
+					name += ArffLoader.FILE_EXTENSION;
+				
+				File out = new File(new File(Environment.getExternalStorageDirectory(),
+					sOutputDir), name);
+				if(out.exists())
+					out.delete();
+				
+				final ArffSaver saver = new ArffSaver();
+				try
+				{
+					// Read training data from internal storage, decompressing it if necessary
+					final InputStream is = openFileInput(sTrainingFile);
+					final SerializedInstancesLoader loader = new SerializedInstancesLoader();
+					if(sTrainingFile.endsWith("z"))
+						loader.setSource(new GZIPInputStream(is));
+					else
+						loader.setSource(is);
+					
+					// Save instances, output stream is closed by writeBatch()
+					final Instances i = loader.getDataSet();
+					is.close();
+					saver.setFile(out);
+					saver.setInstances(i);
+					saver.writeBatch();
+					Toast.makeText(MainActivity.this, R.string.fileSaved, Toast.LENGTH_SHORT)
+						.show();
+				}
+				catch(IOException ex)
+				{
+					Toast.makeText(MainActivity.this, R.string.error_io, Toast.LENGTH_LONG)
+						.show();
+				}
+			}
+		});
+		b.show();
 	}
 	
 	/**

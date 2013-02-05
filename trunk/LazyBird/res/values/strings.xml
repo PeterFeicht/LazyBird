@@ -15,6 +15,7 @@
     <string name="menu_showlog">Show log file</string>
     <string name="menu_about">About</string>
     <string name="menu_showClassifierInfo">Show classifier info</string>
+    <string name="menu_saveTrainingData">Save training data</string>
     
     <!-- Services -->
     <string name="service_started">ARFF Recorder service started</string>
@@ -87,7 +88,6 @@
     <string name="trainQuestion">Replace current classifier?</string>
     <string name="trainNote">If you train a new classifier, the current one will be replaced.\nDo you want to continue?</string>
     <string name="extractionCancelled">Feature extraction cancelled</string>
-    <string name="saveFeaturesQuestion">Enter a filename</string>
     <string name="saveFeaturesNote">If the file exists it will be overwritten.</string>
     <string name="fileSaved">File saved</string>
     <string name="trainingCancelled">Training cancelled</string>
@@ -160,5 +160,7 @@
     <string name="class_standing">standing</string>
     <string name="class_walking">walking</string>
     <string name="class_null">null</string>
+    <string name="enterFilename">Enter a filename</string>
+    <string name="saveTrainingData">Enter a filename to save the training data for the current classifier.\nIf the file exists it will be overwritten.</string>
 
 </resources>

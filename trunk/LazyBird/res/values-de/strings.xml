@@ -15,6 +15,7 @@
     <string name="menu_showlog">Logdatei anzeigen</string>
     <string name="menu_about">Über</string>
     <string name="menu_showClassifierInfo">Classifier Info anzeigen</string>
+    <string name="menu_saveTrainingData">Trainingsdaten speichern</string>
     
     <!-- Services -->
     <string name="service_started">ARFF Recorder service gestartet</string>
@@ -87,8 +88,7 @@
     <string name="trainQuestion">Aktuellen Classifier ersetzen?</string>
     <string name="trainNote">Wenn Sie einen neuen Classifier trainieren, wird der aktuelle ersetzt.\nWollen Sie fortfahren?</string>
     <string name="extractionCancelled">Feature Extraction abgebrochen</string>
-    <string name="saveFeaturesQuestion">Geben Sie einen Dateinamen ein</string>
-    <string name="saveFeaturesNote">Wenn die Datei existiert wird sie überschrieben..</string>
+    <string name="saveFeaturesNote">Wenn die Datei existiert wird sie überschrieben.</string>
     <string name="fileSaved">Datei gespeichert</string>
     <string name="trainingCancelled">Training abgebrochen</string>
     <string name="statusExtract">Extrahierung&#8230;</string>
@@ -160,5 +160,7 @@
     <string name="class_standing">standing</string>
     <string name="class_walking">walking</string>
     <string name="class_null">null</string>
+    <string name="enterFilename">Geben Sie einen Dateinamen ein</string>
+    <string name="saveTrainingData">Geben Sie einen Dateinamen ein um die Trainingsdaten des aktuellen Classifiers zu speichern.\nWenn die Datei existiert wird sie überschrieben.</string>
     
 </resources>
