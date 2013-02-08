@@ -48,6 +48,7 @@ public class ReportFragment extends AbstractTabFragment
 	public static final String EXTRA_REPORT_ENABLE = "at.jku.pci.lazybird.REPORT_ENABLE";
 	public static final String EXTRA_REPORT_SERVER = "at.jku.pci.lazybird.REPORT_SERVER";
 	public static final String EXTRA_REPORT_USER = "at.jku.pci.lazybird.REPORT_USER";
+	public static final String EXTRA_WAKELOCK = "at.jku.pci.lazybird.WAKELOCK";
 	// Intents
 	public static final String BCAST_SERVICE_STOPPED = "at.jku.pci.lazybird.REP_SERVICE_STOPPED";
 	public static final String BCAST_SERVICE_STARTED = "at.jku.pci.lazybird.REP_SERVICE_STARTED";
@@ -108,6 +109,10 @@ public class ReportFragment extends AbstractTabFragment
 	 * Setting: {@link SettingsActivity#KEY_LOG_FILENAME}
 	 */
 	private static String sLogFilename = "";
+	/**
+	 * Setting: {@link SettingsActivity#KEY_USE_WAKELOCK}
+	 */
+	private static boolean sWakelock;
 	
 	private SharedPreferences mPrefs;
 	private SharedPreferences mPrefsClassifier;
@@ -315,6 +320,7 @@ public class ReportFragment extends AbstractTabFragment
 		sReportUser = mPrefs.getString(SettingsActivity.KEY_REPORT_USER, "");
 		sWriteLog = mPrefs.getBoolean(SettingsActivity.KEY_WRITE_LOG, false);
 		sLogFilename = mPrefs.getString(SettingsActivity.KEY_LOG_FILENAME, "");
+		sWakelock = mPrefs.getBoolean(SettingsActivity.KEY_USE_WAKELOCK, false);
 	}
 	
 	/**
@@ -423,6 +429,7 @@ public class ReportFragment extends AbstractTabFragment
 		i.putExtra(EXTRA_WINDOW, sWindowSize);
 		i.putExtra(EXTRA_JUMP, sJumpSize);
 		i.putExtra(EXTRA_FEATURES, sTrainedFeatures);
+		i.putExtra(EXTRA_WAKELOCK, sWakelock);
 		
 		// This is a little complicated, the first value determines whether the feature should be
 		// enabled at all, the second one specifies whether it's actually activated

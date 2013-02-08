@@ -84,6 +84,13 @@ public class SettingsActivity extends Activity
 	 */
 	public static final String KEY_LOG_FILENAME = "logFilename";
 	
+	/**
+	 * Shared preferences key: {@value}
+	 * <p>
+	 * Whether to use a partial wakelock when recording or reporting.
+	 */
+	public static final String KEY_USE_WAKELOCK = "useWakelock";
+	
 	static final String LOGTAG = "SettingsActivity";
 	static final boolean LOCAL_LOGV = true;
 	

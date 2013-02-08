@@ -53,6 +53,8 @@
     <string name="set_writeLog_diasble">Kein Log wird gespeichert</string>
     <string name="set_logFilename">Dateiname</string>
     <string name="set_logFilename_long">Name für die Logdatei.</string>
+    <string name="set_useWakelock">Wakelock</string>
+    <string name="set_useWakelock_note">Aktivieren Sie diese Einstellung, falls das Gerät die Aufnahme oder Klassifizierung unterbricht.\nBei einigen Geräten ist das nötig, der Batterieverbrauch steigt allerdings an.</string>
     
     <!-- Record -->
     <string name="helpRecorder">Hier können Sie Beschleunigungsdaten in ARFF Dateien aufnehmen um Classifier zu trainieren.\nSie müssen Daten aufnehmen und einen Classifier trainieren, bevor Sie ihre Aktivität an den Server melden können.</string>

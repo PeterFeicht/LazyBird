@@ -13,6 +13,8 @@ import android.hardware.SensorManager;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -128,6 +130,7 @@ public class ClassifierService extends Service implements SensorEventListener,
 		}
 	};
 	// State
+	private WakeLock mWakelock = null;
 	private int mLastActivity = -1;
 	private int mNewCount = 0;
 	private int mNewActivity = -2;
@@ -200,6 +203,13 @@ public class ClassifierService extends Service implements SensorEventListener,
 			mWriteToFile = intent.getBooleanExtra(ReportFragment.EXTRA_LOG, false);
 			mReport = intent.getBooleanExtra(ReportFragment.EXTRA_REPORT, false);
 			
+			// If the wakelock option is activated, make a wakelock
+			if(intent.getBooleanExtra(ReportFragment.EXTRA_WAKELOCK, false))
+			{
+				final PowerManager pm = (PowerManager)getSystemService(POWER_SERVICE);
+				mWakelock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, LOGTAG);
+			}
+			
 			// TTS is possible
 			if(mTextToSpeech)
 			{
@@ -242,6 +252,8 @@ public class ClassifierService extends Service implements SensorEventListener,
 		if(LOCAL_LOGV) Log.v(LOGTAG, "Service destroyed: " + this);
 		
 		stopForeground(true);
+		if(mWakelock != null)
+			mWakelock.release();
 		if(mSensorManager != null)
 			mSensorManager.unregisterListener(this);
 		mHandler.removeCallbacks(mRunReportActivity);
@@ -760,6 +772,9 @@ public class ClassifierService extends Service implements SensorEventListener,
 		mSensorManager.registerListener(this, s, SensorManager.SENSOR_DELAY_FASTEST);
 		
 		startForeground(NOTIFICATION_REPORTING, makeOngoingNotification());
+		if(mWakelock != null)
+			mWakelock.acquire();
+		
 		mBrodcastManager.sendBroadcast(new Intent(ReportFragment.BCAST_SERVICE_STARTED));
 	}
 	

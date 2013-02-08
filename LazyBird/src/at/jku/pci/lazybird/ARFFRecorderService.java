@@ -13,6 +13,8 @@ import android.hardware.SensorManager;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -90,6 +92,7 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 	private SensorManager mSensorManager;
 	private PendingIntent mNotificationIntent;
 	private WaitingTimer mWaitingTimer;
+	private WakeLock mWakelock = null;
 	private long mNumValues;
 	private float[] mLastValues;
 	private BufferedWriter mOutfile;
@@ -139,6 +142,14 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 			// Get information from the intent
 			mFilename = intent.getStringExtra(RecorderFragment.EXTRA_FILENAME);
 			mDirname = intent.getStringExtra(RecorderFragment.EXTRA_DIRNAME);
+			
+			// If the wakelock option is activated, make a wakelock
+			if(intent.getBooleanExtra(RecorderFragment.EXTRA_WAKELOCK, false))
+			{
+				final PowerManager pm = (PowerManager)getSystemService(POWER_SERVICE);
+				mWakelock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, LOGTAG);
+			}
+			
 			final int clazz = intent.getIntExtra(RecorderFragment.EXTRA_CLASS, 0);
 			final String[] classes = intent.getStringArrayExtra(RecorderFragment.EXTRA_CLASSES);
 			
@@ -198,6 +209,8 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 		if(LOCAL_LOGV) Log.v(LOGTAG, "Service destroyed: " + this);
 		
 		stopForeground(true);
+		if(mWakelock != null)
+			mWakelock.release();
 		if(mSensorManager != null)
 			mSensorManager.unregisterListener(this);
 		if(mWaitingTimer != null)
@@ -476,6 +489,8 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 		
 		mNotificationManager.cancel(NOTIFICATION_WAITING);
 		startForeground(NOTIFICATION_RECORDING, makeOngoingNotification());
+		if(mWakelock != null)
+			mWakelock.acquire();
 		
 		LocalBroadcastManager.getInstance(this).sendBroadcast(
 			new Intent(RecorderFragment.BCAST_SERVICE_STARTED));

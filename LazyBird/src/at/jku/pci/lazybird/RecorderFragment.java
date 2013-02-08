@@ -41,6 +41,7 @@ public class RecorderFragment extends AbstractTabFragment
 	public static final String EXTRA_CLASS = "at.jku.pci.lazybird.CLASS";
 	public static final String EXTRA_CLASSES = "at.jku.pci.lazybird.CLASSES";
 	public static final String EXTRA_DIRNAME = "at.jku.pci.lazybird.DIRNAME";
+	public static final String EXTRA_WAKELOCK = "at.jku.pci.lazybird.WAKELOCK";
 	// Intents
 	public static final String BCAST_SERVICE_STOPPED = "at.jku.pci.lazybird.REC_SERVICE_STOPPED";
 	public static final String BCAST_SERVICE_STARTED = "at.jku.pci.lazybird.REC_SERVICE_STARTED";
@@ -77,6 +78,10 @@ public class RecorderFragment extends AbstractTabFragment
 	 * @see ARFFRecorderService#getDirname()
 	 */
 	private static String sOutputDir;
+	/**
+	 * Setting: {@link SettingsActivity#KEY_USE_WAKELOCK}
+	 */
+	private static boolean sWakelock;
 	
 	private SharedPreferences mPrefs;
 	
@@ -299,6 +304,7 @@ public class RecorderFragment extends AbstractTabFragment
 	private void updateSettings()
 	{
 		sOutputDir = mPrefs.getString(SettingsActivity.KEY_OUTPUT_DIR, "");
+		sWakelock = mPrefs.getBoolean(SettingsActivity.KEY_USE_WAKELOCK, false);
 		ARFFRecorderService.setStartDelay(mPrefs.getInt(SettingsActivity.KEY_START_DELAY, 0));
 		try
 		{
@@ -456,6 +462,7 @@ public class RecorderFragment extends AbstractTabFragment
 				Intent i = new Intent(ARFFRecorderService.ARFF_SERVICE);
 				i.putExtra(EXTRA_FILENAME, filename);
 				i.putExtra(EXTRA_DIRNAME, sOutputDir);
+				i.putExtra(EXTRA_WAKELOCK, sWakelock);
 				
 				// TODO make classes customizable
 				i.putExtra(EXTRA_CLASSES, getResources().getStringArray(R.array.classes));

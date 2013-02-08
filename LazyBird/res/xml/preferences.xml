@@ -12,6 +12,14 @@
         android:selectAllOnFocus="true"
         android:title="@string/set_outputDir" />
 
+    <PreferenceScreen android:title="@string/set_useWakelock" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="useWakelock"
+            android:summary="@string/set_useWakelock_note"
+            android:title="@string/set_useWakelock" />
+    </PreferenceScreen>
+
     <PreferenceCategory
         android:orderingFromXml="true"
         android:title="@string/title_tab_record" >
