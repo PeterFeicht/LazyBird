@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res/at.jku.pci.lazybird"
+    android:orderingFromXml="true" >
+
+    <EditTextPreference
+        android:defaultValue="ARFF Recorder"
+        android:dialogMessage="@string/set_outputDir_long"
+        android:dialogTitle="@string/set_outputDir"
+        android:inputType="textUri"
+        android:key="outputDir"
+        android:selectAllOnFocus="true"
+        android:title="@string/set_outputDir" />
+
+    <PreferenceScreen android:title="@string/set_useWakelock" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="useWakelock"
+            android:summary="@string/set_useWakelock_note"
+            android:title="@string/set_useWakelock" />
+    </PreferenceScreen>
+
+    <PreferenceCategory
+        android:orderingFromXml="true"
+        android:title="@string/title_tab_record" >
+        <ListPreference
+            android:defaultValue="750"
+            android:dialogTitle="@string/set_valueUpdateSpeed"
+            android:entries="@array/update_speeds"
+            android:entryValues="@array/update_speeds_values"
+            android:key="valueUpdateSpeed"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:summary="%s"
+            android:title="@string/set_valueUpdateSpeed" />
+        <ListPreference
+            android:defaultValue="10000"
+            android:dialogTitle="@string/set_maxNumValues"
+            android:entries="@array/max_num"
+            android:entryValues="@array/max_num_values"
+            android:key="maxNumValues"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:summary="%s"
+            android:title="@string/set_maxNumValues" />
+
+        <at.jku.pci.lazybird.util.NumberPreference
+            android:defaultValue="6"
+            android:dialogLayout="@layout/number_preference"
+            android:dialogMessage="@string/set_startDelay_long"
+            android:dialogTitle="@string/set_startDelay"
+            android:key="startDelay"
+            android:title="@string/set_startDelay"
+            custom:maxValue="120"
+            custom:minValue="0" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:orderingFromXml="true"
+        android:title="@string/title_tab_train" >
+        <at.jku.pci.lazybird.util.NumberPreference
+            android:defaultValue="4"
+            android:dialogLayout="@layout/number_preference"
+            android:dialogMessage="@string/set_numFolds_long"
+            android:dialogTitle="@string/set_numFolds"
+            android:key="numFolds"
+            android:title="@string/set_numFolds"
+            custom:maxValue="10"
+            custom:minValue="2" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/title_tab_report" >
+        <EditTextPreference
+            android:defaultValue=""
+            android:dialogMessage="@string/set_reportServer_long"
+            android:dialogTitle="@string/set_reportServer"
+            android:inputType="textUri|textNoSuggestions"
+            android:key="reportServer"
+            android:selectAllOnFocus="true"
+            android:title="@string/set_reportServer" />
+        <EditTextPreference
+            android:defaultValue=""
+            android:dialogMessage="@string/set_reportUser_long"
+            android:dialogTitle="@string/set_reportUser"
+            android:inputType="number"
+            android:key="reportUser"
+            android:selectAllOnFocus="true"
+            android:title="@string/set_reportUser" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="writeLog"
+            android:summaryOff="@string/set_writeLog_diasble"
+            android:summaryOn="@string/set_writeLog_enable"
+            android:title="@string/set_writeLog" />
+
+        <EditTextPreference
+            android:defaultValue="activity.log"
+            android:dependency="writeLog"
+            android:dialogMessage="@string/set_logFilename_long"
+            android:dialogTitle="@string/set_logFilename"
+            android:inputType="textUri|textNoSuggestions"
+            android:key="logFilename"
+            android:selectAllOnFocus="true"
+            android:title="@string/set_logFilename" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

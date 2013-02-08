@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <declare-styleable name="AppTheme">
+        <attr name="userActivityViewStyle" format="reference" />
+    </declare-styleable>
+    
+    <declare-styleable name="NumberPreference">
+        <attr name="minValue" format="integer" />
+        <attr name="maxValue" format="integer" />
+    </declare-styleable>
+    
+    <declare-styleable name="UserActivityView">
+        <attr name="maxAge" format="integer" />
+        <attr name="age" format="integer" />
+        <attr name="showOffline" format="boolean" />
+        <attr name="activity" format="string" />
+        <attr name="role" format="string" />
+        <attr name="ageBarHeight" format="dimension|reference" />
+        <attr name="ageBarPadding" format="dimension|reference" />
+        <attr name="ageBarBackgroundColor" format="color|reference" />
+        <attr name="ageBarForegroundColor" format="color|reference"/>
+    </declare-styleable>
+    
+    <declare-styleable name="FlowLayout">
+        <attr name="horizontalSpacing" format="dimension" />
+        <attr name="verticalSpacing" format="dimension" />
+        <attr name="distributeHorizontal" format="boolean" />
+    </declare-styleable>
+    
+    <declare-styleable name="FlowLayout_LayoutParams">
+        <attr name="layout_spacing" format="dimension" />
+        <attr name="layout_breakLine" format="boolean" />
+    </declare-styleable>
+    
+    <color name="offlineColor">#999999</color>
+    <color name="nullColor">#CC5500</color>
+    <color name="walkingColor">#0099CC</color>
+    <color name="standingColor">#33CC33</color>
+    <color name="sittingColor">#DDDD33</color>
+    
+</resources>
