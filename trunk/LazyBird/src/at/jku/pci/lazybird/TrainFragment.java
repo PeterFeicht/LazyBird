@@ -16,6 +16,8 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.method.ScrollingMovementMethod;
@@ -170,6 +172,7 @@ public class TrainFragment extends AbstractTabFragment
 	private String mEvaluation = null;
 	@SuppressWarnings("rawtypes")
 	private AsyncTask mTask = null;
+	private WakeLock mWakelock;
 	
 	// Handlers
 	private LocalBroadcastManager mBroadcastManager;
@@ -208,6 +211,11 @@ public class TrainFragment extends AbstractTabFragment
 		mServiceIntentFilter = new IntentFilter();
 		mServiceIntentFilter.addAction(ReportFragment.BCAST_SERVICE_STARTED);
 		mServiceIntentFilter.addAction(ReportFragment.BCAST_SERVICE_STOPPED);
+		
+		final PowerManager pm =
+			(PowerManager)getActivity().getSystemService(Context.POWER_SERVICE);
+		mWakelock = pm.newWakeLock(
+			PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE, LOGTAG);
 		
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		mPrefsClassifier = Storage.getClassifierPreferences(getActivity());
@@ -967,6 +975,8 @@ public class TrainFragment extends AbstractTabFragment
 		@Override
 		protected void onPostExecute(FeatureExtractor result)
 		{
+			mWakelock.release();
+			
 			// Fragment was detached before the task completed, do nothing
 			if(getActivity() == null)
 				return;
@@ -1001,15 +1011,18 @@ public class TrainFragment extends AbstractTabFragment
 			});
 			mBtnSaveFeatures.setText(android.R.string.cancel);
 			
-			// Don't let the screen rotate while a task is running
+			// Don't let the screen rotate or go off while a task is running
 			mOrientation = getActivity().getRequestedOrientation();
 			int currentOrientation = getResources().getConfiguration().orientation;
 			getActivity().setRequestedOrientation(currentOrientation);
+			mWakelock.acquire();
 		}
 		
 		@Override
 		protected void onCancelled(FeatureExtractor result)
 		{
+			mWakelock.release();
+			
 			if(getActivity() != null)
 			{
 				Toast.makeText(getActivity(), R.string.extractionCancelled, Toast.LENGTH_LONG)
@@ -1130,6 +1143,8 @@ public class TrainFragment extends AbstractTabFragment
 		@Override
 		protected void onPostExecute(Classifier result)
 		{
+			mWakelock.release();
+			
 			// Fragment was detached before the task completed, do nothing
 			if(getActivity() == null)
 				return;
@@ -1186,16 +1201,19 @@ public class TrainFragment extends AbstractTabFragment
 			mTxtTrainStatus.setText(R.string.statusExtract);
 			mTxtTrainStatus.setVisibility(View.VISIBLE);
 			mType = (ClassifierEntry)mSpinClassifier.getSelectedItem();
-			
-			// Don't let the screen rotate while a task is running
+
+			// Don't let the screen rotate or go off while a task is running
 			mOrientation = getActivity().getRequestedOrientation();
 			int currentOrientation = getResources().getConfiguration().orientation;
 			getActivity().setRequestedOrientation(currentOrientation);
+			mWakelock.acquire();
 		}
 		
 		@Override
 		protected void onCancelled(Classifier result)
 		{
+			mWakelock.release();
+			
 			if(getActivity() != null)
 			{
 				Toast.makeText(getActivity(), R.string.trainingCancelled, Toast.LENGTH_LONG)
@@ -1298,16 +1316,19 @@ public class TrainFragment extends AbstractTabFragment
 					ValidateClassifierTask.this.cancel(true);
 				}
 			});
-			
-			// Don't let the screen rotate while a task is running
+
+			// Don't let the screen rotate or go off while a task is running
 			mOrientation = getActivity().getRequestedOrientation();
 			int currentOrientation = getResources().getConfiguration().orientation;
 			getActivity().setRequestedOrientation(currentOrientation);
+			mWakelock.acquire();
 		}
 		
 		@Override
 		protected void onPostExecute(String result)
 		{
+			mWakelock.release();
+			
 			// Fragment was detached before the task completed, do nothing
 			if(getActivity() == null)
 				return;
@@ -1331,6 +1352,8 @@ public class TrainFragment extends AbstractTabFragment
 		@Override
 		protected void onCancelled(String result)
 		{
+			mWakelock.release();
+			
 			if(getActivity() != null)
 			{
 				Toast.makeText(getActivity(), R.string.validationCancelled, Toast.LENGTH_LONG)
