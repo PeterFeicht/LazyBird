@@ -20,7 +20,6 @@
     <!-- Services -->
     <string name="service_started">ARFF Recorder service started</string>
     <string name="service_stopped">ARFF Recorder service stopped</string>
-    <string name="service_label">ARFF Recorder Service</string>
     <string name="too_many_values">Recording stopped</string>
     <string name="too_many_values_long">Recording stopped after %d values</string>
     <string name="service_waiting">Recording will start in %s seconds</string>
@@ -35,11 +34,9 @@
     
     <!-- Settings -->
     <string name="set_valueUpdateSpeed">Update speed (display)</string>
-    <string name="set_ValueUpdateSpeed_long">Update speed of the last values displayed.</string>
     <string name="set_outputDir">Output directory</string>
     <string name="set_outputDir_long">Where to put the recorded files.</string>
     <string name="set_maxNumValues">Datapoint limit</string>
-    <string name="set_maxNumValues_long">Number of data points after which recording is stopped.</string>
     <string name="set_startDelay">Start delay</string>
     <string name="set_startDelay_long">Time to wait (in seconds) before starting to record.</string>
     <string name="set_numFolds">Number of folds</string>
@@ -84,8 +81,6 @@
     <string name="btnValidate">Validate</string>
     <string name="labelSelectClassifier">Select a classifier:</string>
     <string name="labelSelectWindowSize">Select sliding window size (ms):</string>
-    <string name="selectFileNote">Note that only files in the output directory are listed.</string>
-    <string name="selectFeaturesNote">Select the features used to train the classifier.</string>
     <string name="noFiles">No ARFF files in output directory.\nPut files you want to use in the output directory.</string>
     <string name="trainQuestion">Replace current classifier?</string>
     <string name="trainNote">If you train a new classifier, the current one will be replaced.\nDo you want to continue?</string>

@@ -20,7 +20,6 @@
     <!-- Services -->
     <string name="service_started">ARFF Recorder service gestartet</string>
     <string name="service_stopped">ARFF Recorder service gestoppt</string>
-    <string name="service_label">ARFF Recorder Service</string>
     <string name="too_many_values">Aufzeichnung gestoppt</string>
     <string name="too_many_values_long">Aufzeichnung gestoppt nach %d Werten</string>
     <string name="service_waiting">Aufnahme startet in %s Sekunden</string>
@@ -35,11 +34,9 @@
     
     <!-- Settings -->
     <string name="set_valueUpdateSpeed">Anzeigegeschwindigkeit</string>
-    <string name="set_ValueUpdateSpeed_long">Geschwindigkeit der Anzeige der letzten Werte.</string>
     <string name="set_outputDir">Ausgabeverzeichnis</string>
     <string name="set_outputDir_long">Verzeichnis in das die Ausgabedateien gespeichert werden.</string>
     <string name="set_maxNumValues">Datenpunkt Limit</string>
-    <string name="set_maxNumValues_long">Anzahl der Datenpunkte nach der die Aufnahme beendet wird.</string>
     <string name="set_startDelay">Startverzögerung</string>
     <string name="set_startDelay_long">Wartezeit (Sekunden) bevor die Aufnahme gestartet wird.</string>
     <string name="set_numFolds">Anzahl Folds</string>
@@ -84,8 +81,6 @@
     <string name="btnValidate">Testen</string>
     <string name="labelSelectClassifier">Wählen Sie einen Classifier:</string>
     <string name="labelSelectWindowSize">Wählen Sie eine Mittelzeit (ms):</string>
-    <string name="selectFileNote">Beachten Sie, dass nur Dateien im Ausgabeverzeichnis angezeigt werden.</string>
-    <string name="selectFeaturesNote">Wählen Sie die Features, mit denen der Classifier trainiert wird.</string>
     <string name="noFiles">Keine ARFF Dateien im Ausgabeverzeichnis.\nKopieren Sie Dateien die Sie verwenden wollen ins Ausgabeverzeichnis.</string>
     <string name="trainQuestion">Aktuellen Classifier ersetzen?</string>
     <string name="trainNote">Wenn Sie einen neuen Classifier trainieren, wird der aktuelle ersetzt.\nWollen Sie fortfahren?</string>
@@ -117,7 +112,7 @@
     <!-- Classifier Info -->
     <string name="noValidation">Keine Validierung durchgeführt.</string>
     <string name="noClassifier">Es ist noch kein Classifier trainiert..</string>
-    <string name="txtClassifierType">Classifier Typ: %1$s&#8195;(%2$d $3$s)</string>
+    <string name="txtClassifierType">Classifier Typ: %1$s&#8195;(%2$d %3$s)</string>
     <string name="txtTrainDate">Trainiert am %1$s, mit %2$d Werten.</string>
     <string name="txtTrainedFeatures">Trainierte Features: %s</string>
     
