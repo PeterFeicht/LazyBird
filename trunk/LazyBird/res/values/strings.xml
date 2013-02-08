@@ -53,6 +53,8 @@
     <string name="set_writeLog_diasble">No log will be written</string>
     <string name="set_logFilename">Filename</string>
     <string name="set_logFilename_long">The name for the log file.</string>
+    <string name="set_useWakelock">Use Wakelock</string>
+    <string name="set_useWakelock_note">Enable this option, if the device sleeps while recording or reporting.\nOn some devices this is needed, but the battery use will be greater if it\'s activated.</string>
 
     <!-- Record -->
     <string name="helpRecorder">Here you can record accelerometer data to ARFF files to train a classifier with.\nYou have to record data and train a classifier, before you can report your activity to the server.</string>
