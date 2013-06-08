@@ -39,6 +39,7 @@ public class OptionParser
 		 * @param resolveEscape Resolve escape sequences (\x).
 		 * @param includeQuote Include the quote characters in the output.
 		 */
+		@SuppressWarnings("hiding")
 		public Quote(char begin, char end, boolean resolveEscape, boolean includeQuote)
 		{
 			this.begin = begin;
@@ -54,6 +55,7 @@ public class OptionParser
 		 * @param begin Character with which the quoted section begins.
 		 * @param end Character with which the quoted section ends.
 		 */
+		@SuppressWarnings("hiding")
 		public Quote(char begin, char end)
 		{
 			this(begin, end, true, false);
@@ -195,8 +197,7 @@ public class OptionParser
 					{
 						if(mFormatErrorsIgnored)
 							break;
-						else
-							throw new OptionFormatException("quote not closed");
+						throw new OptionFormatException("quote not closed");
 					}
 					if(q.includeQuote) result.append(mSource.charAt(i));
 					i++;

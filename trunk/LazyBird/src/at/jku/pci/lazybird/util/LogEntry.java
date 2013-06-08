@@ -15,12 +15,12 @@ public class LogEntry implements Comparable<LogEntry>, Serializable
 	/**
 	 * The time of this log entry.
 	 */
-	public final Date time;
+	public final Date mTime;
 	
 	/**
 	 * The message associated with this log entry.
 	 */
-	public final String message;
+	public final String mMessage;
 	
 	/**
 	 * Initializes a new instance of the {@link LogEntry} class with the specified message and
@@ -46,22 +46,22 @@ public class LogEntry implements Comparable<LogEntry>, Serializable
 	{
 		if(time == null || msg == null)
 			throw new NullPointerException();
-		this.time = time;
-		this.message = msg;
+		mTime = time;
+		mMessage = msg;
 	}
 	
 	@Override
 	public int compareTo(LogEntry another)
 	{
-		return time.compareTo(another.time);
+		return mTime.compareTo(another.mTime);
 	}
 	
 	@Override
 	public int hashCode()
 	{
 		int result = 27;
-		result = result * 13 + time.hashCode();
-		return result * 13 + message.hashCode();
+		result = result * 13 + mTime.hashCode();
+		return result * 13 + mMessage.hashCode();
 	}
 	
 	@Override
@@ -74,7 +74,7 @@ public class LogEntry implements Comparable<LogEntry>, Serializable
 		if(o instanceof LogEntry)
 		{
 			LogEntry other = (LogEntry)o;
-			return time.equals(other.time) && message.equals(other.message);
+			return mTime.equals(other.mTime) && mMessage.equals(other.mMessage);
 		}
 		return false;
 	}

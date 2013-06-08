@@ -112,7 +112,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 		{
 			setBackgroundColor(getActivityColor());
 			if(isOffline())
-				setVisibility(mShowOffline ? View.VISIBLE : View.GONE);
+				setVisibility(getShowOffline() ? View.VISIBLE : View.GONE);
 			postInvalidate();
 		}
 	};
@@ -388,6 +388,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	
 	/**
 	 * Gets the age for this view.
+	 * @return The age in milliseconds.
 	 */
 	public long getAge()
 	{
@@ -461,7 +462,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	 * Sets the activity class label for this view, updating the background color. Note that it
 	 * is safe to call this method from a non-UI thread.
 	 * 
-	 * @param role the new {@link ClassLabel} for this view, or {@code null}.
+	 * @param activity the new {@link ClassLabel} for this view, or {@code null}.
 	 */
 	public void setActivity(ClassLabel activity)
 	{
@@ -543,7 +544,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	/**
 	 * Sets the height of the age bar in pixels.
 	 * 
-	 * @param mAgeBarHeight the height in pixels.
+	 * @param height the height in pixels.
 	 */
 	public void setAgeBarHeight(int height)
 	{
