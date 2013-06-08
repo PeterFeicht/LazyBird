@@ -74,7 +74,7 @@ public class FeatureExtractor
 	private final int mJumpSize;
 	private int mInputInstances;
 	private int mOutputFeatures;
-	private Instances mOutput = null;
+	Instances mOutput = null;
 	private boolean mCalculated = false;
 	
 	/**
@@ -134,8 +134,7 @@ public class FeatureExtractor
 	{
 		if(!mCalculated)
 			throw new IllegalStateException();
-		else
-			return mOutput;
+		return mOutput;
 	}
 	
 	/**
@@ -158,8 +157,7 @@ public class FeatureExtractor
 	{
 		if(!mCalculated)
 			throw new IllegalStateException();
-		else
-			return mOutputFeatures;
+		return mOutputFeatures;
 	}
 	
 	/**
@@ -385,12 +383,20 @@ public class FeatureExtractor
 	}
 	
 	/**
+	 * Call {@link #extractFeatures(Iterable, int)} with our output features.
+	 */
+	Instance extractFeatures(Iterable<Instance> instances)
+	{
+		return extractFeatures(instances, mOutputFeatures);
+	}
+	
+	/**
 	 * Gets a {@link FastVector} with all possible values of the specified nominal attribute.
 	 * 
 	 * @param a the {@link Attribute} to get values from
 	 * @return a {@link FastVector} with all possible {@link String} values of {@code a}.
 	 */
-	private FastVector getValueVector(Attribute a)
+	private static FastVector getValueVector(Attribute a)
 	{
 		@SuppressWarnings("unchecked")
 		final Enumeration<String> names = a.enumerateValues();
@@ -398,14 +404,6 @@ public class FeatureExtractor
 		while(names.hasMoreElements())
 			values.addElement(names.nextElement());
 		return values;
-	}
-	
-	/**
-	 * Call {@link #extractFeatures(Iterable, int)} with our output features.
-	 */
-	private Instance extractFeatures(Iterable<Instance> instances)
-	{
-		return extractFeatures(instances, mOutputFeatures);
 	}
 	
 	/**

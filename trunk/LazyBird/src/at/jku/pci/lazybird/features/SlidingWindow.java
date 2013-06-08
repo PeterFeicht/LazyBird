@@ -50,13 +50,11 @@ public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 	 */
 	public class SlidingWindowIterator implements Iterator<T>
 	{
-		private final int mExpectedModCount;
 		private final Iterator<T> it;
 		
-		private SlidingWindowIterator()
+		SlidingWindowIterator(Iterator<T> i)
 		{
-			mExpectedModCount = mModCount;
-			it = mInstances.iterator();
+			it = i;
 		}
 		
 		/**
@@ -68,9 +66,6 @@ public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 		@Override
 		public boolean hasNext()
 		{
-			if(mExpectedModCount != mModCount)
-				throw new ConcurrentModificationException();
-			
 			return it.hasNext();
 		}
 		
@@ -83,9 +78,6 @@ public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 		@Override
 		public T next()
 		{
-			if(mExpectedModCount != mModCount)
-				throw new ConcurrentModificationException();
-			
 			return it.next();
 		}
 		
@@ -122,7 +114,7 @@ public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 		INVALID;
 	}
 	
-	private volatile int mModCount = 0;
+	volatile int mModCount = 0;
 	private final int mWindowSize;
 	private final int mJumpSize;
 	private final LinkedList<T> mInstances = new LinkedList<T>();
@@ -184,7 +176,7 @@ public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 	@Override
 	public Iterator<T> iterator()
 	{
-		return new SlidingWindowIterator();
+		return new SlidingWindowIterator(mInstances.iterator());
 	}
 	
 	/**
@@ -386,7 +378,6 @@ public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 		
 		if(attrs.nextElement().isNominal())
 			return AttributeOrder.HAS_CLASS;
-		else
-			return AttributeOrder.INVALID;
+		return AttributeOrder.INVALID;
 	}
 }

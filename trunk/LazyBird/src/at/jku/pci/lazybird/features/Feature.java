@@ -140,6 +140,7 @@ public enum Feature
 	public static Feature[] getFeatures(int flags)
 	{
 		final Feature[] out = new Feature[Integer.bitCount(flags)];
+		int processed = 0;
 		int idx = 0;
 		
 		if(flags == 0)
@@ -150,11 +151,11 @@ public enum Feature
 			if(f.isSet(flags))
 			{
 				out[idx++] = f;
-				flags &= ~f.mBit;
+				processed |= f.mBit;
 			}
 		}
 		
-		if(flags != 0)
+		if(processed != flags)
 			throw new IllegalArgumentException();
 		
 		return out;
