@@ -30,10 +30,11 @@ public class GuiClient extends Thread
 	public static class UserState implements Comparable<UserState>
 	{
 		private final String userId;
-		private long age;
-		private ClassLabel activity;
-		private UserRole role;
+		long age;
+		ClassLabel activity;
+		UserRole role;
 		
+		@SuppressWarnings("hiding")
 		public UserState(long age, String userId, ClassLabel activity, UserRole role)
 		{
 			this.age = age;

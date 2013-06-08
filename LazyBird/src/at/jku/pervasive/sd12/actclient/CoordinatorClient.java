@@ -36,9 +36,10 @@ public class CoordinatorClient extends Thread
 	public class UserState implements Comparable<UserState>
 	{
 		private final String userId;
-		private long updateAge;
-		private ClassLabel activity;
+		long updateAge;
+		ClassLabel activity;
 		
+		@SuppressWarnings("hiding")
 		public UserState(String userId)
 		{
 			this.userId = userId;
@@ -105,20 +106,20 @@ public class CoordinatorClient extends Thread
 		
 	}
 	
-	private static final Quote[] BRACKETS = { new Quote('(', ')') };
+	static final Quote[] BRACKETS = { new Quote('(', ')') };
 	
 	private final String mClientId;
 	private final String mHost;
 	private final int mPort;
 	
 	private Socket mSocket;
-	private BufferedReader mIn;
+	BufferedReader mIn;
 	private PrintWriter mOut;
 	private Thread mInputThread;
-	private Semaphore lock;
+	Semaphore lock;
 	
-	private Deque<String> mOutputQueue;
-	private HashMap<String, UserState> mGroupState;
+	Deque<String> mOutputQueue;
+	HashMap<String, UserState> mGroupState;
 	private UserState[] mGroupStateList;
 	private ArrayList<GroupStateListener> mGroupStateListeners;
 	
@@ -191,7 +192,7 @@ public class CoordinatorClient extends Thread
 	 * will be notified whenever an activity changes, but at most every 100 ms and at least every
 	 * 5000 ms.
 	 * 
-	 * @param groupStateListener
+	 * @param groupStateListener The listener to add.
 	 */
 	public void addGroupStateListener(GroupStateListener groupStateListener)
 	{
@@ -201,7 +202,7 @@ public class CoordinatorClient extends Thread
 	/**
 	 * Remove a group state listener.
 	 * 
-	 * @param groupStateListener
+	 * @param groupStateListener The listener to remove.
 	 */
 	public void removeGroupStateListener(GroupStateListener groupStateListener)
 	{
@@ -347,7 +348,6 @@ public class CoordinatorClient extends Thread
 	{
 		if(mInputThread != null)
 			return this.isAlive() && mInputThread.isAlive();
-		else
-			return this.isAlive();
+		return this.isAlive();
 	}
 }

@@ -115,12 +115,11 @@ public class LogListAdapter extends BaseAdapter implements Serializable
 			if(time == null || msg == null)
 				return createView(position, parent);
 			
-			time.setText(mDateFormat.format(mElements.get(position).time));
-			msg.setText(mElements.get(position).message);
+			time.setText(mDateFormat.format(mElements.get(position).mTime));
+			msg.setText(mElements.get(position).mMessage);
 			return view;
 		}
-		else
-			return createView(position, parent);
+		return createView(position, parent);
 	}
 	
 	private View createView(int position, ViewGroup parent)
@@ -134,8 +133,8 @@ public class LogListAdapter extends BaseAdapter implements Serializable
 		TextView msg = (TextView)v.findViewById(R.id.logMessage);
 		if(time == null || msg == null)
 			throw new InternalError("Layout of LogEntry corrupted!");
-		time.setText(mDateFormat.format(mElements.get(position).time));
-		msg.setText(mElements.get(position).message);
+		time.setText(mDateFormat.format(mElements.get(position).mTime));
+		msg.setText(mElements.get(position).mMessage);
 		return v;
 	}
 	
