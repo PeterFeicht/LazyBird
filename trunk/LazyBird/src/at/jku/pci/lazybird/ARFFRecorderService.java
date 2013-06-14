@@ -240,8 +240,7 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 		Toast.makeText(this, R.string.service_stopped, Toast.LENGTH_SHORT).show();
 		sRunning = false;
 		sInstance = null;
-		LocalBroadcastManager.getInstance(this).sendBroadcast(
-			new Intent(RecorderFragment.BCAST_SERVICE_STOPPED));
+		LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(RecorderFragment.BCAST_SERVICE_STOPPED));
 	}
 	
 	@Override
@@ -265,8 +264,8 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 	 * <p>
 	 * Note that this does not mean the service is recording, see {@link #setStartDelay(int)}.
 	 * 
-	 * @return {@code true} if the service is running or was killed unexpectedly and
-	 *         {@link #onDestroy()} has not been called, {@code false} otherwise.
+	 * @return {@code true} if the service is running or was killed unexpectedly and {@link #onDestroy()} has
+	 *         not been called, {@code false} otherwise.
 	 */
 	public static boolean isRunning()
 	{
@@ -393,11 +392,10 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 	/**
 	 * Gets the start time of the service.
 	 * <p>
-	 * If a start delay other than {@code 0} is set, the actual start time of the recording will
-	 * be different from the service start time.
+	 * If a start delay other than {@code 0} is set, the actual start time of the recording will be different
+	 * from the service start time.
 	 * 
-	 * @return the start time of the service, that is the time at which a start command was
-	 *         received.
+	 * @return the start time of the service, that is the time at which a start command was received.
 	 * @see #setStartDelay(int)
 	 */
 	public Date getStartTime()
@@ -430,13 +428,12 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 	}
 	
 	/**
-	 * Creates or updates a notification, announcing that the service is waiting to start
-	 * recording.
+	 * Creates or updates a notification, announcing that the service is waiting to start recording.
 	 * 
 	 * @param seconds the number of seconds until recording starts.
 	 * @see #setStartDelay(int)
 	 */
-	private void notifyWaiting(int seconds)
+	void notifyWaiting(int seconds)
 	{
 		Resources res = getResources();
 		CharSequence ticker = res.getText(R.string.service_waiting_ticker);
@@ -456,8 +453,8 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 	}
 	
 	/**
-	 * Builds and shows a notification, announcing that the maximum number of values has been
-	 * reached and the service stopped.
+	 * Builds and shows a notification, announcing that the maximum number of values has been reached and the
+	 * service stopped.
 	 */
 	private void notifyLimit()
 	{
@@ -479,10 +476,10 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 	}
 	
 	/**
-	 * Registers the sensor listener, starts this service as foreground service and sends a
-	 * broadcast informing of the start.
+	 * Registers the sensor listener, starts this service as foreground service and sends a broadcast
+	 * informing of the start.
 	 */
-	private void startRecording()
+	void startRecording()
 	{
 		Sensor s = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		mSensorManager.registerListener(this, s, SensorManager.SENSOR_DELAY_FASTEST);
@@ -492,8 +489,7 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 		if(mWakelock != null)
 			mWakelock.acquire();
 		
-		LocalBroadcastManager.getInstance(this).sendBroadcast(
-			new Intent(RecorderFragment.BCAST_SERVICE_STARTED));
+		LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(RecorderFragment.BCAST_SERVICE_STARTED));
 	}
 	
 	@Override
