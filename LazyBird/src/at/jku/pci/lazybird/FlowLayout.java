@@ -26,12 +26,9 @@ public class FlowLayout extends ViewGroup
 		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.FlowLayout);
 		try
 		{
-			mHorizontalSpacing =
-				a.getDimensionPixelSize(R.styleable.FlowLayout_horizontalSpacing, 0);
-			mVerticalSpacing =
-				a.getDimensionPixelSize(R.styleable.FlowLayout_verticalSpacing, 0);
-			mDistributeHorizontal =
-				a.getBoolean(R.styleable.FlowLayout_distributeHorizontal, false);
+			mHorizontalSpacing = a.getDimensionPixelSize(R.styleable.FlowLayout_horizontalSpacing, 0);
+			mVerticalSpacing = a.getDimensionPixelSize(R.styleable.FlowLayout_verticalSpacing, 0);
+			mDistributeHorizontal = a.getBoolean(R.styleable.FlowLayout_distributeHorizontal, false);
 		}
 		finally
 		{
@@ -90,8 +87,7 @@ public class FlowLayout extends ViewGroup
 		width = Math.max(width, currentWidth - spacing) + getPaddingRight();
 		height += currentHeight + getPaddingBottom();
 		
-		setMeasuredDimension(resolveSize(width, widthMeasureSpec),
-			resolveSize(height, heightMeasureSpec));
+		setMeasuredDimension(resolveSize(width, widthMeasureSpec), resolveSize(height, heightMeasureSpec));
 	}
 	
 	@Override
@@ -140,8 +136,7 @@ public class FlowLayout extends ViewGroup
 				continue;
 			
 			LayoutParams lp = (LayoutParams)child.getLayoutParams();
-			child.layout(lp.x, lp.y, lp.x + child.getMeasuredWidth(),
-				lp.y + child.getMeasuredHeight());
+			child.layout(lp.x, lp.y, lp.x + child.getMeasuredWidth(), lp.y + child.getMeasuredHeight());
 		}
 	}
 	
@@ -174,9 +169,10 @@ public class FlowLayout extends ViewGroup
 		public boolean breakLine = false;
 		public int spacing = -1;
 		
-		private int x;
-		private int y;
+		int x;
+		int y;
 		
+		@SuppressWarnings("hiding")
 		public LayoutParams(int width, int height)
 		{
 			super(width, height);
@@ -186,14 +182,11 @@ public class FlowLayout extends ViewGroup
 		{
 			super(context, attrs);
 			
-			TypedArray a =
-				context.obtainStyledAttributes(attrs, R.styleable.FlowLayout_LayoutParams);
+			TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.FlowLayout_LayoutParams);
 			try
 			{
-				spacing = a.getDimensionPixelSize(
-					R.styleable.FlowLayout_LayoutParams_layout_spacing, spacing);
-				breakLine = a.getBoolean(
-					R.styleable.FlowLayout_LayoutParams_layout_breakLine, breakLine);
+				spacing = a.getDimensionPixelSize(R.styleable.FlowLayout_LayoutParams_layout_spacing, spacing);
+				breakLine = a.getBoolean(R.styleable.FlowLayout_LayoutParams_layout_breakLine, breakLine);
 			}
 			finally
 			{
