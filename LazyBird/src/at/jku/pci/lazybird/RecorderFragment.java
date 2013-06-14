@@ -71,23 +71,23 @@ public class RecorderFragment extends AbstractTabFragment
 	/**
 	 * Setting: {@link SettingsActivity#KEY_VALUE_UPDATE_SPEED}
 	 */
-	private static long sValueUpdateDelay;
+	static long sValueUpdateDelay;
 	/**
 	 * Setting: {@link SettingsActivity#KEY_OUTPUT_DIR}
 	 * 
 	 * @see ARFFRecorderService#getDirname()
 	 */
-	private static String sOutputDir;
+	static String sOutputDir;
 	/**
 	 * Setting: {@link SettingsActivity#KEY_USE_WAKELOCK}
 	 */
-	private static boolean sWakelock;
+	static boolean sWakelock;
 	
 	private SharedPreferences mPrefs;
 	
 	// Views
 	private Switch mSwOnOff;
-	private EditText mTxtFilename;
+	EditText mTxtFilename;
 	private Spinner mSpinClass;
 	private Button mBtnMakeFilename;
 	private Button mBtnArff;
@@ -100,15 +100,16 @@ public class RecorderFragment extends AbstractTabFragment
 	private TextView mLabelLastValues;
 	private TextView mLabelValsPerSecond;
 	private ImageButton mBtnDelete;
-
+	
 	// Fields
 	private int mTextColor;
 	private int mDisabledColor = Color.GRAY;
 	
 	// Handlers
 	private ARFFRecorderService mService = null;
-	private Handler mHandler = new Handler();
+	Handler mHandler = new Handler();
 	private Runnable mRunUpdateValues = new Runnable() {
+		@Override
 		public void run()
 		{
 			if(ARFFRecorderService.isRunning())
@@ -121,6 +122,7 @@ public class RecorderFragment extends AbstractTabFragment
 	private LocalBroadcastManager mBroadcastManager;
 	private IntentFilter mServiceIntentFilter;
 	private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+		@Override
 		public void onReceive(Context context, Intent intent)
 		{
 			if(LOCAL_LOGV) Log.v(LOGTAG, "Received broadcast: " + intent);
@@ -133,11 +135,10 @@ public class RecorderFragment extends AbstractTabFragment
 	};
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-		Bundle savedInstanceState)
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		// Just return the inflated layout, other initializations will be done when the host
-		// activity is created
+		// Just return the inflated layout, other initializations will be done when the host activity is
+		// created
 		return inflater.inflate(R.layout.fragment_recorder, container, false);
 	}
 	
@@ -188,10 +189,10 @@ public class RecorderFragment extends AbstractTabFragment
 		
 		mSwOnOff = (Switch)v.findViewById(R.id.swOnOff);
 		mSwOnOff.setOnClickListener(onSwOnOffClick);
-		// Prevent dragging of the switch, leads to weird behavior when also setting the checked
-		// state in code
+		// Prevent dragging of the switch, leads to weird behavior when also setting the checked state in code
 		mSwOnOff.setOnTouchListener(new OnTouchListener() {
-			public boolean onTouch(View v, MotionEvent event)
+			@Override
+			public boolean onTouch(View v1, MotionEvent event)
 			{
 				if(event.getAction() == MotionEvent.ACTION_MOVE)
 					return true;
@@ -199,7 +200,8 @@ public class RecorderFragment extends AbstractTabFragment
 			}
 		});
 		mSwOnOff.setOnGenericMotionListener(new OnGenericMotionListener() {
-			public boolean onGenericMotion(View v, MotionEvent event)
+			@Override
+			public boolean onGenericMotion(View v1, MotionEvent event)
 			{
 				if(event.getAction() == MotionEvent.ACTION_MOVE)
 					return true;
@@ -247,14 +249,13 @@ public class RecorderFragment extends AbstractTabFragment
 	{
 		super.onResume();
 		
-		// check for running service every time the fragment is resumed, since broadcast can't
-		// be received while paused or stopped
+		// check for running service every time the fragment is resumed, since broadcast can't be received
+		// while paused or stopped
 		mSwOnOff.setChecked(ARFFRecorderService.isRunning());
 		setViewStates(ARFFRecorderService.isRunning());
 		if(ARFFRecorderService.isRunning())
 		{
-			// resume last value update and re-register the service receiver, if service is
-			// started
+			// resume last value update and re-register the service receiver, if service is started
 			mHandler.post(mRunUpdateValues);
 			mBroadcastManager.registerReceiver(mBroadcastReceiver, mServiceIntentFilter);
 		}
@@ -267,14 +268,13 @@ public class RecorderFragment extends AbstractTabFragment
 	{
 		if(getActivity() != null)
 			return getString(R.string.title_tab_record);
-		else
-			return TITLE;
+		return TITLE;
 	}
 	
 	/**
 	 * Updates the labels with the last values read from the service, if possible.
 	 */
-	private void updateLastValues()
+	void updateLastValues()
 	{
 		if(mService == null)
 			return;
@@ -283,8 +283,7 @@ public class RecorderFragment extends AbstractTabFragment
 		
 		if(values != null)
 		{
-			mTxtLastValues.setText(String.format((Locale)null, TRIPLET_FORMAT,
-				values[0], values[1], values[2]));
+			mTxtLastValues.setText(String.format((Locale)null, TRIPLET_FORMAT, values[0], values[1], values[2]));
 			mTxtNumValues.setText(String.format("%,d", mService.getNumValues()));
 			long runtime = System.currentTimeMillis() - mService.getStartTime().getTime();
 			runtime = runtime / 1000 - (long)ARFFRecorderService.getStartDelay();
@@ -314,8 +313,7 @@ public class RecorderFragment extends AbstractTabFragment
 		catch(NumberFormatException ex)
 		{
 			// Should not happen, clean it up anyway
-			Log.e(LOGTAG, "Setting " + SettingsActivity.KEY_VALUE_UPDATE_SPEED +
-				" is screwed up: " + ex);
+			Log.e(LOGTAG, "Setting " + SettingsActivity.KEY_VALUE_UPDATE_SPEED + " is screwed up: " + ex);
 			displayWarning(R.string.error, R.string.error_generic, "Parse valueUpdateDelay");
 			mPrefs.edit().putString(SettingsActivity.KEY_VALUE_UPDATE_SPEED, "750").apply();
 			sValueUpdateDelay = 750;
@@ -328,8 +326,7 @@ public class RecorderFragment extends AbstractTabFragment
 		catch(NumberFormatException ex)
 		{
 			// Should not happen, clean it up anyway
-			Log.e(LOGTAG, "Setting " + SettingsActivity.KEY_MAX_NUM_VALUES +
-				" is screwed up: " + ex);
+			Log.e(LOGTAG, "Setting " + SettingsActivity.KEY_MAX_NUM_VALUES + " is screwed up: " + ex);
 			displayWarning(R.string.error, R.string.error_generic, "Parse maxNumValues");
 			mPrefs.edit().putString(SettingsActivity.KEY_MAX_NUM_VALUES, "10000").apply();
 			ARFFRecorderService.setMaxNumValues(10000);
@@ -339,9 +336,8 @@ public class RecorderFragment extends AbstractTabFragment
 	/**
 	 * Sets the states of the inputs and labels according to the specified value.
 	 * <p>
-	 * Inputs are disabled if the service is running, labels get a disabled looking color if the
-	 * service is not running. Also the start time is updated and the values of the labels
-	 * cleared when appropriate.
+	 * Inputs are disabled if the service is running, labels get a disabled looking color if the service is
+	 * not running. Also the start time is updated and the values of the labels cleared when appropriate.
 	 * 
 	 * @param running
 	 */
@@ -396,14 +392,14 @@ public class RecorderFragment extends AbstractTabFragment
 			if(filename.isEmpty())
 				return;
 			
-			final File f = new File(new File(Environment.getExternalStorageDirectory(),
-				sOutputDir), filename);
+			final File f = new File(new File(Environment.getExternalStorageDirectory(), sOutputDir), filename);
 			int text;
 			if(f.isFile())
 				text = (f.delete() ? R.string.fileDeleted : R.string.fileNotDeleted);
 			else
 				text = R.string.fileNotFound;
-			Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
+			Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT)
+				.show();
 		}
 	};
 	
@@ -435,15 +431,15 @@ public class RecorderFragment extends AbstractTabFragment
 		}
 	};
 	
-	private void onSwOnOffClick(View v)
+	void onSwOnOffClick(View v)
 	{
 		if(mSwOnOff.isChecked())
 		{
 			// Check for writable external storage
 			if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
 			{
-				Toast.makeText(getActivity(), R.string.error_extstorage,
-					Toast.LENGTH_LONG).show();
+				Toast.makeText(getActivity(), R.string.error_extstorage, Toast.LENGTH_LONG)
+					.show();
 				mSwOnOff.setChecked(false);
 				return;
 			}
@@ -452,8 +448,8 @@ public class RecorderFragment extends AbstractTabFragment
 			
 			if(filename.isEmpty() || filename.contains(File.separator))
 			{
-				Toast.makeText(getActivity(), R.string.error_filename,
-					Toast.LENGTH_SHORT).show();
+				Toast.makeText(getActivity(), R.string.error_filename, Toast.LENGTH_SHORT)
+					.show();
 				mSwOnOff.setChecked(false);
 			}
 			else
@@ -482,7 +478,7 @@ public class RecorderFragment extends AbstractTabFragment
 	/**
 	 * Called from the broadcast receiver when the service has started recording.
 	 */
-	private void onServiceStarted()
+	void onServiceStarted()
 	{
 		mService = ARFFRecorderService.getInstance();
 		mHandler.postDelayed(mRunUpdateValues, 100);
@@ -493,7 +489,7 @@ public class RecorderFragment extends AbstractTabFragment
 	 * Called from the broadcast receiver when the service has stopped. This only happens if
 	 * {@link ARFFRecorderService#onDestroy()} is called by the system.
 	 */
-	private void onServiceStopped()
+	void onServiceStopped()
 	{
 		mHandler.removeCallbacks(mRunUpdateValues);
 		mBroadcastManager.unregisterReceiver(mBroadcastReceiver);
@@ -503,8 +499,8 @@ public class RecorderFragment extends AbstractTabFragment
 	}
 	
 	/**
-	 * Builds an {@link AlertDialog} with the specified title, message and info and displays it
-	 * to the user. The dialog has one OK button and an alert icon.
+	 * Builds an {@link AlertDialog} with the specified title, message and info and displays it to the user.
+	 * The dialog has one OK button and an alert icon.
 	 * 
 	 * @param title the resource ID to use as a title
 	 * @param message the resource ID to use for the message
