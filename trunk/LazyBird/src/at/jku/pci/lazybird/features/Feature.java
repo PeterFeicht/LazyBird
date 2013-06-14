@@ -186,7 +186,7 @@ public enum Feature
 	 */
 	public static Map<String, Feature> getAttributes()
 	{
-		final Feature[] all = values();
+		final Feature[] all = Feature.values();
 		final Map<String, Feature> out = new HashMap<String, Feature>(all.length);
 		
 		for(Feature f : all)

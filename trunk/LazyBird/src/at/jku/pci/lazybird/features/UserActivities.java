@@ -1,8 +1,8 @@
 package at.jku.pci.lazybird.features;
 
-import java.util.HashMap;
 import at.jku.pervasive.sd12.actclient.ClassLabel;
 import at.jku.pervasive.sd12.actclient.CoordinatorClient.UserState;
+import java.util.HashMap;
 
 /**
  * Represents a set of users and their activities for a certain point in time. This is a wrapper for

@@ -14,7 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -127,7 +127,7 @@ public class ClassifierInfoActivity extends Activity
 				getString(R.string.txtClassifierType, sClassifierType, size, unit));
 			
 			mTrainDate = new Date(file.lastModified());
-			final String date = SimpleDateFormat.getDateTimeInstance().format(mTrainDate);
+			final String date = DateFormat.getDateTimeInstance().format(mTrainDate);
 			mTxtTrainDate.setText(getString(R.string.txtTrainDate, date, sTrainInstances));
 			
 			final String features = Arrays.toString(Feature.getFeatures(sTrainedFeatures));

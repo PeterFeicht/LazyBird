@@ -286,7 +286,7 @@ public class RecorderFragment extends AbstractTabFragment
 			mTxtLastValues.setText(String.format((Locale)null, TRIPLET_FORMAT, values[0], values[1], values[2]));
 			mTxtNumValues.setText(String.format("%,d", mService.getNumValues()));
 			long runtime = System.currentTimeMillis() - mService.getStartTime().getTime();
-			runtime = runtime / 1000 - (long)ARFFRecorderService.getStartDelay();
+			runtime = runtime / 1000 - ARFFRecorderService.getStartDelay();
 			if(runtime > 0)
 				mTxtValsPerScond.setText(String.valueOf(mService.getNumValues() / runtime));
 		}

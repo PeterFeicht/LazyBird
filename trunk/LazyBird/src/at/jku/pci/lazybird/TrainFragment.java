@@ -1,7 +1,6 @@
 package at.jku.pci.lazybird;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -502,9 +501,9 @@ public class TrainFragment extends AbstractTabFragment
 			for(int j = 0; j < allFiles.length; j++)
 			{
 				filenames[j] = allFiles[j].getName();
-				for(int k = 0; k < mFiles.length; k++)
+				for(File file : mFiles)
 				{
-					if(allFiles[j].equals(mFiles[k]))
+					if(allFiles[j].equals(file))
 					{
 						selected[j] = true;
 						break;
@@ -548,9 +547,9 @@ public class TrainFragment extends AbstractTabFragment
 				
 				// User clicked OK, count the number of selected files
 				int numSelected = 0;
-				for(int j = 0; j < selected.length; j++)
+				for(boolean element : selected)
 				{
-					if(selected[j])
+					if(element)
 						numSelected++;
 				}
 				
@@ -594,9 +593,9 @@ public class TrainFragment extends AbstractTabFragment
 			for(int j = 0; j < selected.length; j++)
 			{
 				selected[j] = false;
-				for(int k = 0; k < mFeatures.length; k++)
+				for(Feature feature : mFeatures)
 				{
-					if(mFeatures[k] == allFeatures[j])
+					if(feature == allFeatures[j])
 					{
 						selected[j] = true;
 						break;
@@ -665,9 +664,9 @@ public class TrainFragment extends AbstractTabFragment
 				
 				// User clicked OK, count the number of selected features
 				int numSelected = 0;
-				for(int j = 0; j < selected.length; j++)
+				for(boolean element : selected)
 				{
-					if(selected[j])
+					if(element)
 						numSelected++;
 				}
 				
@@ -1273,7 +1272,7 @@ public class TrainFragment extends AbstractTabFragment
 				// There is no old validation log file since it is deleted when a classifier is trained
 				sValidationLogFile = String.format("validation-%X%s", classifier.hashCode(), ".txt");
 				OutputStreamWriter out = new OutputStreamWriter(
-						getActivity().openFileOutput(sValidationLogFile, Activity.MODE_PRIVATE));
+						getActivity().openFileOutput(sValidationLogFile, Context.MODE_PRIVATE));
 				out.write(summary);
 				out.close();
 				

@@ -180,7 +180,7 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 				if(clazz != 0 && classes != null)
 				{
 					mOutfile.write("@ATTRIBUTE class            ");
-					mOutfile.write(getClassesString(classes) + "\n");
+					mOutfile.write(ARFFRecorderService.getClassesString(classes) + "\n");
 					mClass = classes[clazz];
 				}
 				

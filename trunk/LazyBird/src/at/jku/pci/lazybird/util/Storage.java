@@ -1,6 +1,5 @@
 package at.jku.pci.lazybird.util;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import at.jku.pci.lazybird.SettingsActivity;
@@ -83,7 +82,7 @@ public final class Storage
 	 */
 	public static SharedPreferences getClassifierPreferences(Context c)
 	{
-		return c.getSharedPreferences(PREFS_CLASSIFIER, Activity.MODE_PRIVATE);
+		return c.getSharedPreferences(PREFS_CLASSIFIER, Context.MODE_PRIVATE);
 	}
 	
 	/* ======================================================================================= */
@@ -116,7 +115,7 @@ public final class Storage
 	 */
 	public static SharedPreferences getUiPreferences(Context c)
 	{
-		return c.getSharedPreferences(PREFS_UI, Activity.MODE_PRIVATE);
+		return c.getSharedPreferences(PREFS_UI, Context.MODE_PRIVATE);
 	}
 	
 	private Storage()
