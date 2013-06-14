@@ -144,10 +144,8 @@ public class GuiClient extends Thread
 		{
 			mSocket = new Socket();
 			mSocket.connect(new InetSocketAddress(mHost, mPort), 5000);
-			mInput =
-				new BufferedReader(new InputStreamReader(mSocket.getInputStream(), NET_CHARSET));
-			mOutput = new PrintWriter(
-				new OutputStreamWriter(mSocket.getOutputStream(), NET_CHARSET), true);
+			mInput = new BufferedReader(new InputStreamReader(mSocket.getInputStream(), NET_CHARSET));
+			mOutput = new PrintWriter(new OutputStreamWriter(mSocket.getOutputStream(), NET_CHARSET), true);
 			mConnected = true;
 			
 			String line = null;
@@ -228,8 +226,7 @@ public class GuiClient extends Thread
 		}
 		else
 		{
-			mGroupState.put(up[1],
-				new UserState(age, up[1], activity, role));
+			mGroupState.put(up[1], new UserState(age, up[1], activity, role));
 		}
 	}
 	
@@ -239,8 +236,8 @@ public class GuiClient extends Thread
 	}
 	
 	/**
-	 * If not {@code null}, notifies {@link #mListener} of a group state change, updating the
-	 * array if necessary.
+	 * If not {@code null}, notifies {@link #mListener} of a group state change, updating the array if
+	 * necessary.
 	 */
 	protected void notifyGroupStateListener()
 	{
