@@ -52,26 +52,27 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	 * 
 	 * @see ARFFRecorderService#getDirname()
 	 */
-	private static String sOutputDir;
+	static String sOutputDir;
 	/**
 	 * Setting: {@link SettingsActivity#KEY_LOG_FILENAME}
 	 */
-	private static String sLogFilename;
+	static String sLogFilename;
 	/**
 	 * Setting {@link Storage#KEY_TRAINING_FILE}
 	 */
-	private static String sTrainingFile;
+	static String sTrainingFile;
 	
 	private SharedPreferences mPrefs;
 	
 	// The PagerAdapter supplies the fragments to be displayed in the ViewPager
-	private SectionsPagerAdapter mPagerAdapter;
-	private ViewPager mViewPager;
-	private MenuItem mMenuReport;
+	SectionsPagerAdapter mPagerAdapter;
+	ViewPager mViewPager;
+	MenuItem mMenuReport;
 	
 	private LocalBroadcastManager mBroadcastManager;
 	private IntentFilter mServiceIntentFilter;
 	private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+		@Override
 		public void onReceive(Context context, Intent intent)
 		{
 			if(LOCAL_LOGV) Log.v(LOGTAG, "Received broadcast: " + intent);
@@ -121,8 +122,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		// For each of the sections in the app, add a tab to the action bar
 		for(int i = 0; i < mPagerAdapter.getCount(); i++)
 		{
-			actionBar.addTab(
-				actionBar.newTab().setText(mPagerAdapter.getPageTitle(i)).setTabListener(this));
+			actionBar.addTab(actionBar.newTab().setText(mPagerAdapter.getPageTitle(i)).setTabListener(this));
 		}
 		
 		// TTS outputs on the music stream so we want to control that one
@@ -133,8 +133,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	{
 		sOutputDir = mPrefs.getString(SettingsActivity.KEY_OUTPUT_DIR, "");
 		sLogFilename = mPrefs.getString(SettingsActivity.KEY_LOG_FILENAME, "");
-		sTrainingFile = Storage.getClassifierPreferences(this)
-			.getString(Storage.KEY_TRAINING_FILE, "");
+		sTrainingFile = Storage.getClassifierPreferences(this).getString(Storage.KEY_TRAINING_FILE, "");
 	}
 	
 	@Override
@@ -165,10 +164,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		menu.findItem(R.id.menu_help).setOnMenuItemClickListener(onMenuHelpClick);
 		menu.findItem(R.id.menu_showlog).setOnMenuItemClickListener(onMenuShowlogClick);
 		menu.findItem(R.id.menu_about).setOnMenuItemClickListener(onMenuAboutClick);
-		menu.findItem(R.id.menu_showClassifierInfo)
-			.setOnMenuItemClickListener(onMenuShowClassifierInfo);
-		menu.findItem(R.id.menu_saveTrainingData)
-			.setOnMenuItemClickListener(onMenuSaveTrainingDataClick);
+		menu.findItem(R.id.menu_showClassifierInfo).setOnMenuItemClickListener(onMenuShowClassifierInfo);
+		menu.findItem(R.id.menu_saveTrainingData).setOnMenuItemClickListener(onMenuSaveTrainingDataClick);
 		menu.findItem(R.id.menu_liveView).setOnMenuItemClickListener(onMenuLiveViewClick);
 		return true;
 	}
@@ -228,8 +225,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			
 			if(sLogFilename.isEmpty())
 				return true;
-			final File logfile = new File(new File(Environment.getExternalStorageDirectory(),
-				sOutputDir), sLogFilename);
+			final File logfile = new File(
+				new File(Environment.getExternalStorageDirectory(), sOutputDir), sLogFilename);
 			if(logfile.isFile())
 			{
 				Intent i = new Intent(Intent.ACTION_VIEW);
@@ -315,10 +312,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	}
 	
 	/**
-	 * Sets the icon of the report menu item according to the current {@link ClassifierService}
-	 * status.
+	 * Sets the icon of the report menu item according to the current {@link ClassifierService} status.
 	 */
-	private void updateMenuReportIcon()
+	void updateMenuReportIcon()
 	{
 		if(mMenuReport == null)
 			return;
@@ -337,7 +333,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	/**
 	 * Displays a dialog asking for a filename and writes the calculated features to this file.
 	 */
-	private void saveTrainData()
+	void saveTrainData()
 	{
 		final EditText txt = new EditText(this);
 		final AlertDialog.Builder b = new AlertDialog.Builder(this);
@@ -352,8 +348,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 				// Check for writable external storage
 				if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
 				{
-					Toast.makeText(MainActivity.this, R.string.error_extstorage,
-						Toast.LENGTH_SHORT).show();
+					Toast.makeText(MainActivity.this, R.string.error_extstorage, Toast.LENGTH_SHORT)
+						.show();
 					return;
 				}
 				
@@ -362,8 +358,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 				if(!name.endsWith(ArffLoader.FILE_EXTENSION))
 					name += ArffLoader.FILE_EXTENSION;
 				
-				File out = new File(new File(Environment.getExternalStorageDirectory(),
-					sOutputDir), name);
+				File out = new File(new File(Environment.getExternalStorageDirectory(), sOutputDir), name);
 				if(out.exists())
 					out.delete();
 				
@@ -401,8 +396,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	 * Reads text from the raw resource file with the specified ID.
 	 * 
 	 * @param id the ID of the file to read.
-	 * @return the contents of the file as {@code String}, or {@code null} in case of an IO
-	 *         error.
+	 * @return the contents of the file as {@code String}, or {@code null} in case of an IO error.
 	 * @exception NotFoundException if the resource ID is not found.
 	 */
 	public String readRawTextFile(int id)
@@ -450,8 +444,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			// When no cached Fragments is present, the super call returns the item returned by
 			// getItem. When a cached Fragment is present, this is returned and stored in the
 			// array to avoid working with the newly created but detached Fragments.
-			AbstractTabFragment tab =
-				(AbstractTabFragment)super.instantiateItem(container, position);
+			AbstractTabFragment tab = (AbstractTabFragment)super.instantiateItem(container, position);
 			mTabs[position] = tab;
 			return tab;
 		}
