@@ -321,6 +321,24 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 	}
 	
 	/**
+	 * Constructs a string representation of the specified array.
+	 * 
+	 * @param c the array to construct the array string from.
+	 * @return a representation of the array in the form of <code>{ c[0], c[1], ... }</code>.
+	 */
+	private static String getClassesString(String[] c)
+	{
+		if(c.length < 2)
+			throw new IllegalArgumentException("classes array has too few entries!");
+		
+		StringBuilder sb = (new StringBuilder()).append("{ ").append(c[1]);
+		for(int j = 2; j < c.length; j++)
+			sb.append(", " + c[j]);
+		
+		return sb.append(" }").toString();
+	}
+	
+	/**
 	 * Gets the last set of values reported by the sensor.
 	 * 
 	 * @return the last values reported, or {@code null} if there has been no update yet.
@@ -385,24 +403,6 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 	public Date getStartTime()
 	{
 		return mStartTime;
-	}
-	
-	/**
-	 * Constructs a string representation of the specified array.
-	 * 
-	 * @param c the array to construct the array string from.
-	 * @return a representation of the array in the form of <code>{ c[0], c[1], ... }</code>.
-	 */
-	private String getClassesString(String[] c)
-	{
-		if(c.length < 2)
-			throw new IllegalArgumentException("classes array has too few entries!");
-		
-		StringBuilder sb = (new StringBuilder()).append("{ ").append(c[1]);
-		for(int j = 2; j < c.length; j++)
-			sb.append(", " + c[j]);
-		
-		return sb.append(" }").toString();
 	}
 	
 	/**
@@ -568,6 +568,7 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 			return this;
 		}
 		
+		@Override
 		public void run()
 		{
 			mSeconds--;
