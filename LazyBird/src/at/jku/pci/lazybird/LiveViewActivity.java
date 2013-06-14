@@ -47,23 +47,24 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 	private SharedPreferences mPrefs;
 	
 	// Views
-	private FlowLayout mUserContainer;
-	private CheckBox mChkShowOffline;
-	private TextView mLblCannotConnect;
-	private TextView mLblConnectionLost;
-	private ProgressBar mProgressServerUpdate;
+	FlowLayout mUserContainer;
+	CheckBox mChkShowOffline;
+	TextView mLblCannotConnect;
+	TextView mLblConnectionLost;
+	ProgressBar mProgressServerUpdate;
 	private ImageView mImgRoomState;
 	private ImageView mImgConnectionStatus;
 	
 	// Fields
-	private ArrayAdapter<String> mViewUsers;
-	private HashMap<String, UserActivityView> mUserViews;
-	private GuiClient mClient = null;
+	ArrayAdapter<String> mViewUsers;
+	HashMap<String, UserActivityView> mUserViews;
+	GuiClient mClient = null;
+	int mConnectionStatus = R.string.statusDisconnected;
 	private int mOfflineIndex = 0;
-	private int mConnectionStatus = R.string.statusDisconnected;
 	// Handlers
-	private Handler mHandler = new Handler();
-	private Runnable mRunUpdateAges = new Runnable() {
+	Handler mHandler = new Handler();
+	Runnable mRunUpdateAges = new Runnable() {
+		@Override
 		public void run()
 		{
 			if(mClient == null)
@@ -185,7 +186,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 	/**
 	 * Tries to connect to the server, setting lblCannotConnect to visible if that fails.
 	 */
-	private void connect()
+	void connect()
 	{
 		String host;
 		int port = 1;
@@ -304,8 +305,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		return true;
 	}
 	
-	private OnCheckedChangeListener onChkShowOfflineCheckedChange =
-		new OnCheckedChangeListener() {
+	private OnCheckedChangeListener onChkShowOfflineCheckedChange = new OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
 			{
@@ -328,10 +328,9 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		@Override
 		public void onClick(View v)
 		{
-			final Toast t =
-				Toast.makeText(LiveViewActivity.this, mConnectionStatus, Toast.LENGTH_SHORT);
+			final Toast t = Toast.makeText(LiveViewActivity.this, mConnectionStatus, Toast.LENGTH_SHORT);
 			int[] coords = new int[2];
-			mImgConnectionStatus.getLocationOnScreen(coords);
+			v.getLocationOnScreen(coords);
 			t.setGravity(Gravity.LEFT | Gravity.TOP, coords[0], coords[1]);
 			t.show();
 		}
@@ -349,8 +348,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 				final AlertDialog.Builder b = new AlertDialog.Builder(LiveViewActivity.this);
 				b.setTitle(R.string.menu_liveViewLegend);
 				b.setPositiveButton(android.R.string.ok, null);
-				b.setView(
-					LiveViewActivity.this.getLayoutInflater().inflate(R.layout.legend, null));
+				b.setView(LiveViewActivity.this.getLayoutInflater().inflate(R.layout.legend, null));
 				legend = b.create();
 			}
 			
@@ -384,8 +382,7 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		}
 		
 		// Create views for the new users
-		final ArrayList<UserActivityView> newViews =
-			new ArrayList<UserActivityView>(newUsers.size());
+		final ArrayList<UserActivityView> newViews = new ArrayList<UserActivityView>(newUsers.size());
 		for(UserState u : newUsers)
 		{
 			final UserActivityView v = new UserActivityView(this);
