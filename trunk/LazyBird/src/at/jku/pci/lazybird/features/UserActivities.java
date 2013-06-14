@@ -5,8 +5,8 @@ import at.jku.pervasive.sd12.actclient.ClassLabel;
 import at.jku.pervasive.sd12.actclient.CoordinatorClient.UserState;
 
 /**
- * Represents a set of users and their activities for a certain point in time. This is a wrapper
- * for {@link HashMap}{@code <}{@link String}{@code ,}{@link ClassLabel}{@code >} that implements
+ * Represents a set of users and their activities for a certain point in time. This is a wrapper for
+ * {@link HashMap}{@code <}{@link String}{@code ,}{@link ClassLabel}{@code >} that implements
  * {@link Timestamped}.
  * 
  * @author Peter
@@ -28,8 +28,8 @@ public class UserActivities extends HashMap<String, ClassLabel> implements Times
 	}
 	
 	/**
-	 * Initializes a new instance of the {@link UserActivities} class for the specified time with
-	 * the specified capacity.
+	 * Initializes a new instance of the {@link UserActivities} class for the specified time with the
+	 * specified capacity.
 	 * 
 	 * @param time a Linux time in milliseconds.
 	 * @param capacity the initial capacity of this hash map.
