@@ -65,7 +65,8 @@ import java.util.zip.GZIPOutputStream;
 public class TrainFragment extends AbstractTabFragment
 {
 	/**
-	 * Represents an entry in the list of selectable classifiers.
+	 * Represents an entry in the list of selectable classifiers. This is a wrapper that returns the simple
+	 * name of the class in {@link #toString()}.
 	 * 
 	 * @author Peter
 	 */
@@ -73,9 +74,9 @@ public class TrainFragment extends AbstractTabFragment
 	{
 		public final Class<? extends Classifier> type;
 		
-		public ClassifierEntry(Class<? extends Classifier> type)
+		public ClassifierEntry(Class<? extends Classifier> clazz)
 		{
-			this.type = type;
+			type = clazz;
 		}
 		
 		@Override
@@ -113,50 +114,50 @@ public class TrainFragment extends AbstractTabFragment
 	 * 
 	 * @see ClassifierService#getDirname()
 	 */
-	private static String sOutputDir;
+	static String sOutputDir;
 	/**
 	 * Setting {@link SettingsActivity#KEY_NUM_FOLDS}
 	 */
-	private static int sNumFolds;
+	static int sNumFolds;
 	/**
 	 * Setting: {@link Storage#KEY_CLASSIFIER_FILE}
 	 */
-	private static String sClassifierFile;
+	static String sClassifierFile;
 	/**
 	 * Setting {@link Storage#KEY_TRAINING_FILE}
 	 */
-	private static String sTrainingFile;
+	static String sTrainingFile;
 	/**
 	 * Setting: {@link Storage#KEY_TRAIN_INSTANCES}
 	 */
-	private static int sTrainInstances;
+	static int sTrainInstances;
 	/**
 	 * Setting: {@link Storage#KEY_FEATURES}
 	 */
-	private static int sTrainedFeatures;
+	static int sTrainedFeatures;
 	/**
 	 * Setting: {@link Storage#KEY_VALIDATION_LOG_FILE}
 	 */
-	private static String sValidationLogFile;
+	static String sValidationLogFile;
 	/**
 	 * Setting: {@link Storage#KEY_CLASSIFIER_TYPE}
 	 */
-	private static String sClassifierType;
+	static String sClassifierType;
 	
 	private SharedPreferences mPrefs;
 	private SharedPreferences mPrefsClassifier;
 	
 	// Views
-	private Button mBtnSelectFile;
-	private Button mBtnSelectFeatures;
-	private Button mBtnSaveFeatures;
-	private Button mBtnTrain;
-	private Button mBtnValidate;
-	private Spinner mSpinWindowSize;
-	private Spinner mSpinClassifier;
-	private ProgressBar mProgressTraining;
-	private ProgressBar mProgressExtract;
-	private TextView mTxtTrainStatus;
+	Button mBtnSelectFile;
+	Button mBtnSelectFeatures;
+	Button mBtnSaveFeatures;
+	Button mBtnTrain;
+	Button mBtnValidate;
+	Spinner mSpinWindowSize;
+	Spinner mSpinClassifier;
+	ProgressBar mProgressTraining;
+	ProgressBar mProgressExtract;
+	TextView mTxtTrainStatus;
 	
 	// Fields
 	private final int mCompoundCheck = android.R.drawable.checkbox_on_background;
@@ -164,20 +165,21 @@ public class TrainFragment extends AbstractTabFragment
 	private Drawable mCompoundAlert;
 	
 	private List<ClassifierEntry> mClassifiers;
-	private FileFilter mArffFilter;
-	private File[] mFiles = new File[0];
-	private Feature[] mFeatures = new Feature[0];
-	private Instances mCalculatedFeatures = null;
-	private Classifier mClassifier = null;
-	private String mEvaluation = null;
+	FileFilter mArffFilter;
+	File[] mFiles = new File[0];
+	Feature[] mFeatures = new Feature[0];
+	Instances mCalculatedFeatures = null;
+	Classifier mClassifier = null;
+	String mEvaluation = null;
 	@SuppressWarnings("rawtypes")
-	private AsyncTask mTask = null;
-	private WakeLock mWakelock;
+	AsyncTask mTask = null;
+	WakeLock mWakelock;
 	
 	// Handlers
-	private LocalBroadcastManager mBroadcastManager;
+	LocalBroadcastManager mBroadcastManager;
 	private IntentFilter mServiceIntentFilter;
 	private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+		@Override
 		public void onReceive(Context context, Intent intent)
 		{
 			if(LOCAL_LOGV) Log.v(LOGTAG, "Received broadcast: " + intent);
@@ -212,10 +214,8 @@ public class TrainFragment extends AbstractTabFragment
 		mServiceIntentFilter.addAction(ReportFragment.BCAST_SERVICE_STARTED);
 		mServiceIntentFilter.addAction(ReportFragment.BCAST_SERVICE_STOPPED);
 		
-		final PowerManager pm =
-			(PowerManager)getActivity().getSystemService(Context.POWER_SERVICE);
-		mWakelock = pm.newWakeLock(
-			PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE, LOGTAG);
+		final PowerManager pm = (PowerManager)getActivity().getSystemService(Context.POWER_SERVICE);
+		mWakelock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE, LOGTAG);
 		
 		mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		mPrefsClassifier = Storage.getClassifierPreferences(getActivity());
@@ -223,8 +223,7 @@ public class TrainFragment extends AbstractTabFragment
 		
 		getWidgets(getView());
 		
-		final Drawable check =
-			getResources().getDrawable(android.R.drawable.checkbox_off_background);
+		final Drawable check = getResources().getDrawable(android.R.drawable.checkbox_off_background);
 		mCompoundAlert = getResources().getDrawable(android.R.drawable.ic_dialog_alert);
 		mCompoundAlert.setBounds(0, 0, check.getIntrinsicWidth(), check.getIntrinsicHeight());
 		
@@ -298,8 +297,8 @@ public class TrainFragment extends AbstractTabFragment
 		mClassifiers.add(new ClassifierEntry(NaiveBayes.class));
 		mClassifiers.add(new ClassifierEntry(J48.class));
 		
-		ArrayAdapter<ClassifierEntry> adapter = new ArrayAdapter<ClassifierEntry>(
-			getActivity(), android.R.layout.simple_spinner_item, mClassifiers);
+		ArrayAdapter<ClassifierEntry> adapter =
+			new ArrayAdapter<ClassifierEntry>(getActivity(), android.R.layout.simple_spinner_item, mClassifiers);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		mSpinClassifier.setAdapter(adapter);
 		mSpinClassifier.setSelection(0);
@@ -384,14 +383,13 @@ public class TrainFragment extends AbstractTabFragment
 	{
 		if(getActivity() != null)
 			return getString(R.string.title_tab_record);
-		else
-			return TITLE;
+		return TITLE;
 	}
 	
 	/**
 	 * Sets all appropriate private (static) fields from the shared preferences.
 	 */
-	private void readSettings()
+	void readSettings()
 	{
 		sOutputDir = mPrefs.getString(SettingsActivity.KEY_OUTPUT_DIR, "");
 		sNumFolds = mPrefs.getInt(SettingsActivity.KEY_NUM_FOLDS, 4);
@@ -406,7 +404,7 @@ public class TrainFragment extends AbstractTabFragment
 	/**
 	 * Writes the settings for classifier file and type, training file and trained features.
 	 */
-	private void writeSettings()
+	void writeSettings()
 	{
 		mPrefsClassifier.edit()
 			.putString(Storage.KEY_CLASSIFIER_FILE, sClassifierFile)
@@ -424,7 +422,7 @@ public class TrainFragment extends AbstractTabFragment
 	 * <p>
 	 * Inputs are disabled if extraction or training is running.
 	 */
-	private void setViewStates(boolean extracting)
+	void setViewStates(boolean extracting)
 	{
 		mBtnSelectFile.setEnabled(!extracting);
 		mBtnSelectFeatures.setEnabled(!extracting);
@@ -433,10 +431,10 @@ public class TrainFragment extends AbstractTabFragment
 	}
 	
 	/**
-	 * Enables or disables the train and extract features buttons according to the selected
-	 * files, features, spinner items and report service state.
+	 * Enables or disables the train and extract features buttons according to the selected files, features,
+	 * spinner items and report service state.
 	 */
-	private void updateTrainEnabled()
+	void updateTrainEnabled()
 	{
 		boolean enabled = mFiles.length > 0 &&
 			mFeatures.length > 0 &&
@@ -449,10 +447,9 @@ public class TrainFragment extends AbstractTabFragment
 	}
 	
 	/**
-	 * Sets the compound drawables of the buttons depending on whether files or features are
-	 * selected.
+	 * Sets the compound drawables of the buttons depending on whether files or features are selected.
 	 */
-	private void updateCheckButtons()
+	void updateCheckButtons()
 	{
 		mBtnSelectFile.setCompoundDrawablesWithIntrinsicBounds(
 			(mFiles.length > 0) ? mCompoundCheck : mCompoundUncheck, 0, 0, 0);
@@ -463,10 +460,10 @@ public class TrainFragment extends AbstractTabFragment
 	/**
 	 * Shows or hides the validate button.
 	 * 
-	 * @param visible if {@code true} the button will be shown, otherwise it will be hidden and
-	 *        the calculated features and evaluation reset.
+	 * @param visible if {@code true} the button will be shown, otherwise it will be hidden and the calculated
+	 *        features and evaluation reset.
 	 */
-	private void setValidateVisible(boolean visible)
+	void setValidateVisible(boolean visible)
 	{
 		if(!visible)
 		{
@@ -485,12 +482,9 @@ public class TrainFragment extends AbstractTabFragment
 		{
 			// Check for readable external storage
 			final String state = Environment.getExternalStorageState();
-			if(!state.equals(Environment.MEDIA_MOUNTED) &&
-				!state.equals(Environment.MEDIA_MOUNTED_READ_ONLY))
+			if(!state.equals(Environment.MEDIA_MOUNTED) && !state.equals(Environment.MEDIA_MOUNTED_READ_ONLY))
 			{
-				Toast.makeText(getActivity(), R.string.error_extstorage_read, Toast.LENGTH_SHORT)
-					.show();
-				mBtnSelectFile.setCompoundDrawables(mCompoundAlert, null, null, null);
+				showFileError(R.string.error_extstorage_read);
 				return;
 			}
 			
@@ -498,8 +492,7 @@ public class TrainFragment extends AbstractTabFragment
 			final File dir = new File(Environment.getExternalStorageDirectory(), sOutputDir);
 			if(!dir.exists() || !dir.isDirectory())
 			{
-				Toast.makeText(getActivity(), R.string.error_nodir, Toast.LENGTH_SHORT).show();
-				mBtnSelectFile.setCompoundDrawables(mCompoundAlert, null, null, null);
+				showFileError(R.string.error_nodir);
 				return;
 			}
 			allFiles = dir.listFiles(mArffFilter);
@@ -579,6 +572,12 @@ public class TrainFragment extends AbstractTabFragment
 				}
 			};
 	};
+	
+	void showFileError(int str)
+	{
+		Toast.makeText(getActivity(), str, Toast.LENGTH_SHORT).show();
+		mBtnSelectFile.setCompoundDrawables(mCompoundAlert, null, null, null);
+	}
 	
 	private OnClickListener onBtnSelectFeaturesClick = new OnClickListener() {
 		final Feature[] allFeatures = Feature.values();
@@ -705,7 +704,7 @@ public class TrainFragment extends AbstractTabFragment
 		}
 	};
 	
-	private OnClickListener onBtnSaveFeaturesClick = new OnClickListener() {
+	OnClickListener onBtnSaveFeaturesClick = new OnClickListener() {
 		@Override
 		public void onClick(View v)
 		{
@@ -713,8 +712,7 @@ public class TrainFragment extends AbstractTabFragment
 			if(mCalculatedFeatures == null)
 			{
 				int windowSize = Integer.parseInt((String)mSpinWindowSize.getSelectedItem());
-				FeatureExtractor fe =
-					new FeatureExtractor(mFiles, mFeatures, windowSize, JUMP_SIZE);
+				FeatureExtractor fe = new FeatureExtractor(mFiles, mFeatures, windowSize, JUMP_SIZE);
 				
 				SaveFeaturesTask t = new SaveFeaturesTask();
 				mTask = t;
@@ -725,7 +723,7 @@ public class TrainFragment extends AbstractTabFragment
 		}
 	};
 	
-	private OnClickListener onBtnTrainClick = new OnClickListener() {
+	OnClickListener onBtnTrainClick = new OnClickListener() {
 		@Override
 		public void onClick(View v)
 		{
@@ -740,8 +738,7 @@ public class TrainFragment extends AbstractTabFragment
 				{
 					// User wants to train, so train
 					int windowSize = Integer.parseInt((String)mSpinWindowSize.getSelectedItem());
-					FeatureExtractor fe =
-						new FeatureExtractor(mFiles, mFeatures, windowSize, JUMP_SIZE);
+					FeatureExtractor fe = new FeatureExtractor(mFiles, mFeatures, windowSize, JUMP_SIZE);
 					
 					TrainClassifierTask t = new TrainClassifierTask();
 					mTask = t;
@@ -752,7 +749,7 @@ public class TrainFragment extends AbstractTabFragment
 		}
 	};
 	
-	private OnClickListener onBtnValidateClick = new OnClickListener() {
+	OnClickListener onBtnValidateClick = new OnClickListener() {
 		@Override
 		public void onClick(View v)
 		{
@@ -792,7 +789,7 @@ public class TrainFragment extends AbstractTabFragment
 	 * 
 	 * @param ex the type of the {@link Exception} determines the message shown.
 	 */
-	private void showExceptionDialog(Exception ex)
+	void showExceptionDialog(Exception ex)
 	{
 		AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
 		b.setIcon(android.R.drawable.ic_dialog_alert);
@@ -814,7 +811,7 @@ public class TrainFragment extends AbstractTabFragment
 	/**
 	 * Displays a dialog asking for a filename and writes the calculated features to this file.
 	 */
-	private void saveFeatures()
+	void saveFeatures()
 	{
 		final EditText txt = new EditText(getActivity());
 		final AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
@@ -829,8 +826,8 @@ public class TrainFragment extends AbstractTabFragment
 				// Check for writable external storage
 				if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
 				{
-					Toast.makeText(getActivity(), R.string.error_extstorage,
-						Toast.LENGTH_LONG).show();
+					Toast.makeText(getActivity(), R.string.error_extstorage, Toast.LENGTH_LONG)
+						.show();
 					return;
 				}
 				
@@ -840,8 +837,7 @@ public class TrainFragment extends AbstractTabFragment
 					name += ArffLoader.FILE_EXTENSION;
 				
 				// Save file
-				File out = new File(new File(Environment.getExternalStorageDirectory(),
-					sOutputDir), name);
+				File out = new File(new File(Environment.getExternalStorageDirectory(), sOutputDir), name);
 				if(out.exists())
 					out.delete();
 				ArffSaver saver = new ArffSaver();
@@ -866,7 +862,7 @@ public class TrainFragment extends AbstractTabFragment
 	/**
 	 * Extracts data from the evaluation of the classifier and shows it in a dialog.
 	 */
-	private void showEvaluation()
+	void showEvaluation()
 	{
 		// Create a TextView with small monospace font
 		final TextView txt = new TextView(getActivity());
@@ -945,12 +941,11 @@ public class TrainFragment extends AbstractTabFragment
 	}
 	
 	/**
-	 * {@link AsyncTask} that extracts the selected features from the selected files, merges and
-	 * saves them.
+	 * {@link AsyncTask} that extracts the selected features from the selected files, merges and saves them.
 	 * 
 	 * @author Peter
 	 */
-	private class SaveFeaturesTask extends AsyncTask<FeatureExtractor, Void, FeatureExtractor>
+	class SaveFeaturesTask extends AsyncTask<FeatureExtractor, Void, FeatureExtractor>
 	{
 		private Exception mException = null;
 		private int mOrientation;
@@ -1044,8 +1039,9 @@ public class TrainFragment extends AbstractTabFragment
 		}
 	}
 	
-	private class TrainClassifierTask extends AsyncTask<FeatureExtractor, Instances, Classifier>
+	class TrainClassifierTask extends AsyncTask<FeatureExtractor, Instances, Classifier>
 	{
+		public static final String SERIALIZED_EXTENSION = Instances.SERIALIZED_OBJ_FILE_EXTENSION;
 		private Exception mException = null;
 		private int mOutputFeatures = 0;
 		private ClassifierEntry mType = null;
@@ -1079,15 +1075,13 @@ public class TrainFragment extends AbstractTabFragment
 				
 				// Make new filenames and save info
 				sClassifierFile = String.format("classifier-%X%s", out.hashCode(), ".bin");
-				sTrainingFile = String.format("trainfile-%X%s",
-					out.hashCode(), Instances.SERIALIZED_OBJ_FILE_EXTENSION + "z");
+				sTrainingFile = String.format("trainfile-%X%s", out.hashCode(), SERIALIZED_EXTENSION + "z");
 				sValidationLogFile = "";
 				sClassifierType = mType.toString();
 				sTrainInstances = fe.getNumInputInstances();
 				
 				// Serialize the classifier to internal storage
-				OutputStream os =
-					getActivity().openFileOutput(sClassifierFile, Context.MODE_PRIVATE);
+				OutputStream os = getActivity().openFileOutput(sClassifierFile, Context.MODE_PRIVATE);
 				final ObjectOutputStream oos = new ObjectOutputStream(os);
 				oos.writeObject(out);
 				oos.close();
@@ -1201,7 +1195,7 @@ public class TrainFragment extends AbstractTabFragment
 			mTxtTrainStatus.setText(R.string.statusExtract);
 			mTxtTrainStatus.setVisibility(View.VISIBLE);
 			mType = (ClassifierEntry)mSpinClassifier.getSelectedItem();
-
+			
 			// Don't let the screen rotate or go off while a task is running
 			mOrientation = getActivity().getRequestedOrientation();
 			int currentOrientation = getResources().getConfiguration().orientation;
@@ -1236,7 +1230,7 @@ public class TrainFragment extends AbstractTabFragment
 		}
 	}
 	
-	private class ValidateClassifierTask extends AsyncTask<Bundle, Void, String>
+	class ValidateClassifierTask extends AsyncTask<Bundle, Void, String>
 	{
 		public static final String KEY_NUM_FOLDS = "numFolds";
 		public static final String KEY_INSTANCES = "instances";
@@ -1280,8 +1274,7 @@ public class TrainFragment extends AbstractTabFragment
 				
 				// There is no old validation log file since it is deleted when a classifier is
 				// trained
-				sValidationLogFile =
-					String.format("validation-%X%s", classifier.hashCode(), ".txt");
+				sValidationLogFile = String.format("validation-%X%s", classifier.hashCode(), ".txt");
 				OutputStreamWriter out = new OutputStreamWriter(
 					getActivity().openFileOutput(sValidationLogFile, Activity.MODE_PRIVATE));
 				out.write(summary);
@@ -1316,7 +1309,7 @@ public class TrainFragment extends AbstractTabFragment
 					ValidateClassifierTask.this.cancel(true);
 				}
 			});
-
+			
 			// Don't let the screen rotate or go off while a task is running
 			mOrientation = getActivity().getRequestedOrientation();
 			int currentOrientation = getResources().getConfiguration().orientation;
