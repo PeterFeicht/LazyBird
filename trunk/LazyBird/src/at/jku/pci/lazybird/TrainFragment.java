@@ -186,7 +186,7 @@ public class TrainFragment extends AbstractTabFragment
 			
 			// Disable or enable train button when report service is started or stopped
 			if(intent.getAction().equals(ReportFragment.BCAST_SERVICE_STARTED) ||
-				intent.getAction().equals(ReportFragment.BCAST_SERVICE_STOPPED))
+					intent.getAction().equals(ReportFragment.BCAST_SERVICE_STOPPED))
 			{
 				updateTrainEnabled();
 			}
@@ -194,8 +194,7 @@ public class TrainFragment extends AbstractTabFragment
 	};
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-		Bundle savedInstanceState)
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		if(LOCAL_LOGV) Log.v(LOGTAG, "View created.");
 		// Just return the inflated layout, other initializations will be done when the host activity is
@@ -298,7 +297,7 @@ public class TrainFragment extends AbstractTabFragment
 		mClassifiers.add(new ClassifierEntry(J48.class));
 		
 		ArrayAdapter<ClassifierEntry> adapter =
-			new ArrayAdapter<ClassifierEntry>(getActivity(), android.R.layout.simple_spinner_item, mClassifiers);
+				new ArrayAdapter<ClassifierEntry>(getActivity(), android.R.layout.simple_spinner_item, mClassifiers);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		mSpinClassifier.setAdapter(adapter);
 		mSpinClassifier.setSelection(0);
@@ -437,10 +436,10 @@ public class TrainFragment extends AbstractTabFragment
 	void updateTrainEnabled()
 	{
 		boolean enabled = mFiles.length > 0 &&
-			mFeatures.length > 0 &&
-			mSpinClassifier.getSelectedItem() != null &&
-			mSpinWindowSize.getSelectedItem() != null &&
-			!ClassifierService.isRunning();
+				mFeatures.length > 0 &&
+				mSpinClassifier.getSelectedItem() != null &&
+				mSpinWindowSize.getSelectedItem() != null &&
+				!ClassifierService.isRunning();
 		
 		mBtnTrain.setEnabled(enabled);
 		mBtnSaveFeatures.setEnabled(enabled);
@@ -452,9 +451,9 @@ public class TrainFragment extends AbstractTabFragment
 	void updateCheckButtons()
 	{
 		mBtnSelectFile.setCompoundDrawablesWithIntrinsicBounds(
-			(mFiles.length > 0) ? mCompoundCheck : mCompoundUncheck, 0, 0, 0);
+				(mFiles.length > 0) ? mCompoundCheck : mCompoundUncheck, 0, 0, 0);
 		mBtnSelectFeatures.setCompoundDrawablesWithIntrinsicBounds(
-			(mFeatures.length > 0) ? mCompoundCheck : mCompoundUncheck, 0, 0, 0);
+				(mFeatures.length > 0) ? mCompoundCheck : mCompoundUncheck, 0, 0, 0);
 	}
 	
 	/**
@@ -540,37 +539,36 @@ public class TrainFragment extends AbstractTabFragment
 			b.show();
 		}
 		
-		DialogInterface.OnClickListener filesSelectedListener =
-			new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which)
+		DialogInterface.OnClickListener filesSelectedListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				// Kill everything when new files are selected
+				setValidateVisible(false);
+				
+				// User clicked OK, count the number of selected files
+				int numSelected = 0;
+				for(int j = 0; j < selected.length; j++)
 				{
-					// Kill everything when new files are selected
-					setValidateVisible(false);
-					
-					// User clicked OK, count the number of selected files
-					int numSelected = 0;
+					if(selected[j])
+						numSelected++;
+				}
+				
+				// Save selected files in field and set button checkbox
+				mFiles = new File[numSelected];
+				if(numSelected > 0)
+				{
+					int idx = 0;
 					for(int j = 0; j < selected.length; j++)
 					{
 						if(selected[j])
-							numSelected++;
+							mFiles[idx++] = allFiles[j].getAbsoluteFile();
 					}
-					
-					// Save selected files in field and set button checkbox
-					mFiles = new File[numSelected];
-					if(numSelected > 0)
-					{
-						int idx = 0;
-						for(int j = 0; j < selected.length; j++)
-						{
-							if(selected[j])
-								mFiles[idx++] = allFiles[j].getAbsoluteFile();
-						}
-					}
-					updateCheckButtons();
-					updateTrainEnabled();
 				}
-			};
+				updateCheckButtons();
+				updateTrainEnabled();
+			}
+		};
 	};
 	
 	void showFileError(int str)
@@ -649,46 +647,45 @@ public class TrainFragment extends AbstractTabFragment
 			b.show();
 		}
 		
-		DialogInterface.OnClickListener featuresSelectedListener =
-			new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which)
+		DialogInterface.OnClickListener featuresSelectedListener = new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which)
+			{
+				setValidateVisible(false);
+				
+				// Special case when raw is selected
+				if(selected[rawIdx])
 				{
-					setValidateVisible(false);
+					mFeatures = new Feature[] { Feature.RAW };
+					updateCheckButtons();
+					updateTrainEnabled();
 					
-					// Special case when raw is selected
-					if(selected[rawIdx])
-					{
-						mFeatures = new Feature[] { Feature.RAW };
-						updateCheckButtons();
-						updateTrainEnabled();
-						
-						return;
-					}
-					
-					// User clicked OK, count the number of selected features
-					int numSelected = 0;
+					return;
+				}
+				
+				// User clicked OK, count the number of selected features
+				int numSelected = 0;
+				for(int j = 0; j < selected.length; j++)
+				{
+					if(selected[j])
+						numSelected++;
+				}
+				
+				// Save selected features in field and set button checkbox
+				mFeatures = new Feature[numSelected];
+				if(numSelected > 0)
+				{
+					int idx = 0;
 					for(int j = 0; j < selected.length; j++)
 					{
 						if(selected[j])
-							numSelected++;
+							mFeatures[idx++] = allFeatures[j];
 					}
-					
-					// Save selected features in field and set button checkbox
-					mFeatures = new Feature[numSelected];
-					if(numSelected > 0)
-					{
-						int idx = 0;
-						for(int j = 0; j < selected.length; j++)
-						{
-							if(selected[j])
-								mFeatures[idx++] = allFeatures[j];
-						}
-					}
-					updateCheckButtons();
-					updateTrainEnabled();
 				}
-			};
+				updateCheckButtons();
+				updateTrainEnabled();
+			}
+		};
 		
 		private void init()
 		{
@@ -906,10 +903,10 @@ public class TrainFragment extends AbstractTabFragment
 			sb.append(sNumFolds).append(" fold cross validation.\n");
 			sb.append("Correctly Classified Instances\n");
 			sb.append(Utils.doubleToString(e.correct(), width, after) + "    " +
-				Utils.doubleToString(e.pctCorrect(), width, after) + " %\n");
+					Utils.doubleToString(e.pctCorrect(), width, after) + " %\n");
 			sb.append("Incorrectly Classified Instances\n");
 			sb.append(Utils.doubleToString(e.incorrect(), width, after) + "    " +
-				Utils.doubleToString(e.pctIncorrect(), width, after) + " %\n");
+					Utils.doubleToString(e.pctIncorrect(), width, after) + " %\n");
 			
 			sb.append("\nKappa statistic\n");
 			sb.append(Utils.doubleToString(e.kappa(), width, after) + "\n");
@@ -926,7 +923,7 @@ public class TrainFragment extends AbstractTabFragment
 			{
 				sb.append("UnClassified Instances\n");
 				sb.append(Utils.doubleToString(e.unclassified(), width, after) + "    " +
-					Utils.doubleToString(e.pctUnclassified(), width, after) + " %\n");
+						Utils.doubleToString(e.pctUnclassified(), width, after) + " %\n");
 			}
 			sb.append("Total Number of Instances\n");
 			sb.append(Utils.doubleToString(e.numInstances(), width, after));
@@ -1276,7 +1273,7 @@ public class TrainFragment extends AbstractTabFragment
 				// There is no old validation log file since it is deleted when a classifier is trained
 				sValidationLogFile = String.format("validation-%X%s", classifier.hashCode(), ".txt");
 				OutputStreamWriter out = new OutputStreamWriter(
-					getActivity().openFileOutput(sValidationLogFile, Activity.MODE_PRIVATE));
+						getActivity().openFileOutput(sValidationLogFile, Activity.MODE_PRIVATE));
 				out.write(summary);
 				out.close();
 				

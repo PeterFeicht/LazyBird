@@ -72,7 +72,7 @@ public class ClassifierService extends Service implements SensorEventListener,
 	 * The default server and port to be used when nothing is specified.
 	 */
 	public static final String DEFAULT_HOST =
-		CoordinatorClient.DEFAULT_SERVER_HOST + ":" + CoordinatorClient.DEFAULT_SERVER_PORT;
+			CoordinatorClient.DEFAULT_SERVER_HOST + ":" + CoordinatorClient.DEFAULT_SERVER_PORT;
 	/**
 	 * The window size of the {@link SlidingWindow} for the user activities.
 	 */
@@ -182,13 +182,13 @@ public class ClassifierService extends Service implements SensorEventListener,
 			sRunning = true;
 			mStartTime = new Date();
 			mUserSlidingWindow = new SlidingWindow<UserActivities>(ACTIVITY_WINDOW_SIZE,
-				ACTIVITY_JUMP_SIZE, new WindowListener<UserActivities>() {
-					@Override
-					public void onWindowChanged(Iterable<UserActivities> window)
-					{
-						onUserWindowChanged(window);
-					}
-				});
+					ACTIVITY_JUMP_SIZE, new WindowListener<UserActivities>() {
+						@Override
+						public void onWindowChanged(Iterable<UserActivities> window)
+						{
+							onUserWindowChanged(window);
+						}
+					});
 			mUsersOnline = new HashSet<String>();
 			
 			// get information from the intent

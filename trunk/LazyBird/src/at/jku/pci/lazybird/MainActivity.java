@@ -79,7 +79,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			
 			// Update the icon of the report button on the action bar when the service starts
 			if(intent.getAction().equals(ReportFragment.BCAST_SERVICE_STOPPED) ||
-				intent.getAction().equals(ReportFragment.BCAST_SERVICE_STARTED))
+					intent.getAction().equals(ReportFragment.BCAST_SERVICE_STARTED))
 			{
 				updateMenuReportIcon();
 			}
@@ -225,7 +225,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			if(sLogFilename.isEmpty())
 				return true;
 			final File logfile = new File(
-				new File(Environment.getExternalStorageDirectory(), sOutputDir), sLogFilename);
+					new File(Environment.getExternalStorageDirectory(), sOutputDir), sLogFilename);
 			if(logfile.isFile())
 			{
 				Intent i = new Intent(Intent.ACTION_VIEW);

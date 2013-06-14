@@ -289,10 +289,10 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 		mAgeBarWidth = getWidth() - getCompoundPaddingLeft() - getCompoundPaddingRight() - 2 * mAgeBarPadding;
 		
 		mAgeBackground.setBounds(
-			mAgeBarLeft,
-			mAgeBarTop,
-			mAgeBarLeft + mAgeBarWidth,
-			mAgeBarTop + mAgeBarHeight);
+				mAgeBarLeft,
+				mAgeBarTop,
+				mAgeBarLeft + mAgeBarWidth,
+				mAgeBarTop + mAgeBarHeight);
 		onAgeChanged();
 		requestLayout();
 	}
@@ -304,10 +304,10 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	{
 		int width = (int)((mAgeBarWidth * (mMaxAge - mAge)) / mMaxAge);
 		mAgeBar.setBounds(
-			mAgeBarLeft,
-			mAgeBarTop,
-			mAgeBarLeft + (width > 0 ? width : 0),
-			mAgeBarTop + mAgeBarHeight);
+				mAgeBarLeft,
+				mAgeBarTop,
+				mAgeBarLeft + (width > 0 ? width : 0),
+				mAgeBarTop + mAgeBarHeight);
 		
 		post(mRunUpdateBackgroundColor);
 	}

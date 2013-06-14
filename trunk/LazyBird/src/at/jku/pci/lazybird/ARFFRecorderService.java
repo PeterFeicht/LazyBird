@@ -43,10 +43,10 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 	 * Note that a class may also be specified, which is not part of this specification.
 	 */
 	public static final String ATTRIBUTE_STRING =
-		"@ATTRIBUTE timestamp        NUMERIC\n" +
-			"@ATTRIBUTE accelerationx    NUMERIC\n" +
-			"@ATTRIBUTE accelerationy    NUMERIC\n" +
-			"@ATTRIBUTE accelerationz    NUMERIC\n";
+			"@ATTRIBUTE timestamp        NUMERIC\n" +
+					"@ATTRIBUTE accelerationx    NUMERIC\n" +
+					"@ATTRIBUTE accelerationy    NUMERIC\n" +
+					"@ATTRIBUTE accelerationz    NUMERIC\n";
 	
 	/**
 	 * UID for the ongoing notification.
@@ -173,7 +173,7 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 				mOutfile.write("% Group: Feichtinger, Hager\n% Date: ");
 				mOutfile.write(DateFormat.format(DATE_FORMAT, new Date()).toString());
 				mOutfile.write(String.format(
-					(Locale)null, "\n\n@RELATION lazybird-%d\n\n", System.currentTimeMillis()));
+						(Locale)null, "\n\n@RELATION lazybird-%d\n\n", System.currentTimeMillis()));
 				
 				mOutfile.write(ATTRIBUTE_STRING);
 				
@@ -510,7 +510,7 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 			try
 			{
 				mOutfile.write(String.format((Locale)null, DATA_FORMAT, timestamp,
-					event.values[0], event.values[1], event.values[2]));
+						event.values[0], event.values[1], event.values[2]));
 				if(mClass != null)
 					mOutfile.write("," + mClass);
 				mOutfile.write("\n");

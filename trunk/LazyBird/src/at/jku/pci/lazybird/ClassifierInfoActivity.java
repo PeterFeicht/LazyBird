@@ -162,7 +162,7 @@ public class ClassifierInfoActivity extends Activity
 			showNoClassifier();
 		}
 	}
-
+	
 	/**
 	 * Hides all views except the classifier type and sets a message that there is no classifier.
 	 */
