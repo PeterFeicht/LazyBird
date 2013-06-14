@@ -113,8 +113,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			@Override
 			public void onPageSelected(int position)
 			{
-				// Doesn't work when tabs are collapsed to a list (e.g. when in landscape), this
-				// is an android bug
+				// Doesn't work when tabs are collapsed to a list (when in landscape), this is an Android bug
 				actionBar.setSelectedNavigationItem(position);
 			}
 		});
@@ -441,9 +440,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		@Override
 		public Object instantiateItem(ViewGroup container, int position)
 		{
-			// When no cached Fragments is present, the super call returns the item returned by
-			// getItem. When a cached Fragment is present, this is returned and stored in the
-			// array to avoid working with the newly created but detached Fragments.
+			// When no cached Fragments is present, the super call returns the item returned by getItem. When
+			// a cached Fragment is present, this is returned and stored in the array to avoid working with
+			// the newly created but detached Fragments.
 			AbstractTabFragment tab = (AbstractTabFragment)super.instantiateItem(container, position);
 			mTabs[position] = tab;
 			return tab;

@@ -363,7 +363,7 @@ public class FeatureExtractor
 					throw new UnsupportedAttributeTypeException();
 			}
 			
-			// Make an educated guess for the needed capacity of the output set
+			// Guess some more
 			cap *= input.numInstances();
 		}
 		
@@ -414,9 +414,8 @@ public class FeatureExtractor
 		if(flags == 0)
 			throw new IllegalArgumentException("flags cannot be 0.");
 		
-		// The output features need to be in the right order, which depends on the definition of
-		// the Feature class. To be independent, put all features in a map and get them in the
-		// right order.
+		// The output features need to be in the right order, which depends on the definition of the Feature
+		// class. To be independent, put all features in a map and get them in the right order.
 		final EnumMap<Feature, Double> values = new EnumMap<Feature, Double>(Feature.class);
 		
 		// Check for empty input set

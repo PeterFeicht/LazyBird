@@ -321,8 +321,8 @@ public class CoordinatorClient extends Thread
 		}
 		catch(InterruptedException e)
 		{
-			// thread is interrupted by a call to interrupt, which we consider
-			// to be the "correct" way to terminate the client. do nothing.
+			// thread is interrupted by a call to interrupt, which we consider to be the "correct" way to
+			// terminate the client. do nothing.
 		}
 		
 		if(mInputThread != null)

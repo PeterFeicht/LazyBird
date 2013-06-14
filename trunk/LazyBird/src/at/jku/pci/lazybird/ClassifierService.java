@@ -146,8 +146,7 @@ public class ClassifierService extends Service implements SensorEventListener,
 	@Override
 	public void onCreate()
 	{
-		// Only one instance is created by the system
-		// (hopefully, the docs don't explicitly state this)
+		// Only one instance is created by the system (hopefully, the docs don't explicitly state this)
 		sInstance = this;
 		if(LOCAL_LOGV) Log.v(LOGTAG, "Service created: " + this);
 		
@@ -343,8 +342,7 @@ public class ClassifierService extends Service implements SensorEventListener,
 			return;
 		}
 		
-		// Set output stream to music, this is the stream the main activity requests for volume
-		// control
+		// Set output stream to music, this is the stream the main activity requests for volume control
 		mTtsParams = new HashMap<String, String>();
 		mTtsParams.put(TextToSpeech.Engine.KEY_PARAM_STREAM, "STREAM_MUSIC");
 		mTtsInit = true;

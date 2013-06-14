@@ -236,8 +236,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 		if(heightMode == MeasureSpec.EXACTLY)
 			return;
 		
-		// The value for the line height was determined experimentally, I have no idea where it
-		// comes from
+		// The value for the line height was determined experimentally, I have no idea where it comes from
 		final int lineHeight = (int)(getTextSize() * 1.36f);
 		final Drawable[] cd = getCompoundDrawables();
 		
