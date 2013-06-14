@@ -10,12 +10,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
- * Represents a sliding window over a set of {@link Timestamped} objects with a defined window
- * and jump size. A listener can be registered to be notified when the window jumps as data are
- * added.
+ * Represents a sliding window over a set of {@link Timestamped} objects with a defined window and jump size.
+ * A listener can be registered to be notified when the window jumps as data are added.
  * <p>
- * Static methods are provided to process a fixed set of data (in an {@link Instances} object)
- * instead of incrementally adding data.
+ * Static methods are provided to process a fixed set of data (in an {@link Instances} object) instead of
+ * incrementally adding data.
  * 
  * @see WindowListener
  * @see #slide(Instances, int, int, WindowListener)
@@ -25,8 +24,8 @@ import java.util.LinkedList;
 public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 {
 	/**
-	 * Defines the interface that can be registered to be notified of window changes as data are
-	 * added to a {@link SlidingWindow}.
+	 * Defines the interface that can be registered to be notified of window changes as data are added to a
+	 * {@link SlidingWindow}.
 	 * 
 	 * @author Peter
 	 */
@@ -41,9 +40,8 @@ public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 	}
 	
 	/**
-	 * Represents an iterator over a {@link SlidingWindow} object. Note that this implementation
-	 * is fail-fast, however the {@code SlidingWindow} iterated over should not be changed while
-	 * iterating regardless.
+	 * Represents an iterator over a {@link SlidingWindow} object. Note that this implementation is fail-fast,
+	 * however the {@code SlidingWindow} iterated over should not be changed while iterating regardless.
 	 * 
 	 * @author Peter
 	 * @see Iterator
@@ -60,8 +58,8 @@ public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 		/**
 		 * {@inheritDoc}
 		 * 
-		 * @exception ConcurrentModificationException if the underlying {@link SlidingWindow} has
-		 *            been changed since this iterator was created.
+		 * @exception ConcurrentModificationException if the underlying {@link SlidingWindow} has been changed
+		 *            since this iterator was created.
 		 */
 		@Override
 		public boolean hasNext()
@@ -72,8 +70,8 @@ public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 		/**
 		 * {@inheritDoc}
 		 * 
-		 * @exception ConcurrentModificationException if the underlying {@link SlidingWindow} has
-		 *            been changed since this iterator was created.
+		 * @exception ConcurrentModificationException if the underlying {@link SlidingWindow} has been changed
+		 *            since this iterator was created.
 		 */
 		@Override
 		public T next()
@@ -122,8 +120,8 @@ public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 	private long mNextJump;
 	
 	/**
-	 * Initializes a new instance of the {@link SlidingWindow} class with default window size
-	 * (1000ms) and jump size (100ms).
+	 * Initializes a new instance of the {@link SlidingWindow} class with default window size (1000ms) and
+	 * jump size (100ms).
 	 */
 	public SlidingWindow()
 	{
@@ -131,15 +129,12 @@ public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 	}
 	
 	/**
-	 * Initializes a new instance of the {@link SlidingWindow} class with the specified window
-	 * and jump size.
+	 * Initializes a new instance of the {@link SlidingWindow} class with the specified window and jump size.
 	 * 
 	 * @param windowSize the window size in ms, needs to be greater than {@code 1}.
-	 * @param jumpSize the jump size in ms, needs to be at least {@code 1} and less than
-	 *        {@code windowSize}.
-	 * @exception IllegalArgumentException if {@code windowSize} is less than {@code 2},
-	 *            {@code jumpSize} is less than {@code 1} or {@code windowSize} is less than
-	 *            {@code jumpSize}.
+	 * @param jumpSize the jump size in ms, needs to be at least {@code 1} and less than {@code windowSize}.
+	 * @exception IllegalArgumentException if {@code windowSize} is less than {@code 2}, {@code jumpSize} is
+	 *            less than {@code 1} or {@code windowSize} is less than {@code jumpSize}.
 	 */
 	public SlidingWindow(int windowSize, int jumpSize)
 	{
@@ -153,16 +148,14 @@ public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 	}
 	
 	/**
-	 * Initializes a new instance of the {@link SlidingWindow} class with the specified window
-	 * size, jump size and listener.
+	 * Initializes a new instance of the {@link SlidingWindow} class with the specified window size, jump size
+	 * and listener.
 	 * 
 	 * @param windowSize the window size in ms, needs to be greater than {@code 1}.
-	 * @param jumpSize the jump size in ms, needs to be at least {@code 1} and less than
-	 *        {@code windowSize}.
+	 * @param jumpSize the jump size in ms, needs to be at least {@code 1} and less than {@code windowSize}.
 	 * @param listener the {@link WindowListener} to be registered, or {@code null}.
-	 * @exception IllegalArgumentException if {@code windowSize} is less than {@code 2},
-	 *            {@code jumpSize} is less than {@code 1} or {@code windowSize} is less than
-	 *            {@code jumpSize}.
+	 * @exception IllegalArgumentException if {@code windowSize} is less than {@code 2}, {@code jumpSize} is
+	 *            less than {@code 1} or {@code windowSize} is less than {@code jumpSize}.
 	 */
 	public SlidingWindow(int windowSize, int jumpSize, WindowListener<T> listener)
 	{
@@ -226,8 +219,7 @@ public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 	 * Adds an instance of data to this sliding window.
 	 * 
 	 * @param i the {@link Timestamped} object to add.
-	 * @return {@code true} if the window changed after adding this instance, {@code false}
-	 *         otherwise.
+	 * @return {@code true} if the window changed after adding this instance, {@code false} otherwise.
 	 * @exception NullPointerException if {@code i} is {@code null}.
 	 */
 	public boolean add(T i)
@@ -256,10 +248,10 @@ public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 	}
 	
 	/**
-	 * This static method takes a fixed set of data and applies a sliding window, calling a
-	 * listener when the window changes.<br>
-	 * This method should be used instead of instantiating a {@link SlidingWindow} when the data
-	 * is training data that contains a class.
+	 * This static method takes a fixed set of data and applies a sliding window, calling a listener when the
+	 * window changes.<br>
+	 * This method should be used instead of instantiating a {@link SlidingWindow} when the data is training
+	 * data that contains a class.
 	 * <p>
 	 * The format of the input data has to match the following conditions:
 	 * <ul>
@@ -267,30 +259,27 @@ public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 	 * <li>The following three attributes are numeric values (e.g. acceleration coordinates).
 	 * <li>The optional last attribute is the class.
 	 * <li>The data is sorted in ascending order by timestamp.
-	 * <li>The data only contains one class value (this is not checked, but it leads to undefined
-	 * behavior if there is more than one class).
+	 * <li>The data only contains one class value (this is not checked, but it leads to undefined behavior if
+	 * there is more than one class).
 	 * </ul>
 	 * When these conditions are not met, an exception will be thrown.
 	 * <p>
-	 * The instances in the set given to {@code listener} is associated with the specified
-	 * {@link Instances}.
+	 * The instances in the set given to {@code listener} is associated with the specified {@link Instances}.
 	 * 
 	 * @param data the data to apply the sliding window average to.
 	 * @param windowSize the window size in ms, needs to be greater than {@code 1}.
-	 * @param jumpSize the jump size in ms, needs to be at least {@code 1} and less than
-	 *        {@code windowSize}.
+	 * @param jumpSize the jump size in ms, needs to be at least {@code 1} and less than {@code windowSize}.
 	 * @param listener the {@link WindowListener} to be called on window changes.
 	 * @exception NullPointerException if {@code data} or {@code listener} is {@code null}.
 	 * @exception IllegalArgumentException if
 	 *            <ul>
-	 *            <li>{@code windowSize} is less than {@code 2} <li>{@code jumpSize} is less than
-	 *            {@code 1} <li>{@code windowSize} is less than {@code jumpSize}
+	 *            <li>{@code windowSize} is less than {@code 2} <li>{@code jumpSize} is less than {@code 1}
+	 *            <li>{@code windowSize} is less than {@code jumpSize}
 	 *            </ul>
-	 * @exception UnsupportedAttributeTypeException if the input data doesn't meet the
-	 *            requirements specified.
+	 * @exception UnsupportedAttributeTypeException if the input data doesn't meet the requirements specified.
 	 */
-	public static void slide(Instances data, int windowSize, int jumpSize,
-		WindowListener<Instance> listener) throws UnsupportedAttributeTypeException
+	public static void slide(Instances data, int windowSize, int jumpSize, WindowListener<Instance> listener)
+		throws UnsupportedAttributeTypeException
 	{
 		if(data == null || listener == null)
 			throw new NullPointerException();
@@ -337,8 +326,8 @@ public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 	 * {@link #slide(Instances, int, int, WindowListener)}.
 	 * 
 	 * @param structure the data set to check.
-	 * @return {@code true} if the specified data set can be supplied to {@code average} without
-	 *         an exception being thrown, {@code false} otherwise.
+	 * @return {@code true} if the specified data set can be supplied to {@code average} without an exception
+	 *         being thrown, {@code false} otherwise.
 	 */
 	public static boolean hasValidAttributes(Instances structure)
 	{
@@ -352,8 +341,7 @@ public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 	 * Determines the order of the attributes in the specified enumeration.
 	 * 
 	 * @param attrs an {@link Enumeration} of {@link Attribute} objects to check.
-	 * @return a value of {@link AttributeOrder} corresponding to the order of the specified
-	 *         attributes.
+	 * @return a value of {@link AttributeOrder} corresponding to the order of the specified attributes.
 	 */
 	protected static AttributeOrder getAttributeOrder(Enumeration<Attribute> attrs)
 	{

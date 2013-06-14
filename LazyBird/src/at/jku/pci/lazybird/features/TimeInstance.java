@@ -3,8 +3,8 @@ package at.jku.pci.lazybird.features;
 import weka.core.Instance;
 
 /**
- * A wrapper for {@link Instance} that implements {@link Timestamped}. The first value is used
- * for the timestamp.
+ * A wrapper for {@link Instance} that implements {@link Timestamped}. The first value is used for the
+ * timestamp.
  * 
  * @author Peter
  */
@@ -13,8 +13,7 @@ public class TimeInstance extends Instance implements Timestamped
 	private static final long serialVersionUID = 4762755102097775605L;
 	
 	/**
-	 * Initializes a new instance of the {@link TimeInstance} class wit the specified number of
-	 * values.
+	 * Initializes a new instance of the {@link TimeInstance} class wit the specified number of values.
 	 * 
 	 * @param numValues the number of values, including the timestamp.
 	 * @exception IllegalArgumentException if {@code numValues} is less than {@code 1}.
@@ -29,8 +28,8 @@ public class TimeInstance extends Instance implements Timestamped
 	}
 	
 	/**
-	 * Initializes a new instance of the {@link TimeInstance} class wit the specified number of
-	 * values and sets the timestamp to the specified value.
+	 * Initializes a new instance of the {@link TimeInstance} class wit the specified number of values and
+	 * sets the timestamp to the specified value.
 	 * 
 	 * @param numValues the number of values, including the timestamp.
 	 * @param timestamp a Linux time in milliseconds.

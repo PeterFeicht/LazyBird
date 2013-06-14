@@ -21,34 +21,33 @@ import java.util.LinkedList;
 import java.util.Map;
 
 /**
- * Represents a task that takes an array of {@link File} and {@link Feature} objects and creates
- * an {@link Instances} data set. Static methods are provided to extract features from a set of
- * {@link Instance} objects.
+ * Represents a task that takes an array of {@link File} and {@link Feature} objects and creates an
+ * {@link Instances} data set. Static methods are provided to extract features from a set of {@link Instance}
+ * objects.
  * <p>
- * The {@code File} objects need to point to ARFF Files, the {@code Feature} objects need to be a
- * subset of the {@link Feature} enumeration. This class can be used to asynchronously calculate
- * the features of ARFF Files containing acceleration vectors (in 3D space) by transporting both
- * the source filenames and the requested features as well as the resulting data set.
+ * The {@code File} objects need to point to ARFF Files, the {@code Feature} objects need to be a subset of
+ * the {@link Feature} enumeration. This class can be used to asynchronously calculate the features of ARFF
+ * Files containing acceleration vectors (in 3D space) by transporting both the source filenames and the
+ * requested features as well as the resulting data set.
  * <p>
- * A sliding window is applied to the input data, see the {@link SlidingWindow} class for more
- * information.<br>
+ * A sliding window is applied to the input data, see the {@link SlidingWindow} class for more information.<br>
  * The input ARFF files or {@link Instance} objects need to have the following attributes:
  * <ul>
  * <li>The first attribute is the timestamp.
  * <li>The following three attributes are numeric values (e.g. acceleration coordinates).
  * <li>The last attribute is the nominal class.
- * <li>The data is sorted in ascending order by timestamp (when averaging multiple instances in
- * the sliding window, the timestamp of the last value is used).
- * <li>The data only contains one class value per file (this is not checked for performance
- * reasons, but it leads to undefined behavior if there is more than one class).
+ * <li>The data is sorted in ascending order by timestamp (when averaging multiple instances in the sliding
+ * window, the timestamp of the last value is used).
+ * <li>The data only contains one class value per file (this is not checked for performance reasons, but it
+ * leads to undefined behavior if there is more than one class).
  * </ul>
- * If multiple files are specified, the output data set will contain the features of every file,
- * extracted separately and then joined in no particular order.
+ * If multiple files are specified, the output data set will contain the features of every file, extracted
+ * separately and then joined in no particular order.
  * <p>
- * If the only feature specified is {@link Feature#RAW}, then no feature extraction is performed
- * on the input files, but all files are merged into one single feature file, if all of them
- * contain the same features. If not all files contain the same features, an exception will be
- * thrown. See also {@link Feature#getAttribute()}.
+ * If the only feature specified is {@link Feature#RAW}, then no feature extraction is performed on the input
+ * files, but all files are merged into one single feature file, if all of them contain the same features. If
+ * not all files contain the same features, an exception will be thrown. See also
+ * {@link Feature#getAttribute()}.
  * 
  * @see <a href="http://weka.wikispaces.com/ARFF+(stable+version)">ARFF at the WEKA Wiki</a>
  * @author Peter
@@ -57,9 +56,9 @@ public class FeatureExtractor
 {
 	/**
 	 * A mask with bits set for all features implemented for extraction by this class.<br>
-	 * If a feature is specified for extraction that is not implemented, it will be silently
-	 * ignored. However, you can safely consider all features that have corresponding bits set in
-	 * this mask to be implemented and generate the expected output.
+	 * If a feature is specified for extraction that is not implemented, it will be silently ignored. However,
+	 * you can safely consider all features that have corresponding bits set in this mask to be implemented
+	 * and generate the expected output.
 	 * 
 	 * @see Feature#getMask(Feature[])
 	 * @see Feature#getBit()
@@ -78,19 +77,18 @@ public class FeatureExtractor
 	private boolean mCalculated = false;
 	
 	/**
-	 * Initializes a new instance of the {@link FeatureExtractor} class with the specified
-	 * {@link File} and {@link Feature} sets and the specified window and jump sizes for the
-	 * sliding window.
+	 * Initializes a new instance of the {@link FeatureExtractor} class with the specified {@link File} and
+	 * {@link Feature} sets and the specified window and jump sizes for the sliding window.
 	 * 
 	 * @param files the files to calculate features for.
-	 * @param features the features to calculate, or the single feature {@link Feature#RAW}. If
-	 *        any other features than {@link Feature#RAW} are specified, it is ignored.
-	 * @param windowSize the window size for
-	 *        {@link SlidingWindow#slide(Instances, int, int, WindowListener)} in ms.
-	 * @param jumpSize the jump size for
-	 *        {@link SlidingWindow#slide(Instances, int, int, WindowListener)} in ms.
-	 * @exception IllegalArgumentException if either one of {@code files} or {@code features}
-	 *            does not have any entries.
+	 * @param features the features to calculate, or the single feature {@link Feature#RAW}. If any other
+	 *        features than {@link Feature#RAW} are specified, it is ignored.
+	 * @param windowSize the window size for {@link SlidingWindow#slide(Instances, int, int, WindowListener)}
+	 *        in ms.
+	 * @param jumpSize the jump size for {@link SlidingWindow#slide(Instances, int, int, WindowListener)} in
+	 *        ms.
+	 * @exception IllegalArgumentException if either one of {@code files} or {@code features} does not have
+	 *            any entries.
 	 */
 	public FeatureExtractor(File[] files, Feature[] features, int windowSize, int jumpSize)
 	{
@@ -138,8 +136,8 @@ public class FeatureExtractor
 	}
 	
 	/**
-	 * When extracting features, gets the number of input instances used. When merging already
-	 * extracted features, gets the number of feature instances.
+	 * When extracting features, gets the number of input instances used. When merging already extracted
+	 * features, gets the number of feature instances.
 	 */
 	public int getNumInputInstances()
 	{
@@ -161,8 +159,7 @@ public class FeatureExtractor
 	}
 	
 	/**
-	 * Gets the window size for {@link SlidingWindow#slide(Instances, int, int, WindowListener)}
-	 * in ms.
+	 * Gets the window size for {@link SlidingWindow#slide(Instances, int, int, WindowListener)} in ms.
 	 */
 	public int getWindowSize()
 	{
@@ -170,8 +167,7 @@ public class FeatureExtractor
 	}
 	
 	/**
-	 * Gets the jump size for {@link SlidingWindow#slide(Instances, int, int, WindowListener)} in
-	 * ms.
+	 * Gets the jump size for {@link SlidingWindow#slide(Instances, int, int, WindowListener)} in ms.
 	 */
 	public int getJumpSize()
 	{
@@ -180,11 +176,10 @@ public class FeatureExtractor
 	
 	/**
 	 * Determines whether {@link #extract()} has been called and returned.<br>
-	 * Note that this class is not thread safe and {@code extract} may be running when this
-	 * method is called.
+	 * Note that this class is not thread safe and {@code extract} may be running when this method is called.
 	 * 
-	 * @return {@code true} if {@code extract()} has been called, {@code false} if it is still
-	 *         running or was never called.
+	 * @return {@code true} if {@code extract()} has been called, {@code false} if it is still running or was
+	 *         never called.
 	 */
 	public boolean hasRun()
 	{
@@ -192,16 +187,15 @@ public class FeatureExtractor
 	}
 	
 	/**
-	 * Starts the feature extraction by reading files and extracting features. This method can
-	 * block the calling thread a long time and should not be run on the UI thread.<br>
-	 * Note that calls to this method are not synchronized and multiple calls my lead to
-	 * undefined behavior.
+	 * Starts the feature extraction by reading files and extracting features. This method can block the
+	 * calling thread a long time and should not be run on the UI thread.<br>
+	 * Note that calls to this method are not synchronized and multiple calls my lead to undefined behavior.
 	 * 
 	 * @exception IllegalStateException if {@link #extract()} was called before.
 	 * @exception FileNotFoundException if a file from the specified list does not exist.
 	 * @exception IOException if another file related error occurred.
-	 * @exception UnsupportedAttributeTypeException if the attributes in one of the input files
-	 *            are of the wrong format, see the {@link FeatureExtractor class documentation}.
+	 * @exception UnsupportedAttributeTypeException if the attributes in one of the input files are of the
+	 *            wrong format, see the {@link FeatureExtractor class documentation}.
 	 * @see AsyncTask
 	 */
 	public void extract() throws IOException, UnsupportedAttributeTypeException
@@ -266,8 +260,8 @@ public class FeatureExtractor
 	}
 	
 	/**
-	 * Just merges all input files into a single {@link Instances} data set. Also checks that all
-	 * input files have the same features.
+	 * Just merges all input files into a single {@link Instances} data set. Also checks that all input files
+	 * have the same features.
 	 */
 	private void mergeFiles() throws IOException, UnsupportedAttributeTypeException
 	{
@@ -318,8 +312,7 @@ public class FeatureExtractor
 	}
 	
 	/**
-	 * Initializes an output set from the specified instances and sets {@link #mOutputFeatures}
-	 * if necessary.
+	 * Initializes an output set from the specified instances and sets {@link #mOutputFeatures} if necessary.
 	 */
 	private Instances initOutput(Instances input) throws UnsupportedAttributeTypeException
 	{
@@ -332,8 +325,7 @@ public class FeatureExtractor
 			for(Feature f : Feature.getFeatures(mOutputFeatures))
 				attributes.addElement(new Attribute(f.getAttribute()));
 			
-			attributes.addElement(
-				new Attribute("class", getValueVector(input.classAttribute())));
+			attributes.addElement(new Attribute("class", getValueVector(input.classAttribute())));
 			
 			// Make an educated guess for the needed capacity of the output set
 			cap *= (input.lastInstance().value(0) - input.firstInstance().value(0)) / mJumpSize;
@@ -375,8 +367,7 @@ public class FeatureExtractor
 			cap *= input.numInstances();
 		}
 		
-		Instances out = new Instances("lazybird-train-" + System.currentTimeMillis(),
-			attributes, (int)cap);
+		Instances out = new Instances("lazybird-train-" + System.currentTimeMillis(), attributes, (int)cap);
 		out.setClassIndex(out.numAttributes() - 1);
 		
 		return out;
@@ -414,10 +405,9 @@ public class FeatureExtractor
 	 * 
 	 * @param instances the instances to extract features from.
 	 * @param flags a bit mask, as returned by {@link Feature#getMask(Feature[])}.
-	 * @return an {@link Instance} with the specified features. The features are in the same
-	 *         order that {@link Feature#getFeatures(int)} returns.
-	 * @exception IllegalArgumentException if {@code instances} is empty or {@code flags} is
-	 *            {@code 0}.
+	 * @return an {@link Instance} with the specified features. The features are in the same order that
+	 *         {@link Feature#getFeatures(int)} returns.
+	 * @exception IllegalArgumentException if {@code instances} is empty or {@code flags} is {@code 0}.
 	 */
 	public static <T extends Instance> Instance extractFeatures(Iterable<T> instances, int flags)
 	{
@@ -496,22 +486,19 @@ public class FeatureExtractor
 	
 	/**
 	 * Extracts the specified features from the specified instances.<br>
-	 * This is a convenience method and {@link #extractFeatures(Iterable, int)} is more
-	 * efficient.
+	 * This is a convenience method and {@link #extractFeatures(Iterable, int)} is more efficient.
 	 * <p>
 	 * For more information on the expected instance format see the {@link FeatureExtractor class
 	 * documentation}.
 	 * 
 	 * @param instances the instances to extract features from.
-	 * @param features an array of {@link Feature} objects. Occurrences of {@link Feature#RAW}
-	 *        are ignored.
-	 * @return an {@link Instance} with the specified features. The features are in the same
-	 *         order that {@link Feature#getMask(Feature[])} returns.
-	 * @exception IllegalArgumentException if {@code instances} is empty or {@code features}
-	 *            contains no features.
+	 * @param features an array of {@link Feature} objects. Occurrences of {@link Feature#RAW} are ignored.
+	 * @return an {@link Instance} with the specified features. The features are in the same order that
+	 *         {@link Feature#getMask(Feature[])} returns.
+	 * @exception IllegalArgumentException if {@code instances} is empty or {@code features} contains no
+	 *            features.
 	 */
-	public static <T extends Instance> Instance extractFeatures(Iterable<T> instances,
-		Feature[] features)
+	public static <T extends Instance> Instance extractFeatures(Iterable<T> instances, Feature[] features)
 	{
 		return extractFeatures(instances, Feature.getMask(features));
 	}
@@ -521,8 +508,8 @@ public class FeatureExtractor
 	 * 
 	 * @param instances the set of instances to calculate the variance for.
 	 * @param idx the index of the needed attribute.
-	 * @return an {@link Instance} with the timestamp of the last input instance and the variance
-	 *         of the specified index. The class is retained, if present.
+	 * @return an {@link Instance} with the timestamp of the last input instance and the variance of the
+	 *         specified index. The class is retained, if present.
 	 */
 	private static <T extends Instance> Instance variance(Iterable<T> instances, int idx)
 	{
@@ -568,8 +555,8 @@ public class FeatureExtractor
 	 * Calculates the magnitude of the specified instances.
 	 * 
 	 * @param instances the set of instances to calculate the magnitude for.
-	 * @return an {@link Instance} with the timestamp of the last input instance and the
-	 *         magnitude. The class is retained, if present.
+	 * @return an {@link Instance} with the timestamp of the last input instance and the magnitude. The class
+	 *         is retained, if present.
 	 */
 	private static <T extends Instance> Iterable<Instance> magnitude(Iterable<T> instances)
 	{
@@ -593,9 +580,8 @@ public class FeatureExtractor
 	/**
 	 * Calculates the average of the specified instances.<br>
 	 * For the required attributes of an {@code Instance}, see
-	 * {@link SlidingWindow#slide(Instances, int, int, WindowListener)}. If the instances contain
-	 * a class, it is also set in the output instance, the timestamp is that of the last instance
-	 * in the set.
+	 * {@link SlidingWindow#slide(Instances, int, int, WindowListener)}. If the instances contain a class, it
+	 * is also set in the output instance, the timestamp is that of the last instance in the set.
 	 * 
 	 * @param instances a set of {@link Instance} objects.
 	 * @return an averaged {@code Instance}, or {@code null} if {@code instances} is empty.
