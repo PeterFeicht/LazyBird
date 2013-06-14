@@ -76,63 +76,64 @@ public class ReportFragment extends AbstractTabFragment
 	 * 
 	 * @see ARFFRecorderService#getDirname()
 	 */
-	private static String sOutputDir = "";
+	static String sOutputDir = "";
 	/**
 	 * Setting: {@link Storage#KEY_CLASSIFIER_FILE}
 	 */
-	private static String sClassifierFile = "";
+	static String sClassifierFile = "";
 	/**
 	 * Setting: {@link Storage#KEY_FEATURES}
 	 */
-	private static int sTrainedFeatures;
+	static int sTrainedFeatures;
 	/**
 	 * Setting {@link Storage#KEY_WINDOW_SIZE}
 	 */
-	private static int sWindowSize;
+	static int sWindowSize;
 	/**
 	 * Setting that's not actually a setting, see {@link TrainFragment#JUMP_SIZE}
 	 */
-	private static int sJumpSize;
+	static int sJumpSize;
 	/**
 	 * Setting: {@link SettingsActivity#KEY_REPORT_SERVER}
 	 */
-	private static String sReportServer = "";
+	static String sReportServer = "";
 	/**
 	 * Setting: {@link SettingsActivity#KEY_REPORT_USER}
 	 */
-	private static String sReportUser = "";
+	static String sReportUser = "";
 	/**
 	 * Setting: {@link SettingsActivity#KEY_WRITE_LOG}
 	 */
-	private static boolean sWriteLog;
+	static boolean sWriteLog;
 	/**
 	 * Setting: {@link SettingsActivity#KEY_LOG_FILENAME}
 	 */
-	private static String sLogFilename = "";
+	static String sLogFilename = "";
 	/**
 	 * Setting: {@link SettingsActivity#KEY_USE_WAKELOCK}
 	 */
-	private static boolean sWakelock;
+	static boolean sWakelock;
 	
 	private SharedPreferences mPrefs;
-	private SharedPreferences mPrefsClassifier;
+	SharedPreferences mPrefsClassifier;
 	
 	// Views
 	private TextView mLblNoClassifier;
 	private Switch mSwClassifiy;
-	private ProgressBar mProgressSerialize;
+	ProgressBar mProgressSerialize;
 	private CheckBox mChkTts;
 	private CheckBox mChkReport;
 	private ListView mListLog;
 	
 	// Fields
-	private Classifier mClassifier = null;
+	Classifier mClassifier = null;
 	private LogListAdapter mLogAdapter;
 	// Handlers
-	private ClassifierService mService = null;
+	ClassifierService mService = null;
 	private LocalBroadcastManager mBroadcastManager;
 	private IntentFilter mServiceIntentFilter;
 	private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+		@Override
 		public void onReceive(Context context, Intent intent)
 		{
 			if(LOCAL_LOGV) Log.v(LOGTAG, "Received broadcast: " + intent);
@@ -149,12 +150,11 @@ public class ReportFragment extends AbstractTabFragment
 	};
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-		Bundle savedInstanceState)
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		if(LOCAL_LOGV) Log.v(LOGTAG, "View created.");
-		// Just return the inflated layout, other initializations will be done when the host
-		// activity is created
+		// Just return the inflated layout, other initializations will be done when the host activity is
+		// created
 		return inflater.inflate(R.layout.fragment_report, container, false);
 	}
 	
@@ -193,8 +193,7 @@ public class ReportFragment extends AbstractTabFragment
 			// Restore the log if the service is running
 			if(savedInstanceState != null)
 			{
-				final LogListAdapter log =
-					(LogListAdapter)savedInstanceState.getSerializable(STATE_LOG);
+				final LogListAdapter log = (LogListAdapter)savedInstanceState.getSerializable(STATE_LOG);
 				if(log != null)
 				{
 					// The context can't be serialized so we need to set it to the new one
@@ -227,8 +226,8 @@ public class ReportFragment extends AbstractTabFragment
 	public void onSaveInstanceState(Bundle outState)
 	{
 		super.onSaveInstanceState(outState);
-		// Save the classifier to avoid deserializing it when the screen rotates, doesn't seem to
-		// do any good though
+		// Save the classifier to avoid deserializing it when the screen rotates, doesn't seem to do any good
+		// though
 		outState.putSerializable(STATE_CLASSIFIER, mClassifier);
 		// Save the log, will be restored in case the service is running
 		outState.putSerializable(STATE_LOG, mLogAdapter);
@@ -271,14 +270,14 @@ public class ReportFragment extends AbstractTabFragment
 	{
 		super.onResume();
 		
-		// check for running service every time the fragment is resumed, since broadcast can't
-		// be received while paused or stopped
+		// check for running service every time the fragment is resumed, since broadcast can't be received
+		// while paused or stopped
 		mSwClassifiy.setChecked(ClassifierService.isRunning());
 		mBroadcastManager.registerReceiver(mBroadcastReceiver, mServiceIntentFilter);
 		if(!ClassifierService.isRunning())
 		{
 			mService = null;
-
+			
 			sReportUser = mPrefs.getString(SettingsActivity.KEY_REPORT_USER, "");
 			if(sReportUser.isEmpty())
 				mChkReport.setChecked(false);
@@ -302,8 +301,7 @@ public class ReportFragment extends AbstractTabFragment
 	{
 		if(getActivity() != null)
 			return getString(R.string.title_tab_report);
-		else
-			return TITLE;
+		return TITLE;
 	}
 	
 	/**
@@ -326,7 +324,7 @@ public class ReportFragment extends AbstractTabFragment
 	/**
 	 * Enable or disable the report switch and set visibility of {@link #mLblNoClassifier}.
 	 */
-	private void setClassifierPresent(boolean present)
+	void setClassifierPresent(boolean present)
 	{
 		mLblNoClassifier.setVisibility(present ? View.GONE : View.VISIBLE);
 		mSwClassifiy.setEnabled(present);
@@ -335,10 +333,10 @@ public class ReportFragment extends AbstractTabFragment
 	}
 	
 	/**
-	 * Checks static variable {@link #sClassifierFile} for a filename and deserializes the
-	 * classifier if there is one. Does nothing if the {@link ClassifierService} is running.
+	 * Checks static variable {@link #sClassifierFile} for a filename and deserializes the classifier if there
+	 * is one. Does nothing if the {@link ClassifierService} is running.
 	 */
-	private void checkForClassifier()
+	void checkForClassifier()
 	{
 		if(LOCAL_LOGV) Log.v(LOGTAG, "checkForClassifier called");
 		if(ClassifierService.isRunning())
@@ -381,7 +379,7 @@ public class ReportFragment extends AbstractTabFragment
 		}
 	};
 	
-	private void onNewActivity(Intent intent)
+	void onNewActivity(Intent intent)
 	{
 		// Log the new activity
 		String activity = intent.getStringExtra(ClassifierService.EXTRA_ACTIVITY_NAME);
@@ -389,7 +387,7 @@ public class ReportFragment extends AbstractTabFragment
 			mLogAdapter.add(getString(R.string.log_new_activity, activity));
 	}
 	
-	private void onServiceStarted()
+	void onServiceStarted()
 	{
 		// Get service instance and log event
 		mService = ClassifierService.getInstance();
@@ -397,7 +395,7 @@ public class ReportFragment extends AbstractTabFragment
 		mLogAdapter.add(getString(R.string.rservice_started));
 	}
 	
-	private void onServiceStopped()
+	void onServiceStopped()
 	{
 		mSwClassifiy.setChecked(false);
 		mLogAdapter.add(getString(R.string.rservice_stopped));
@@ -407,8 +405,7 @@ public class ReportFragment extends AbstractTabFragment
 	/**
 	 * Determines whether the report service can be started.
 	 * 
-	 * @return {@code true} if the service can be started and is not running, {@code false}
-	 *         otherwise.
+	 * @return {@code true} if the service can be started and is not running, {@code false} otherwise.
 	 */
 	public boolean canStart()
 	{
@@ -431,8 +428,8 @@ public class ReportFragment extends AbstractTabFragment
 		i.putExtra(EXTRA_FEATURES, sTrainedFeatures);
 		i.putExtra(EXTRA_WAKELOCK, sWakelock);
 		
-		// This is a little complicated, the first value determines whether the feature should be
-		// enabled at all, the second one specifies whether it's actually activated
+		// This is a little complicated; the first value determines whether the feature should be enabled at
+		// all, the second one specifies whether it's actually activated
 		i.putExtra(EXTRA_TTS, true);
 		i.putExtra(EXTRA_TTS_ENABLE, mChkTts.isChecked());
 		
@@ -463,7 +460,7 @@ public class ReportFragment extends AbstractTabFragment
 	 * 
 	 * @author Peter
 	 */
-	private class CheckForClassifierTask extends AsyncTask<Void, Void, Classifier>
+	class CheckForClassifierTask extends AsyncTask<Void, Void, Classifier>
 	{
 		@Override
 		protected Classifier doInBackground(Void... params)
@@ -492,7 +489,8 @@ public class ReportFragment extends AbstractTabFragment
 			}
 			catch(IOException ex)
 			{
-				Toast.makeText(getActivity(), R.string.error_io, Toast.LENGTH_LONG).show();
+				Toast.makeText(getActivity(), R.string.error_io, Toast.LENGTH_LONG)
+					.show();
 				Log.e(LOGTAG, "IOException while reading serialized classifier.", ex);
 				return null;
 			}
