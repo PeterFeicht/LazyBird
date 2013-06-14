@@ -291,7 +291,7 @@ public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 			return;
 		
 		@SuppressWarnings("unchecked")
-		final AttributeOrder attributeOrder = getAttributeOrder(data.enumerateAttributes());
+		final AttributeOrder attributeOrder = SlidingWindow.getAttributeOrder(data.enumerateAttributes());
 		if(attributeOrder == AttributeOrder.INVALID)
 			throw new UnsupportedAttributeTypeException();
 		
@@ -334,7 +334,7 @@ public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 		@SuppressWarnings("unchecked")
 		final Enumeration<Attribute> attrs = structure.enumerateAttributes();
 		
-		return getAttributeOrder(attrs) != AttributeOrder.INVALID;
+		return SlidingWindow.getAttributeOrder(attrs) != AttributeOrder.INVALID;
 	}
 	
 	/**

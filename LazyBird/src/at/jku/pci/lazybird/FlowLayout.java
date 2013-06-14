@@ -87,7 +87,7 @@ public class FlowLayout extends ViewGroup
 		width = Math.max(width, currentWidth - spacing) + getPaddingRight();
 		height += currentHeight + getPaddingBottom();
 		
-		setMeasuredDimension(resolveSize(width, widthMeasureSpec), resolveSize(height, heightMeasureSpec));
+		setMeasuredDimension(View.resolveSize(width, widthMeasureSpec), View.resolveSize(height, heightMeasureSpec));
 	}
 	
 	@Override
@@ -149,7 +149,7 @@ public class FlowLayout extends ViewGroup
 	@Override
 	protected LayoutParams generateDefaultLayoutParams()
 	{
-		return new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		return new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 	}
 	
 	@Override

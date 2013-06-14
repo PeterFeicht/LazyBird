@@ -325,7 +325,7 @@ public class FeatureExtractor
 			for(Feature f : Feature.getFeatures(mOutputFeatures))
 				attributes.addElement(new Attribute(f.getAttribute()));
 			
-			attributes.addElement(new Attribute("class", getValueVector(input.classAttribute())));
+			attributes.addElement(new Attribute("class", FeatureExtractor.getValueVector(input.classAttribute())));
 			
 			// Make an educated guess for the needed capacity of the output set
 			cap *= (input.lastInstance().value(0) - input.firstInstance().value(0)) / mJumpSize;
@@ -357,7 +357,7 @@ public class FeatureExtractor
 					if(inAttributes.hasMoreElements())
 						throw new UnsupportedAttributeTypeException();
 					
-					attributes.addElement(new Attribute("class", getValueVector(a)));
+					attributes.addElement(new Attribute("class", FeatureExtractor.getValueVector(a)));
 				}
 				else
 					throw new UnsupportedAttributeTypeException();
@@ -378,7 +378,7 @@ public class FeatureExtractor
 	 */
 	Instance extractFeatures(Iterable<Instance> instances)
 	{
-		return extractFeatures(instances, mOutputFeatures);
+		return FeatureExtractor.extractFeatures(instances, mOutputFeatures);
 	}
 	
 	/**
@@ -426,7 +426,7 @@ public class FeatureExtractor
 		// All means are extracted at once, so if any one is needed, do it
 		if((flags & 0x07) != 0)
 		{
-			final Instance mean = mean(instances);
+			final Instance mean = FeatureExtractor.mean(instances);
 			if(Feature.X.isSet(flags))
 				values.put(Feature.X, mean.value(1));
 			if(Feature.Y.isSet(flags))
@@ -438,7 +438,7 @@ public class FeatureExtractor
 		// Magnitude and Variance of the Magnitude both need the magnitude
 		if(Feature.MAGNITUDE.isSet(flags) || Feature.VARIANCE_OF_MAGNITUDE.isSet(flags))
 		{
-			final Iterable<Instance> mag = magnitude(instances);
+			final Iterable<Instance> mag = FeatureExtractor.magnitude(instances);
 			
 			if(Feature.MAGNITUDE.isSet(flags))
 			{
@@ -453,16 +453,16 @@ public class FeatureExtractor
 			}
 			
 			if(Feature.VARIANCE_OF_MAGNITUDE.isSet(flags))
-				values.put(Feature.VARIANCE_OF_MAGNITUDE, variance(mag, 1).value(1));
+				values.put(Feature.VARIANCE_OF_MAGNITUDE, FeatureExtractor.variance(mag, 1).value(1));
 		}
 		
 		// Extract variance features
 		if(Feature.VARIANCE_X.isSet(flags))
-			values.put(Feature.VARIANCE_X, variance(instances, 1).value(1));
+			values.put(Feature.VARIANCE_X, FeatureExtractor.variance(instances, 1).value(1));
 		if(Feature.VARIANCE_Y.isSet(flags))
-			values.put(Feature.VARIANCE_Y, variance(instances, 2).value(1));
+			values.put(Feature.VARIANCE_Y, FeatureExtractor.variance(instances, 2).value(1));
 		if(Feature.VARIANCE_Z.isSet(flags))
-			values.put(Feature.VARIANCE_Z, variance(instances, 3).value(1));
+			values.put(Feature.VARIANCE_Z, FeatureExtractor.variance(instances, 3).value(1));
 		
 		// We need the last instance for the timestamp
 		Instance last = null;
@@ -499,7 +499,7 @@ public class FeatureExtractor
 	 */
 	public static <T extends Instance> Instance extractFeatures(Iterable<T> instances, Feature[] features)
 	{
-		return extractFeatures(instances, Feature.getMask(features));
+		return FeatureExtractor.extractFeatures(instances, Feature.getMask(features));
 	}
 	
 	/**

@@ -573,9 +573,9 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	@Override
 	public int compareTo(UserActivityView another)
 	{
-		if(this.isOffline() && !another.isOffline())
+		if(isOffline() && !another.isOffline())
 			return 1;
-		if(!this.isOffline() && another.isOffline())
+		if(!isOffline() && another.isOffline())
 			return -1;
 		return compareToText(another);
 	}
