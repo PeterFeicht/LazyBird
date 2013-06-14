@@ -198,8 +198,8 @@ public class TrainFragment extends AbstractTabFragment
 		Bundle savedInstanceState)
 	{
 		if(LOCAL_LOGV) Log.v(LOGTAG, "View created.");
-		// Just return the inflated layout, other initializations will be done when the host
-		// activity is created
+		// Just return the inflated layout, other initializations will be done when the host activity is
+		// created
 		return inflater.inflate(R.layout.fragment_train, container, false);
 	}
 	
@@ -575,7 +575,8 @@ public class TrainFragment extends AbstractTabFragment
 	
 	void showFileError(int str)
 	{
-		Toast.makeText(getActivity(), str, Toast.LENGTH_SHORT).show();
+		Toast.makeText(getActivity(), str, Toast.LENGTH_SHORT)
+			.show();
 		mBtnSelectFile.setCompoundDrawables(mCompoundAlert, null, null, null);
 	}
 	
@@ -605,8 +606,8 @@ public class TrainFragment extends AbstractTabFragment
 				}
 			}
 			
-			// This listener removes feature selections when RAW is selected and removes the RAW
-			// selection when any other feature is selected
+			// This listener removes feature selections when RAW is selected and removes the RAW selection
+			// when any other feature is selected
 			final OnMultiChoiceClickListener checkListener = new OnMultiChoiceClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which, boolean isChecked)
@@ -616,8 +617,8 @@ public class TrainFragment extends AbstractTabFragment
 					
 					if(isChecked)
 					{
-						// If raw feature was selected, clear all other selections, otherwise
-						// clear raw feature selection
+						// If raw feature was selected, clear all other selections, otherwise clear raw
+						// feature selection
 						if(which == rawIdx)
 						{
 							for(int j = 0; j < selected.length; j++)
@@ -870,8 +871,8 @@ public class TrainFragment extends AbstractTabFragment
 		txt.setTypeface(Typeface.MONOSPACE);
 		txt.setTextSize(12f);
 		txt.setTextColor(getResources().getColorStateList(android.R.color.primary_text_light));
-		// Let the TextView scroll horizontally and vertically. Doesn't look very nice,
-		// but it shouldn't bee needed much
+		// Let the TextView scroll horizontally and vertically. Doesn't look very nice, but it shouldn't bee
+		// needed much
 		txt.setHorizontallyScrolling(true);
 		txt.setMovementMethod(ScrollingMovementMethod.getInstance());
 		// Set 12dp of padding left and right
@@ -1272,8 +1273,7 @@ public class TrainFragment extends AbstractTabFragment
 				
 				final String summary = getEvaluationSummary(eval);
 				
-				// There is no old validation log file since it is deleted when a classifier is
-				// trained
+				// There is no old validation log file since it is deleted when a classifier is trained
 				sValidationLogFile = String.format("validation-%X%s", classifier.hashCode(), ".txt");
 				OutputStreamWriter out = new OutputStreamWriter(
 					getActivity().openFileOutput(sValidationLogFile, Activity.MODE_PRIVATE));

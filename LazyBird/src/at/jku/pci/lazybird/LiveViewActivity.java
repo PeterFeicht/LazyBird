@@ -70,8 +70,8 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 			if(mClient == null)
 				return;
 			
-			// When there are no updates from the server in a long time, the displayed ages are
-			// incremented until the server sends an update
+			// When there are no updates from the server in a long time, the displayed ages are incremented
+			// until the server sends an update
 			for(UserActivityView v : mUserViews.values())
 				v.setAge(v.getAge() + AUTO_UPDATE_DELAY);
 			sortOffline();
@@ -257,8 +257,8 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 	}
 	
 	/**
-	 * Sets the image of {@link #mImgConnectionStatus} and the value of
-	 * {@link #mConnectionStatus} to the appropriate string resource.
+	 * Sets the image of {@link #mImgConnectionStatus} and the value of {@link #mConnectionStatus} to the
+	 * appropriate string resource.
 	 * 
 	 * @param statusResource the drawable for the image view.
 	 */
@@ -306,13 +306,13 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 	}
 	
 	private OnCheckedChangeListener onChkShowOfflineCheckedChange = new OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-			{
-				for(UserActivityView v : mUserViews.values())
-					v.setShowOffline(mChkShowOffline.isChecked());
-			}
-		};
+		@Override
+		public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+		{
+			for(UserActivityView v : mUserViews.values())
+				v.setShowOffline(mChkShowOffline.isChecked());
+		}
+	};
 	
 	private OnClickListener onLblConnectionLostClick = new OnClickListener() {
 		@Override
@@ -459,11 +459,10 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 	/**
 	 * Sort the user views by offline status, moving offline views to the bottom.
 	 * <p>
-	 * {@link #mOfflineIndex} has the boundary between the offline and online users, so we only
-	 * need to move online users beyond this index to the front and offline users before that to
-	 * the end. Since no users are dropped by the server, this is the easiest method.<br>
-	 * Also, should we want to add an animation when users are moved, then this is easily
-	 * possible.
+	 * {@link #mOfflineIndex} has the boundary between the offline and online users, so we only need to move
+	 * online users beyond this index to the front and offline users before that to the end. Since no users
+	 * are dropped by the server, this is the easiest method.<br>
+	 * Also, should we want to add an animation when users are moved, then this is easily possible.
 	 */
 	protected void sortOffline()
 	{
@@ -512,8 +511,8 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 	 * {@code UserActivityView}.
 	 * 
 	 * @param position the position at which to get the view from.
-	 * @return the view at the specified position or {@code null} if the position does not exist
-	 *         within the group
+	 * @return the view at the specified position or {@code null} if the position does not exist within the
+	 *         group
 	 */
 	protected UserActivityView getUserViewAt(int position)
 	{

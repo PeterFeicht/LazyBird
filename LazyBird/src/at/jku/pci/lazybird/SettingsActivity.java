@@ -180,8 +180,8 @@ public class SettingsActivity extends Activity
 		
 		private void setReportServerSummary(SharedPreferences p)
 		{
-			// When nothing is entered, the ClassifieService uses the default server, so reflect
-			// this behavior in the displayed value
+			// When nothing is entered, the ClassifieService uses the default server, so reflect this behavior
+			// in the displayed value
 			if(p.getString(KEY_REPORT_SERVER, "").isEmpty())
 				mReportServer.setSummary(ClassifierService.DEFAULT_HOST);
 			else

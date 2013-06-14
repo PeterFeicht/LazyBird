@@ -104,8 +104,7 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 	@Override
 	public void onCreate()
 	{
-		// Only one instance is created by the system
-		// (hopefully, the docs don't explicitly state this)
+		// Only one instance is created by the system (hopefully, the docs don't explicitly state this)
 		sInstance = this;
 		if(LOCAL_LOGV) Log.v(LOGTAG, "Service created: " + this);
 		
@@ -216,8 +215,8 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 		if(mWaitingTimer != null)
 			mWaitingTimer.stop();
 		
-		// We don't want to cancel the notification telling the user why we stopped, only those
-		// that aren't needed any more.
+		// We don't want to cancel the notification telling the user why we stopped, only those that aren't
+		// needed any more.
 		mNotificationManager.cancel(NOTIFICATION_WAITING);
 		
 		try
@@ -237,7 +236,8 @@ public class ARFFRecorderService extends Service implements SensorEventListener
 			mOutfile = null;
 		}
 		
-		Toast.makeText(this, R.string.service_stopped, Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, R.string.service_stopped, Toast.LENGTH_SHORT)
+			.show();
 		sRunning = false;
 		sInstance = null;
 		LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(RecorderFragment.BCAST_SERVICE_STOPPED));
