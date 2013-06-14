@@ -99,8 +99,7 @@ public class SettingsActivity extends Activity
 	 * 
 	 * @author Peter
 	 */
-	public static class SettingsFragment extends PreferenceFragment implements
-			OnSharedPreferenceChangeListener
+	public static class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener
 	{
 		private ListPreference mValueUpdateSpeed;
 		private EditTextPreference mOutputDir;
@@ -143,8 +142,7 @@ public class SettingsActivity extends Activity
 			if(LOCAL_LOGV) Log.v(LOGTAG, "SettingsFragment paused.");
 			
 			super.onPause();
-			getPreferenceScreen().getSharedPreferences()
-				.unregisterOnSharedPreferenceChangeListener(this);
+			getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
 		}
 		
 		@Override
@@ -153,10 +151,10 @@ public class SettingsActivity extends Activity
 			if(LOCAL_LOGV) Log.v(LOGTAG, "SettingsFragment resumed.");
 			
 			super.onResume();
-			getPreferenceScreen().getSharedPreferences()
-				.registerOnSharedPreferenceChangeListener(this);
+			getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 		}
 		
+		@Override
 		public void onSharedPreferenceChanged(SharedPreferences p, String key)
 		{
 			if(LOCAL_LOGV) Log.v(LOGTAG, "SharedPreference changed: " + key);
