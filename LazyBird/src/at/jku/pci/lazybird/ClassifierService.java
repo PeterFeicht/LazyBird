@@ -120,8 +120,9 @@ public class ClassifierService extends Service implements SensorEventListener,
 	private String mUsername;
 	private CoordinatorClient mClient = null;
 	private boolean mReportEnabled = false;
-	private Handler mHandler = new Handler();
+	Handler mHandler = new Handler();
 	private Runnable mRunReportActivity = new Runnable() {
+		@Override
 		public void run()
 		{
 			// The server expects an update every few seconds to keep the client online
@@ -192,8 +193,7 @@ public class ClassifierService extends Service implements SensorEventListener,
 			mUsersOnline = new HashSet<String>();
 			
 			// get information from the intent
-			mClassifier =
-				(Classifier)intent.getSerializableExtra(ReportFragment.EXTRA_CLASSIFIER);
+			mClassifier = (Classifier)intent.getSerializableExtra(ReportFragment.EXTRA_CLASSIFIER);
 			mFeatures = intent.getIntExtra(ReportFragment.EXTRA_FEATURES, 0x21);
 			mHeader = buildHeader(mFeatures);
 			int windowSize = intent.getIntExtra(ReportFragment.EXTRA_WINDOW, 1000);
@@ -289,7 +289,8 @@ public class ClassifierService extends Service implements SensorEventListener,
 			mTtsEngine = null;
 		}
 		
-		Toast.makeText(this, R.string.rservice_stopped, Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, R.string.rservice_stopped, Toast.LENGTH_SHORT)
+			.show();
 		sRunning = false;
 		sInstance = null;
 		mBrodcastManager.sendBroadcast(new Intent(ReportFragment.BCAST_SERVICE_STOPPED));
@@ -305,9 +306,8 @@ public class ClassifierService extends Service implements SensorEventListener,
 	 * Builds an {@link Instances} object with the specified feature attributes and a class
 	 * 
 	 * @param flags a mask of selected features, see {@link Feature#getMask(Feature[])}.
-	 * @return an {@link Instances} object with attributes for the specified features, a class
-	 *         attribute with possible values taken from the {@code classes} array resource, and
-	 *         a capacity of {@code 2}.
+	 * @return an {@link Instances} object with attributes for the specified features, a class attribute with
+	 *         possible values taken from the {@code classes} array resource, and a capacity of {@code 2}.
 	 */
 	private Instances buildHeader(int flags)
 	{
@@ -333,7 +333,7 @@ public class ClassifierService extends Service implements SensorEventListener,
 	 * <p>
 	 * TODO maybe add a check for TTS data to the main activity to inform the user.
 	 */
-	private void initTts()
+	void initTts()
 	{
 		int lang = mTtsEngine.setLanguage(Locale.ENGLISH);
 		if(lang == TextToSpeech.LANG_MISSING_DATA || lang == TextToSpeech.LANG_NOT_SUPPORTED)
@@ -434,8 +434,8 @@ public class ClassifierService extends Service implements SensorEventListener,
 	/**
 	 * Gets a value indicating whether the service has received a start command and is running.
 	 * 
-	 * @return {@code true} if the service is running or was killed unexpectedly and
-	 *         {@link #onDestroy()} has not been called, {@code false} otherwise.
+	 * @return {@code true} if the service is running or was killed unexpectedly and {@link #onDestroy()} has
+	 *         not been called, {@code false} otherwise.
 	 */
 	public static boolean isRunning()
 	{
@@ -452,8 +452,7 @@ public class ClassifierService extends Service implements SensorEventListener,
 	{
 		if(mLastActivity < 0)
 			return null;
-		else
-			return mHeader.classAttribute().value(mLastActivity);
+		return mHeader.classAttribute().value(mLastActivity);
 	}
 	
 	/**
@@ -467,8 +466,8 @@ public class ClassifierService extends Service implements SensorEventListener,
 	}
 	
 	/**
-	 * Sets whether Text-to-speech output is enabled. This has no effect if TTS was not enabled
-	 * in the start {@code Intent}.
+	 * Sets whether Text-to-speech output is enabled. This has no effect if TTS was not enabled in the start
+	 * {@code Intent}.
 	 * 
 	 * @param enable {@code true} if Text-to-speech output should be enabled.
 	 */
@@ -522,11 +521,10 @@ public class ClassifierService extends Service implements SensorEventListener,
 	}
 	
 	/**
-	 * Sets whether the log should be written to a file. This has no effect if logging to a file
-	 * was not enabled in the start {@code Intent}.
+	 * Sets whether the log should be written to a file. This has no effect if logging to a file was not
+	 * enabled in the start {@code Intent}.
 	 * <p>
-	 * Note that every time this is set from {@code false} to {@code true}, the output file is
-	 * overwritten.
+	 * Note that every time this is set from {@code false} to {@code true}, the output file is overwritten.
 	 * 
 	 * @param write {@code true} to write a log file.
 	 */
@@ -616,8 +614,8 @@ public class ClassifierService extends Service implements SensorEventListener,
 	}
 	
 	/**
-	 * Sets whether the current activity should be reported to the sever. This has no effect if
-	 * reporting was not enabled in the start {@code Intent}.
+	 * Sets whether the current activity should be reported to the sever. This has no effect if reporting was
+	 * not enabled in the start {@code Intent}.
 	 * 
 	 * @param report {@code true} to report the current activity.
 	 * @see #getReportToServer()
@@ -675,8 +673,6 @@ public class ClassifierService extends Service implements SensorEventListener,
 	
 	/**
 	 * Gets the features used for classifying the current activity.
-	 * 
-	 * @return
 	 */
 	public int getFeatures()
 	{
@@ -686,8 +682,7 @@ public class ClassifierService extends Service implements SensorEventListener,
 	/**
 	 * Gets the start time of the service.
 	 * 
-	 * @return the start time of the service, that is the time at which a start command was
-	 *         received.
+	 * @return the start time of the service, that is the time at which a start command was received.
 	 */
 	public Date getStartTime()
 	{
@@ -719,8 +714,7 @@ public class ClassifierService extends Service implements SensorEventListener,
 	}
 	
 	/**
-	 * Builds and shows a notification, to inform the user of an error when writing the output
-	 * log file.
+	 * Builds and shows a notification, to inform the user of an error when writing the output log file.
 	 */
 	private void notifyWriteFail()
 	{
@@ -741,8 +735,7 @@ public class ClassifierService extends Service implements SensorEventListener,
 	}
 	
 	/**
-	 * Builds and shows a notification, to inform the user of a failed connection to the
-	 * reporting server.
+	 * Builds and shows a notification, to inform the user of a failed connection to the reporting server.
 	 */
 	private void notifyConnectionFail()
 	{
@@ -763,8 +756,8 @@ public class ClassifierService extends Service implements SensorEventListener,
 	}
 	
 	/**
-	 * Registers the sensor listener, starts this service as foreground service and sends a
-	 * broadcast informing of the start.
+	 * Registers the sensor listener, starts this service as foreground service and sends a broadcast
+	 * informing of the start.
 	 */
 	private void startReporting()
 	{
@@ -803,10 +796,10 @@ public class ClassifierService extends Service implements SensorEventListener,
 	/**
 	 * Reports the specified activity to the server, if enabled.
 	 * 
-	 * @param activity the activity to report, has to correspond to a value in the
-	 *        {@link ClassLabel} enumeration.
+	 * @param activity the activity to report, has to correspond to a value in the {@link ClassLabel}
+	 *        enumeration.
 	 */
-	private void reportActivity(String activity)
+	void reportActivity(String activity)
 	{
 		if(mClient != null && mReportEnabled)
 		{
@@ -836,8 +829,8 @@ public class ClassifierService extends Service implements SensorEventListener,
 	/**
 	 * Outputs the specified activity on all enabled channels.
 	 * 
-	 * @param newActivity the index of the new activity in the {@code class} attribute of
-	 *        {@link #mHeader}, see {@link #buildHeader(int)}.
+	 * @param newActivity the index of the new activity in the {@code class} attribute of {@link #mHeader},
+	 *        see {@link #buildHeader(int)}.
 	 */
 	private void onActivityChanged(int newActivity)
 	{
