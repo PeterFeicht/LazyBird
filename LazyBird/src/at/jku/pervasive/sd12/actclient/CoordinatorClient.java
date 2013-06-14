@@ -18,9 +18,9 @@ import java.util.LinkedList;
 import java.util.concurrent.Semaphore;
 
 /**
- * A CoordinatorClient handles interaction with an activity coordination server. It will
- * immediately activate the client thread upon object instantiation and connect to the designated
- * coordination server. To terminate the client, call {@linkplain #interrupt()}.
+ * A CoordinatorClient handles interaction with an activity coordination server. It will immediately activate
+ * the client thread upon object instantiation and connect to the designated coordination server. To terminate
+ * the client, call {@linkplain #interrupt()}.
  * 
  * @author matsch, 2012
  */
@@ -157,8 +157,8 @@ public class CoordinatorClient extends Thread
 	}
 	
 	/**
-	 * Update the current activity and notify the server. This method will return immediately,
-	 * the server update will be performed by the client thread.
+	 * Update the current activity and notify the server. This method will return immediately, the server
+	 * update will be performed by the client thread.
 	 * 
 	 * @param label the new activity (class label), null for null-class
 	 */
@@ -188,9 +188,8 @@ public class CoordinatorClient extends Thread
 	}
 	
 	/**
-	 * Add a new listener, that will be notified about any user activity changes. The listeners
-	 * will be notified whenever an activity changes, but at most every 100 ms and at least every
-	 * 5000 ms.
+	 * Add a new listener, that will be notified about any user activity changes. The listeners will be
+	 * notified whenever an activity changes, but at most every 100 ms and at least every 5000 ms.
 	 * 
 	 * @param groupStateListener The listener to add.
 	 */
@@ -232,10 +231,8 @@ public class CoordinatorClient extends Thread
 			// open connection
 			mSocket = new Socket();
 			mSocket.connect(new InetSocketAddress(mHost, mPort), 5000);
-			mIn =
-				new BufferedReader(new InputStreamReader(mSocket.getInputStream(), NET_CHARSET));
-			mOut = new PrintWriter(
-				new OutputStreamWriter(mSocket.getOutputStream(), NET_CHARSET), true);
+			mIn = new BufferedReader(new InputStreamReader(mSocket.getInputStream(), NET_CHARSET));
+			mOut = new PrintWriter(new OutputStreamWriter(mSocket.getOutputStream(), NET_CHARSET), true);
 			
 			// send our client id to the server
 			mOut.println(mClientId);
@@ -273,8 +270,7 @@ public class CoordinatorClient extends Thread
 							if(e.getMessage() == null)
 								e.printStackTrace(System.out);
 							else
-								System.out.println(e.getClass().getSimpleName() + ": " +
-									e.getMessage());
+								System.out.println(e.getClass().getSimpleName() + ": " + e.getMessage());
 							interrupt();
 						}
 					}

@@ -3,20 +3,18 @@ package at.jku.pervasive.sd12.util;
 import java.util.ArrayList;
 
 /**
- * Parse text into several segments. Segments are separated by one of the separator characters
- * (e.g. ',' or ';'). Whitespace around segments will be removed. Segments can be enclosed in
- * quotes (e.g. "text"). Within a quoted segment it is possible to use separator characters and
- * whitespace at the beginning or end of the segment; a quote character within a quoted section
- * has to be escaped with backslash.
+ * Parse text into several segments. Segments are separated by one of the separator characters (e.g. ',' or
+ * ';'). Whitespace around segments will be removed. Segments can be enclosed in quotes (e.g. "text"). Within
+ * a quoted segment it is possible to use separator characters and whitespace at the beginning or end of the
+ * segment; a quote character within a quoted section has to be escaped with backslash.
  * <p>
  * Behavior of the parser is fully configurable:
  * <ul>
  * <li>Separator characters can be set; default is comma (",").
  * <li>Quotes can be changed; default is single and double quotes ('\'', '"').
  * <li>Whitespace at the beginning and end of segments can be truncated; on by default
- * <li>A parse error can either be thrown as {@link OptionFormatException} (e.g. when a quote is
- * never closed) or just ignored. If errors are ignored, the parser will continue as best as
- * possible.
+ * <li>A parse error can either be thrown as {@link OptionFormatException} (e.g. when a quote is never closed)
+ * or just ignored. If errors are ignored, the parser will continue as best as possible.
  * </ul>
  * 
  * @author Michael Matscheko, 2012
@@ -49,8 +47,8 @@ public class OptionParser
 		}
 		
 		/**
-		 * Create a new Quote descriptor. Escape sequences will be resolved and the quote
-		 * characters truncated.
+		 * Create a new Quote descriptor. Escape sequences will be resolved and the quote characters
+		 * truncated.
 		 * 
 		 * @param begin Character with which the quoted section begins.
 		 * @param end Character with which the quoted section ends.
@@ -185,8 +183,8 @@ public class OptionParser
 					i++;
 					while(i < len && mSource.charAt(i) != q.end)
 					{
-						if(q.resolveEscape && mSource.charAt(i) == '\\' && i < len - 1
-							&& (mSource.charAt(i + 1) == q.end || mSource.charAt(i + 1) == '\\'))
+						if(q.resolveEscape && mSource.charAt(i) == '\\' && i < len - 1 &&
+							(mSource.charAt(i + 1) == q.end || mSource.charAt(i + 1) == '\\'))
 						{
 							i++;
 						}
@@ -229,8 +227,8 @@ public class OptionParser
 				if(mWhiteSpaceIgnored)
 				{
 					// skip trailing whitespace after quote
-					while(i < len && separators.indexOf((int)mSource.charAt(i)) < 0
-						&& Character.isWhitespace(mSource.charAt(i)))
+					while(i < len && separators.indexOf((int)mSource.charAt(i)) < 0 &&
+						Character.isWhitespace(mSource.charAt(i)))
 					{
 						i++;
 					}
@@ -257,16 +255,15 @@ public class OptionParser
 	}
 	
 	/**
-	 * Split text by one or more separator characters in multiple parts. Parts may be quoted,
-	 * e.g. in double quotes, "first part" "second part". If a parse error occurs (e.g. a quote
-	 * is not closed) a {@link OptionFormatException} will be thrown.
+	 * Split text by one or more separator characters in multiple parts. Parts may be quoted, e.g. in double
+	 * quotes, "first part" "second part". If a parse error occurs (e.g. a quote is not closed) a
+	 * {@link OptionFormatException} will be thrown.
 	 * 
 	 * @param src Text to split
-	 * @param separators String with separator characters. Throws
-	 *        {@link IllegalArgumentException} if null.
+	 * @param separators String with separator characters. Throws {@link IllegalArgumentException} if null.
 	 * @param quotes List of allowed quotes. Throws {@link IllegalArgumentException} if null.
-	 * @return Separated text sections. Never null and never empty. Contains a single empty
-	 *         String ("") if src is null or empty.
+	 * @return Separated text sections. Never null and never empty. Contains a single empty String ("") if src
+	 *         is null or empty.
 	 */
 	public static String[] split(String src, String separators, Quote[] quotes)
 	{
@@ -294,16 +291,15 @@ public class OptionParser
 	}
 	
 	/**
-	 * Split text by one or more separator characters in multiple parts. Parts may be quoted,
-	 * e.g. in double quotes, "first part" "second part". Parse errors (e.g. a quote is not
-	 * closed) will be ignored and the method will try to continue in the most meaningful way.
+	 * Split text by one or more separator characters in multiple parts. Parts may be quoted, e.g. in double
+	 * quotes, "first part" "second part". Parse errors (e.g. a quote is not closed) will be ignored and the
+	 * method will try to continue in the most meaningful way.
 	 * 
 	 * @param src Text to split
-	 * @param separators String with separator characters. Throws
-	 *        {@link IllegalArgumentException} if null.
+	 * @param separators String with separator characters. Throws {@link IllegalArgumentException} if null.
 	 * @param quotes List of allowed quotes. Throws {@link IllegalArgumentException} if null.
-	 * @return Separated text sections. Never null and never empty. Contains a single empty
-	 *         String ("") if src is null or empty.
+	 * @return Separated text sections. Never null and never empty. Contains a single empty String ("") if src
+	 *         is null or empty.
 	 */
 	public static String[] splitYielding(String src, String separators, Quote[] quotes)
 	{
