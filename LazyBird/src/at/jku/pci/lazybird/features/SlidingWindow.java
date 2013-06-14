@@ -279,7 +279,7 @@ public class SlidingWindow<T extends Timestamped> implements Iterable<T>
 	 * @exception UnsupportedAttributeTypeException if the input data doesn't meet the requirements specified.
 	 */
 	public static void slide(Instances data, int windowSize, int jumpSize, WindowListener<Instance> listener)
-		throws UnsupportedAttributeTypeException
+			throws UnsupportedAttributeTypeException
 	{
 		if(data == null || listener == null)
 			throw new NullPointerException();

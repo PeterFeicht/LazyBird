@@ -112,9 +112,9 @@ public class LiveViewActivity extends Activity implements ActionBar.OnNavigation
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		// The first element is always for the global view
 		mViewUsers = new ArrayAdapter<String>(
-			actionBar.getThemedContext(),
-			android.R.layout.simple_list_item_1,
-			android.R.id.text1);
+				actionBar.getThemedContext(),
+				android.R.layout.simple_list_item_1,
+				android.R.id.text1);
 		mViewUsers.add(getString(R.string.globalView));
 		actionBar.setListNavigationCallbacks(mViewUsers, this);
 	}

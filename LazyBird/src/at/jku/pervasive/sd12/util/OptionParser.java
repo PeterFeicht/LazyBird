@@ -184,7 +184,7 @@ public class OptionParser
 					while(i < len && mSource.charAt(i) != q.end)
 					{
 						if(q.resolveEscape && mSource.charAt(i) == '\\' && i < len - 1 &&
-							(mSource.charAt(i + 1) == q.end || mSource.charAt(i + 1) == '\\'))
+								(mSource.charAt(i + 1) == q.end || mSource.charAt(i + 1) == '\\'))
 						{
 							i++;
 						}
@@ -228,7 +228,7 @@ public class OptionParser
 				{
 					// skip trailing whitespace after quote
 					while(i < len && separators.indexOf((int)mSource.charAt(i)) < 0 &&
-						Character.isWhitespace(mSource.charAt(i)))
+							Character.isWhitespace(mSource.charAt(i)))
 					{
 						i++;
 					}
