@@ -149,7 +149,7 @@ public class GuiClient extends Thread
 			mConnected = true;
 			
 			String line = null;
-			while(!interrupted())
+			while(!Thread.interrupted())
 			{
 				try
 				{

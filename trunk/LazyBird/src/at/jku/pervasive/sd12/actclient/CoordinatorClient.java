@@ -43,8 +43,8 @@ public class CoordinatorClient extends Thread
 		public UserState(String userId)
 		{
 			this.userId = userId;
-			this.updateAge = -1;
-			this.activity = null;
+			updateAge = -1;
+			activity = null;
 		}
 		
 		/**
@@ -246,7 +246,7 @@ public class CoordinatorClient extends Thread
 				public void run()
 				{
 					String line;
-					while(!interrupted())
+					while(!Thread.interrupted())
 					{
 						try
 						{
@@ -301,7 +301,7 @@ public class CoordinatorClient extends Thread
 			mInputThread.start();
 			
 			// send current activity to server until this thread is stopped
-			while(!interrupted())
+			while(!Thread.interrupted())
 			{
 				// wait for an activity change
 				lock.acquire();
@@ -343,7 +343,7 @@ public class CoordinatorClient extends Thread
 	public boolean isConnected()
 	{
 		if(mInputThread != null)
-			return this.isAlive() && mInputThread.isAlive();
-		return this.isAlive();
+			return isAlive() && mInputThread.isAlive();
+		return isAlive();
 	}
 }

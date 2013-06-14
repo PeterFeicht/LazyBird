@@ -152,7 +152,7 @@ public class OptionParser
 		int i = mPosition, len = mSource.length();
 		
 		// return one last empty element if last character in text is separator
-		if(len > 0 && i == len && separators.indexOf((int)mSource.charAt(i - 1)) >= 0)
+		if(len > 0 && i == len && separators.indexOf(mSource.charAt(i - 1)) >= 0)
 		{
 			mPosition++;
 			return "";
@@ -172,9 +172,8 @@ public class OptionParser
 		{
 			
 			boolean quotedOption = false;
-			for(int qi = 0; qi < mQuotes.length; qi++)
+			for(Quote q : mQuotes)
 			{
-				Quote q = mQuotes[qi];
 				if(mSource.charAt(i) == q.begin)
 				{
 					// find quoted section
@@ -206,7 +205,7 @@ public class OptionParser
 			if(!quotedOption)
 			{
 				// find normal section (no quotes)
-				while(i < len && separators.indexOf((int)mSource.charAt(i)) < 0)
+				while(i < len && separators.indexOf(mSource.charAt(i)) < 0)
 				{
 					result.append(mSource.charAt(i));
 					i++;
@@ -227,7 +226,7 @@ public class OptionParser
 				if(mWhiteSpaceIgnored)
 				{
 					// skip trailing whitespace after quote
-					while(i < len && separators.indexOf((int)mSource.charAt(i)) < 0 &&
+					while(i < len && separators.indexOf(mSource.charAt(i)) < 0 &&
 							Character.isWhitespace(mSource.charAt(i)))
 					{
 						i++;
@@ -236,7 +235,7 @@ public class OptionParser
 			}
 			
 			// if not at end of text, there has to follow a separator
-			if(i < len && separators.indexOf((int)mSource.charAt(i)) < 0)
+			if(i < len && separators.indexOf(mSource.charAt(i)) < 0)
 			{
 				if(!mFormatErrorsIgnored)
 					throw new OptionFormatException("separator expected");
@@ -282,12 +281,12 @@ public class OptionParser
 	
 	public static String[] split(String src, String separators)
 	{
-		return split(src, separators, DEFAULT_QUOTES);
+		return OptionParser.split(src, separators, DEFAULT_QUOTES);
 	}
 	
 	public static String[] split(String src)
 	{
-		return split(src, DEFAULT_SEPARATORS, DEFAULT_QUOTES);
+		return OptionParser.split(src, DEFAULT_SEPARATORS, DEFAULT_QUOTES);
 	}
 	
 	/**
@@ -319,11 +318,11 @@ public class OptionParser
 	
 	public static String[] splitYielding(String src, String separators)
 	{
-		return splitYielding(src, separators, DEFAULT_QUOTES);
+		return OptionParser.splitYielding(src, separators, DEFAULT_QUOTES);
 	}
 	
 	public static String[] splitYielding(String src)
 	{
-		return splitYielding(src, DEFAULT_SEPARATORS, DEFAULT_QUOTES);
+		return OptionParser.splitYielding(src, DEFAULT_SEPARATORS, DEFAULT_QUOTES);
 	}
 }
