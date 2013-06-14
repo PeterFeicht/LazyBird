@@ -47,8 +47,8 @@ public final class Storage
 	/**
 	 * Shared preference key: {@code String} {@value}
 	 * <p>
-	 * The number of instances the current classifier was trained with, to avoid deserializing
-	 * the whole {@code Instances} just to get the count.
+	 * The number of instances the current classifier was trained with, to avoid deserializing the whole
+	 * {@code Instances} just to get the count.
 	 */
 	public static final String KEY_TRAIN_INSTANCES = "numTrainInstances";
 	
@@ -62,8 +62,8 @@ public final class Storage
 	/**
 	 * Shared preference key: {@code String} {@value}
 	 * <p>
-	 * The type of the current classifier, stored to avoid deserialization when the classifier is
-	 * not actually needed.
+	 * The type of the current classifier, stored to avoid deserialization when the classifier is not actually
+	 * needed.
 	 */
 	public static final String KEY_CLASSIFIER_TYPE = "classifierType";
 	

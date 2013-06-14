@@ -16,11 +16,11 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * A {@link ListAdapter} with a queue that produces log-like element views and supports unbounded
- * addition of elements.
+ * A {@link ListAdapter} with a queue that produces log-like element views and supports unbounded addition of
+ * elements.
  * <p>
- * Note that the {@code Context} of this Adapter is not preserved when serializing it, you have
- * to call {@link #setContext(Context)} after deserialization to use it again.
+ * Note that the {@code Context} of this Adapter is not preserved when serializing it, you have to call
+ * {@link #setContext(Context)} after deserialization to use it again.
  * 
  * @author Peter
  */
@@ -39,8 +39,8 @@ public class LogListAdapter extends BaseAdapter implements Serializable
 	private DateFormat mDateFormat;
 	
 	/**
-	 * Initializes a new instance of the {@link LogListAdapter} class with the default minimum
-	 * capacity for the specified context.
+	 * Initializes a new instance of the {@link LogListAdapter} class with the default minimum capacity for
+	 * the specified context.
 	 * 
 	 * @param c the context for this adapter.
 	 */
@@ -50,8 +50,8 @@ public class LogListAdapter extends BaseAdapter implements Serializable
 	}
 	
 	/**
-	 * Initializes a new instance of the {@link LogListAdapter} class with the specified minimum
-	 * capacity for the specified context.
+	 * Initializes a new instance of the {@link LogListAdapter} class with the specified minimum capacity for
+	 * the specified context.
 	 * 
 	 * @param c the context for this adapter.
 	 * @param capacity the minimum capacity.
@@ -71,8 +71,8 @@ public class LogListAdapter extends BaseAdapter implements Serializable
 	}
 	
 	/**
-	 * Sets the context to use when creating views. This has to be called after deserialization
-	 * so the adapter can be used again.
+	 * Sets the context to use when creating views. This has to be called after deserialization so the adapter
+	 * can be used again.
 	 * 
 	 * @param c the new {@link Context}.
 	 * @exception NullPointerException if {@code c} is {@code null}.
@@ -126,13 +126,15 @@ public class LogListAdapter extends BaseAdapter implements Serializable
 	{
 		if(mContext == null)
 			return null;
-		LayoutInflater inflater =
-			(LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		
+		LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View v = inflater.inflate(R.layout.log_entry, parent, false);
+		
 		TextView time = (TextView)v.findViewById(R.id.logTime);
 		TextView msg = (TextView)v.findViewById(R.id.logMessage);
 		if(time == null || msg == null)
 			throw new InternalError("Layout of LogEntry corrupted!");
+		
 		time.setText(mDateFormat.format(mElements.get(position).mTime));
 		msg.setText(mElements.get(position).mMessage);
 		return v;
@@ -145,12 +147,12 @@ public class LogListAdapter extends BaseAdapter implements Serializable
 	}
 	
 	/**
-	 * Constructs a new {@link LogEntry} with the specified message and current time and adds it
-	 * to this adapter.
+	 * Constructs a new {@link LogEntry} with the specified message and current time and adds it to this
+	 * adapter.
 	 * 
 	 * @param msg the message for the log entry.
-	 * @return {@code true} if the number of elements has exceeded the initial capacity, you can
-	 *         use this to determine if the adapter should be trimmed, see {@link #trim()}.
+	 * @return {@code true} if the number of elements has exceeded the initial capacity, you can use this to
+	 *         determine if the adapter should be trimmed, see {@link #trim()}.
 	 */
 	public boolean add(String msg)
 	{
@@ -158,13 +160,12 @@ public class LogListAdapter extends BaseAdapter implements Serializable
 	}
 	
 	/**
-	 * Constructs a new {@link LogEntry} with the specified time and message and adds it to this
-	 * adapter.
+	 * Constructs a new {@link LogEntry} with the specified time and message and adds it to this adapter.
 	 * 
 	 * @param time the time for the log entry.
 	 * @param msg the message for the log entry.
-	 * @return {@code true} if the number of elements has exceeded the initial capacity, you can
-	 *         use this to determine if the adapter should be trimmed, see {@link #trim()}.
+	 * @return {@code true} if the number of elements has exceeded the initial capacity, you can use this to
+	 *         determine if the adapter should be trimmed, see {@link #trim()}.
 	 */
 	public boolean add(Date time, String msg)
 	{
@@ -175,8 +176,8 @@ public class LogListAdapter extends BaseAdapter implements Serializable
 	 * Adds the specified log entry to this adapter.
 	 * 
 	 * @param entry the {@link LogEntry} to add.
-	 * @return {@code true} if the number of elements has exceeded the initial capacity, you can
-	 *         use this to determine if the adapter should be trimmed, see {@link #trim()}.
+	 * @return {@code true} if the number of elements has exceeded the initial capacity, you can use this to
+	 *         determine if the adapter should be trimmed, see {@link #trim()}.
 	 */
 	public boolean add(LogEntry entry)
 	{
@@ -186,8 +187,8 @@ public class LogListAdapter extends BaseAdapter implements Serializable
 	}
 	
 	/**
-	 * Resizes the backing list of this adapter to the initial capacity, removing the oldest
-	 * elements (i.e. the ones inserted first).
+	 * Resizes the backing list of this adapter to the initial capacity, removing the oldest elements (i.e.
+	 * the ones inserted first).
 	 * 
 	 * @see #getInitialCapacity()
 	 */

@@ -23,8 +23,8 @@ public class LogEntry implements Comparable<LogEntry>, Serializable
 	public final String mMessage;
 	
 	/**
-	 * Initializes a new instance of the {@link LogEntry} class with the specified message and
-	 * the current time.
+	 * Initializes a new instance of the {@link LogEntry} class with the specified message and the current
+	 * time.
 	 * 
 	 * @param msg the log message.
 	 * @exception NullPointerException if {@code msg} is {@code null}.
@@ -35,8 +35,7 @@ public class LogEntry implements Comparable<LogEntry>, Serializable
 	}
 	
 	/**
-	 * Initializes a new instance of the {@link LogEntry} class with the specified time and
-	 * message.
+	 * Initializes a new instance of the {@link LogEntry} class with the specified time and message.
 	 * 
 	 * @param time the time.
 	 * @param msg the log message.

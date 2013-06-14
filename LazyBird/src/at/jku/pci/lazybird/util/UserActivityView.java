@@ -59,25 +59,25 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	 */
 	protected static final int BG_STROKE_WIDTH = 2;
 	/**
-	 * The offset, in dp, that the age bar is shifted to the bottom from the middle between text
-	 * and background drawable edge.
+	 * The offset, in dp, that the age bar is shifted to the bottom from the middle between text and
+	 * background drawable edge.
 	 */
 	protected static final int AGE_BAR_OFFSET = 2;
 	
 	// Static fields
 	/**
-	 * {@link Drawable} for the {@link UserRole#transition} role. We cannot use resource IDs here
-	 * since we need to keep the other compound drawables.
+	 * {@link Drawable} for the {@link UserRole#transition} role. We cannot use resource IDs here since we
+	 * need to keep the other compound drawables.
 	 */
 	protected static Drawable sRoleTransition = null;
 	/**
-	 * {@link Drawable} for the {@link UserRole#speaker} role. We cannot use resource IDs here
-	 * since we need to keep the other compound drawables.
+	 * {@link Drawable} for the {@link UserRole#speaker} role. We cannot use resource IDs here since we need
+	 * to keep the other compound drawables.
 	 */
 	protected static Drawable sRoleSpeaker = null;
 	/**
-	 * {@link Drawable} for the {@link UserRole#listener} role. We cannot use resource IDs here
-	 * since we need to keep the other compound drawables.
+	 * {@link Drawable} for the {@link UserRole#listener} role. We cannot use resource IDs here since we need
+	 * to keep the other compound drawables.
 	 */
 	protected static Drawable sRoleListener = null;
 	
@@ -102,9 +102,9 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	private GradientDrawable mAgeBar;
 	
 	/**
-	 * Sets the background color according to the activity of this view, using
-	 * {@link #getActivityColor()}, sets the visibility according to {@link #isOffline()} and
-	 * {@link #mShowOffline} and invalidates the view.
+	 * Sets the background color according to the activity of this view, using {@link #getActivityColor()},
+	 * sets the visibility according to {@link #isOffline()} and {@link #mShowOffline} and invalidates the
+	 * view.
 	 */
 	protected final Runnable mRunUpdateBackgroundColor = new Runnable() {
 		@Override
@@ -117,8 +117,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 		}
 	};
 	/**
-	 * Sets the left compound Drawable from {@link #getRoleDrawable()} without changing the other
-	 * ones.
+	 * Sets the left compound Drawable from {@link #getRoleDrawable()} without changing the other ones.
 	 */
 	protected final Runnable mRunUpdateRoleDrawable = new Runnable() {
 		@Override
@@ -156,8 +155,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 		
 		if(attrs != null)
 		{
-			final TypedArray a = getContext().obtainStyledAttributes(attrs,
-				R.styleable.UserActivityView, defStyle, 0);
+			final TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.UserActivityView, defStyle, 0);
 			final int count = a.getIndexCount();
 			for(int j = 0; j < count; j++)
 			{
@@ -186,8 +184,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 						{
 							mRole = UserRole.parse(role);
 							final Drawable[] cd = getCompoundDrawables();
-							setCompoundDrawablesWithIntrinsicBounds(getRoleDrawable(),
-								cd[1], cd[2], cd[3]);
+							setCompoundDrawablesWithIntrinsicBounds(getRoleDrawable(), cd[1], cd[2], cd[3]);
 						}
 						break;
 					case R.styleable.UserActivityView_ageBarHeight:
@@ -289,10 +286,8 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	protected void updateAgeBar()
 	{
 		mAgeBarLeft = getCompoundPaddingLeft() + mAgeBarPadding;
-		mAgeBarTop = getHeight() - getCompoundPaddingBottom() -
-			mAgeBarHeight - mAgeBarPadding + mAgeBarOffset;
-		mAgeBarWidth = getWidth() -
-			getCompoundPaddingLeft() - getCompoundPaddingRight() - 2 * mAgeBarPadding;
+		mAgeBarTop = getHeight() - getCompoundPaddingBottom() - mAgeBarHeight - mAgeBarPadding + mAgeBarOffset;
+		mAgeBarWidth = getWidth() - getCompoundPaddingLeft() - getCompoundPaddingRight() - 2 * mAgeBarPadding;
 		
 		mAgeBackground.setBounds(
 			mAgeBarLeft,
@@ -377,8 +372,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 				default:
 					if(sRoleTransition == null)
 					{
-						sRoleTransition =
-							getResources().getDrawable(R.drawable.role_transitional);
+						sRoleTransition = getResources().getDrawable(R.drawable.role_transitional);
 					}
 					role = sRoleTransition;
 			}
@@ -388,6 +382,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	
 	/**
 	 * Gets the age for this view.
+	 * 
 	 * @return The age in milliseconds.
 	 */
 	public long getAge()
@@ -440,8 +435,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	}
 	
 	/**
-	 * Sets the background color of this view. Note that it is safe to call this method from a
-	 * non-UI thread.
+	 * Sets the background color of this view. Note that it is safe to call this method from a non-UI thread.
 	 */
 	@Override
 	public void setBackgroundColor(int argb)
@@ -459,8 +453,8 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	}
 	
 	/**
-	 * Sets the activity class label for this view, updating the background color. Note that it
-	 * is safe to call this method from a non-UI thread.
+	 * Sets the activity class label for this view, updating the background color. Note that it is safe to
+	 * call this method from a non-UI thread.
 	 * 
 	 * @param activity the new {@link ClassLabel} for this view, or {@code null}.
 	 */
@@ -479,8 +473,8 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	}
 	
 	/**
-	 * Sets the role for this view, updating the role image. Note that it is safe to call this
-	 * method from a non-UI thread.
+	 * Sets the role for this view, updating the role image. Note that it is safe to call this method from a
+	 * non-UI thread.
 	 * 
 	 * @param role the new {@link UserRole} for this view, or {@code null}.
 	 */
@@ -491,8 +485,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	}
 	
 	/**
-	 * Gets the maximum age for this view, that is the age after which the view is considered
-	 * offline.
+	 * Gets the maximum age for this view, that is the age after which the view is considered offline.
 	 */
 	public long getMaxAge()
 	{
@@ -500,8 +493,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	}
 	
 	/**
-	 * Sets the maximum age for this view, that is the age after which the view is considered
-	 * offline.
+	 * Sets the maximum age for this view, that is the age after which the view is considered offline.
 	 * 
 	 * @param maxAge the maximum age, needs to be positive.
 	 */
@@ -519,8 +511,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	public void setAgeBarBackgroundColor(int argb)
 	{
 		mAgeBackground.setColor(argb);
-		postInvalidate(mAgeBarLeft, mAgeBarTop,
-			mAgeBarLeft + mAgeBarWidth, mAgeBarTop + mAgeBarHeight);
+		postInvalidate(mAgeBarLeft, mAgeBarTop, mAgeBarLeft + mAgeBarWidth, mAgeBarTop + mAgeBarHeight);
 	}
 	
 	/**
@@ -529,8 +520,7 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	public void setAgeBarForegroundColor(int argb)
 	{
 		mAgeBar.setColor(argb);
-		postInvalidate(mAgeBarLeft, mAgeBarTop,
-			mAgeBarLeft + mAgeBarWidth, mAgeBarTop + mAgeBarHeight);
+		postInvalidate(mAgeBarLeft, mAgeBarTop, mAgeBarLeft + mAgeBarWidth, mAgeBarTop + mAgeBarHeight);
 	}
 	
 	/**
@@ -572,14 +562,14 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	}
 	
 	/**
-	 * Compares this object to the specified object to determine their relative order,
-	 * considering their offline status and text. A view that is offline is considered larger
-	 * than an online view, so that offline views will be sorted after online views.
+	 * Compares this object to the specified object to determine their relative order, considering their
+	 * offline status and text. A view that is offline is considered larger than an online view, so that
+	 * offline views will be sorted after online views.
 	 * 
 	 * @param another the object to compare to this instance.
-	 * @return a negative integer if this instance is less than {@code another}; a positive
-	 *         integer if this instance is greater than {@code another}; 0 if this instance has
-	 *         the same order as {@code another}.
+	 * @return a negative integer if this instance is less than {@code another}; a positive integer if this
+	 *         instance is greater than {@code another}; 0 if this instance has the same order as
+	 *         {@code another}.
 	 */
 	@Override
 	public int compareTo(UserActivityView another)
@@ -592,13 +582,13 @@ public class UserActivityView extends TextView implements Comparable<UserActivit
 	}
 	
 	/**
-	 * Compares this object to the specified object to determine their relative order, only
-	 * considering their text.
+	 * Compares this object to the specified object to determine their relative order, only considering their
+	 * text.
 	 * 
 	 * @param another the object to compare to this instance.
-	 * @return a negative integer if this instance is less than {@code another}; a positive
-	 *         integer if this instance is greater than {@code another}; 0 if this instance has
-	 *         the same order as {@code another}.
+	 * @return a negative integer if this instance is less than {@code another}; a positive integer if this
+	 *         instance is greater than {@code another}; 0 if this instance has the same order as
+	 *         {@code another}.
 	 */
 	public int compareToText(UserActivityView another)
 	{
