@@ -147,6 +147,7 @@ public class ClassifierInfoActivity extends Activity
 					line = reader.readLine();
 				}
 				
+				reader.close();
 				mValidation = sb.toString();
 			}
 			catch(IOException ex)

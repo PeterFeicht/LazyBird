@@ -413,9 +413,18 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 				sb.append("\n");
 				line = r.readLine();
 			}
+			r.close();
 		}
 		catch(IOException ex)
 		{
+			try
+			{
+				r.close();
+			}
+			catch(IOException foo)
+			{
+				// Program failed to fail, what do we do now?
+			}
 			return null;
 		}
 		

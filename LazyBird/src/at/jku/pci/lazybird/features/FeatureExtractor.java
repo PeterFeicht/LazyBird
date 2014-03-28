@@ -235,9 +235,14 @@ public class FeatureExtractor
 			
 			// For static feature extraction, files need to have timestamp, class and coordinates
 			if(input.numAttributes() == 5)
+			{
 				input.setClassIndex(input.numAttributes() - 1);
+			}
 			else
+			{
+				reader.close();
 				throw new UnsupportedAttributeTypeException(f.toString());
+			}
 			
 			// Initialize output Instances object from data of the first file
 			if(mOutput == null)
@@ -250,6 +255,7 @@ public class FeatureExtractor
 			}
 			catch(UnsupportedAttributeTypeException ex)
 			{
+				reader.close();
 				throw new UnsupportedAttributeTypeException(f.toString());
 			}
 			
@@ -284,14 +290,20 @@ public class FeatureExtractor
 			}
 			
 			if(input.numAttributes() != mOutput.numAttributes())
+			{
+				reader.close();
 				throw new UnsupportedAttributeTypeException(f.toString());
+			}
 			
 			// Check if all input attributes are wanted
 			for(int j = 0; j < input.numAttributes() - 1; j++)
 			{
 				final Attribute a = input.attribute(j);
 				if(!a.isNumeric() || !inFeatures.contains(a.name()))
+				{
+					reader.close();
 					throw new UnsupportedAttributeTypeException(f.toString());
+				}
 			}
 			
 			// Simply add all instances to the output
