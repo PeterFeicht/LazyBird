@@ -889,7 +889,7 @@ public class TrainFragment extends AbstractTabFragment
 	 * @param e the {@link Evaluation} to summarize.
 	 * @return a summary string, or {@code null} in case of an error.
 	 */
-	public String getEvaluationSummary(Evaluation e)
+	public static String getEvaluationSummary(Evaluation e)
 	{
 		final StringBuilder sb = new StringBuilder();
 		
@@ -1087,9 +1087,9 @@ public class TrainFragment extends AbstractTabFragment
 					return null;
 				
 				// Serialize training data to internal storage
-				os = getActivity().openFileOutput(sTrainingFile, Context.MODE_PRIVATE);
+				os = new GZIPOutputStream(getActivity().openFileOutput(sTrainingFile, Context.MODE_PRIVATE));
 				final SerializedInstancesSaver saver = new SerializedInstancesSaver();
-				saver.setDestination(new GZIPOutputStream(os));
+				saver.setDestination(os);
 				saver.setInstances(fe.getOutput());
 				saver.writeBatch();
 				// writeBatch() closes the stream
