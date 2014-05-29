@@ -53,6 +53,7 @@ public class NumberPreference extends DialogPreference
 					break;
 			}
 		}
+		a.recycle();
 	}
 	
 	@Override
