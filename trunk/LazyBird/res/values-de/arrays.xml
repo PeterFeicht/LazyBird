@@ -29,4 +29,12 @@
         <item>standing</item>
     </string-array>
     
+    <!-- Train -->
+    
+    <string-array name="slidingWindowSizes">
+        <item>300</item>
+        <item>1000</item>
+        <item>3000</item>
+    </string-array>
+    
 </resources>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     
     <!-- Settings -->
     
@@ -9,13 +9,13 @@
         <item>Fast</item>
     </string-array>
     
-    <string-array name="update_speeds_values">
+    <string-array name="update_speeds_values" tools:ignore="MissingTranslation">
         <item>1500</item>
         <item>750</item>
         <item>300</item>
     </string-array>
     
-    <string-array name="max_num_values">
+    <string-array name="max_num_values" tools:ignore="MissingTranslation">
         <item>1000</item>
         <item>2000</item>
         <item>5000</item>
