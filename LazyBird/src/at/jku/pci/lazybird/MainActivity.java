@@ -433,6 +433,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 	
 	private class SectionsPagerAdapter extends FragmentPagerAdapter
 	{
+		private static final int TAB_COUNT = 3;
 		AbstractTabFragment[] mTabs;
 		
 		public SectionsPagerAdapter(FragmentManager fm)
@@ -440,7 +441,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 			super(fm);
 			
 			// Fill array with newly created Fragments, see instantiateItem
-			mTabs = new AbstractTabFragment[3];
+			mTabs = new AbstractTabFragment[TAB_COUNT];
 			mTabs[2] = new RecorderFragment();
 			mTabs[1] = new TrainFragment();
 			mTabs[0] = new ReportFragment();
@@ -449,7 +450,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		@Override
 		public Object instantiateItem(ViewGroup container, int position)
 		{
-			// When no cached Fragments is present, the super call returns the item returned by getItem. When
+			// When no cached Fragment is present, the super call returns the item returned by getItem. When
 			// a cached Fragment is present, this is returned and stored in the array to avoid working with
 			// the newly created but detached Fragments.
 			AbstractTabFragment tab = (AbstractTabFragment)super.instantiateItem(container, position);
@@ -466,7 +467,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 		@Override
 		public int getCount()
 		{
-			return 3;
+			return TAB_COUNT;
 		}
 		
 		@Override
